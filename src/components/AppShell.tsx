@@ -9,19 +9,6 @@ import { TrainRM } from '@/pages/TrainRM';
 import { RLLoop } from '@/pages/RLLoop';
 import { Evaluate } from '@/pages/Evaluate';
 
-function PageWrapper({ children }: { children: React.ReactNode }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 8 }}
-      transition={{ duration: 0.15, ease: 'easeOut' }}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
 export function AppShell() {
   const location = useLocation();
   const mainRef = useRef<HTMLDivElement>(null);
@@ -45,14 +32,23 @@ export function AppShell() {
             style={{ background: 'radial-gradient(ellipse, rgba(52,211,153,0.05) 0%, transparent 70%)' }} />
 
           <div className="relative z-10 p-7 max-w-[1300px] mx-auto w-full">
+            {/* ✅ Fix: motion.div keyed by pathname is the direct child of AnimatePresence */}
             <AnimatePresence mode="wait">
-              <Routes location={location} key={location.pathname}>
-                <Route path="/dashboard" element={<PageWrapper><Dashboard /></PageWrapper>} />
-                <Route path="/annotate" element={<PageWrapper><Annotate /></PageWrapper>} />
-                <Route path="/train-rm" element={<PageWrapper><TrainRM /></PageWrapper>} />
-                <Route path="/rl-loop" element={<PageWrapper><RLLoop /></PageWrapper>} />
-                <Route path="/evaluate" element={<PageWrapper><Evaluate /></PageWrapper>} />
-              </Routes>
+              <motion.div
+                key={location.pathname}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                transition={{ duration: 0.15, ease: 'easeOut' }}
+              >
+                <Routes location={location}>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/annotate" element={<Annotate />} />
+                  <Route path="/train-rm" element={<TrainRM />} />
+                  <Route path="/rl-loop" element={<RLLoop />} />
+                  <Route path="/evaluate" element={<Evaluate />} />
+                </Routes>
+              </motion.div>
             </AnimatePresence>
           </div>
         </main>

@@ -168,9 +168,16 @@ export function CopilotPanel() {
                   <div className="w-5 h-5 rounded shrink-0 mr-2 mt-0.5 flex items-center justify-center" style={{ background: 'rgba(56,189,248,0.1)' }}>
                     <LogoMark size={14} />
                   </div>
-                  <div className="max-w-[85%] p-3 text-[12px] leading-relaxed cursor-blink"
+                  <div className="max-w-[85%] p-3 text-[12px] leading-relaxed"
                     style={{ background: '#071020', border: '1px solid rgba(56,189,248,0.15)', borderRadius: '10px 10px 10px 2px', color: '#e2e8f0' }}>
                     {streamedText}
+                    {/* Blinking blue cursor */}
+                    <motion.span
+                      className="inline-block ml-0.5 w-[7px] h-[13px] rounded-[1px] align-text-bottom"
+                      style={{ background: '#38bdf8' }}
+                    animate={{ opacity: [1, 0, 1] }}
+                    transition={{ duration: 0.9, repeat: Infinity, ease: 'linear' }}
+                    />
                   </div>
                 </div>
               )}
