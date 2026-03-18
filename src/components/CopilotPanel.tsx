@@ -175,8 +175,8 @@ export function CopilotPanel() {
                     <motion.span
                       className="inline-block ml-0.5 w-[7px] h-[13px] rounded-[1px] align-text-bottom"
                       style={{ background: '#38bdf8' }}
-                      animate={{ opacity: [1, 0, 1] }}
-                      transition={{ duration: 0.9, repeat: Infinity, ease: 'steps(1)' }}
+                    animate={{ opacity: [1, 0, 1] }}
+                    transition={{ duration: 0.9, repeat: Infinity, ease: 'linear' }}
                     />
                   </div>
                 </div>
