@@ -1,5 +1,5 @@
-import { useNavigate, useLocation } from 'react-router-dom';
-import { LayoutGrid, MessageSquare, Cpu, RefreshCw, BarChart2, Sparkles, Settings } from 'lucide-react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { LayoutGrid, MessageSquare, Cpu, RefreshCw, BarChart2, Sparkles, Settings, Home } from 'lucide-react';
 import { LogoMark, Wordmark } from './Logo';
 import { useApp } from '@/context/AppContext';
 import { useState } from 'react';
@@ -31,8 +31,8 @@ export function Sidebar() {
         className="w-[220px] border-r flex flex-col shrink-0 bg-grid-sidebar relative z-20"
         style={{ background: '#000', borderColor: '#1a1a1a' }}
       >
-        {/* Logo */}
-        <div className="px-4 pt-5 pb-4" style={{ borderBottom: '1px solid #1a1a1a' }}>
+        {/* Logo — clickable, links to homepage */}
+        <Link to="/" className="px-4 pt-5 pb-4 cursor-pointer block" style={{ borderBottom: '1px solid #1a1a1a', textDecoration: 'none' }}>
           <div className="flex items-center gap-2.5">
             <LogoMark size={32} />
             <div>
@@ -42,7 +42,7 @@ export function Sidebar() {
               </div>
             </div>
           </div>
-        </div>
+        </Link>
 
         {/* Nav */}
         <nav className="flex-1 px-3 pt-4">
@@ -57,7 +57,7 @@ export function Sidebar() {
                 <button
                   key={item.id}
                   onClick={() => navigate(item.path)}
-                  className="w-full flex items-center justify-between px-2.5 py-2 rounded-r-md transition-all duration-150 group"
+                  className="w-full flex items-center justify-between px-2.5 py-2 rounded-r-md transition-all duration-150 group cursor-pointer"
                   style={{
                     background: isActive ? '#111' : 'transparent',
                     color: isActive ? '#fafafa' : '#404040',
@@ -84,7 +84,7 @@ export function Sidebar() {
           {/* Copilot */}
           <button
             onClick={() => setCopilotOpen(true)}
-            className="w-full mt-5 flex items-center gap-2.5 px-3 py-2.5 rounded-lg transition-all duration-150"
+            className="w-full mt-5 flex items-center gap-2.5 px-3 py-2.5 rounded-lg transition-all duration-150 cursor-pointer"
             style={{ background: 'rgba(56,189,248,0.06)', border: '1px solid rgba(56,189,248,0.2)', color: '#38bdf8' }}
           >
             <Sparkles size={15} />
@@ -94,6 +94,17 @@ export function Sidebar() {
 
         {/* Bottom */}
         <div className="p-3" style={{ borderTop: '1px solid #1a1a1a' }}>
+          {/* Home link */}
+          <Link to="/"
+            className="flex items-center gap-2 px-2.5 py-1.5 rounded-md mb-2 transition-colors text-[11px] font-mono cursor-pointer"
+            style={{ color: '#333', textDecoration: 'none' }}
+            onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#525252'}
+            onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#333'}
+          >
+            <Home size={11} />
+            ← Home
+          </Link>
+
           <div className="flex items-center gap-2.5 p-2 rounded-lg cursor-pointer transition-colors hover:bg-surface3">
             <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
               style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#a3a3a3' }}>
@@ -105,14 +116,14 @@ export function Sidebar() {
             </div>
             <button
               onClick={() => setSettingsOpen(true)}
-              className="transition-colors"
+              className="transition-colors cursor-pointer"
               style={{ color: '#525252' }}
             >
               <Settings size={13} />
             </button>
           </div>
           <button
-            className="w-full mt-2 py-1.5 rounded-lg text-xs font-bold transition-all"
+            className="w-full mt-2 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer"
             style={{ border: '1px solid #1a1a1a', color: '#38bdf8', background: 'transparent' }}
           >
             Upgrade to Pro

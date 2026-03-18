@@ -4,10 +4,12 @@ import { Download, Search } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useApp } from '@/context/AppContext';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 function useCountUp(target: number, duration = 800) {
   const [value, setValue] = useState(0);
-  useState(() => {
+  useEffect(() => {
+    if (target === 0) { setValue(0); return; }
     let start = 0;
     const step = target / (duration / 16);
     const timer = setInterval(() => {
@@ -16,14 +18,14 @@ function useCountUp(target: number, duration = 800) {
       if (start >= target) clearInterval(timer);
     }, 16);
     return () => clearInterval(timer);
-  });
+  }, [target, duration]);
   return value;
 }
 
 const MOCK_CHART = Array.from({ length: 25 }, (_, i) => ({
   step: i * 20,
-  PPO: +(0.4 + i * 0.11 + (Math.random() - 0.5) * 0.15).toFixed(3),
-  GRPO: +(0.35 + i * 0.13 + (Math.random() - 0.5) * 0.18).toFixed(3),
+  PPO: +(0.4 + i * 0.11 + (Math.sin(i) * 0.08)).toFixed(3),
+  GRPO: +(0.35 + i * 0.13 + (Math.cos(i) * 0.1)).toFixed(3),
 }));
 
 export function Evaluate() {
@@ -46,11 +48,18 @@ export function Evaluate() {
     return matchSearch;
   });
 
+  const bestRewardTarget = bestRun ? Math.round(bestRun.finalReward * 1000) : 0;
+  const bestRewardCount = useCountUp(bestRewardTarget);
+  const rmAccTarget = rewardModels[0] ? Math.round(rewardModels[0].accuracy * 1000) : 0;
+  const rmAccCount = useCountUp(rmAccTarget);
+  const stepsTarget = bestRun?.maxSteps ?? 0;
+  const stepsCount = useCountUp(stepsTarget);
+
   const metrics = [
-    { label: 'Best Reward', value: bestRun?.finalReward.toFixed(3) ?? '—', color: '#38bdf8' },
-    { label: 'KL Divergence', value: bestRun?.klDivergence.toFixed(4) ?? '—', color: '#34d399' },
-    { label: 'RM Accuracy', value: rewardModels[0] ? `${(rewardModels[0].accuracy * 100).toFixed(1)}%` : '—', color: '#f472b6' },
-    { label: 'Total Steps', value: bestRun?.maxSteps.toString() ?? '—', color: '#a78bfa' },
+    { label: 'Best Reward', rawValue: bestRun?.finalReward, displayValue: bestRun ? (bestRewardCount / 1000).toFixed(3) : '—', color: '#38bdf8' },
+    { label: 'KL Divergence', rawValue: bestRun?.klDivergence, displayValue: bestRun?.klDivergence.toFixed(4) ?? '—', color: '#34d399' },
+    { label: 'RM Accuracy', rawValue: rewardModels[0]?.accuracy, displayValue: rewardModels[0] ? `${(rmAccCount / 10).toFixed(1)}%` : '—', color: '#f472b6' },
+    { label: 'Total Steps', rawValue: bestRun?.maxSteps, displayValue: bestRun ? stepsCount.toString() : '—', color: '#a78bfa' },
   ];
 
   const handleExport = () => {
@@ -59,11 +68,11 @@ export function Evaluate() {
   };
 
   const DIFF_ROWS = [
-    { label: 'Final Reward', key: 'finalReward', better: 'higher' },
-    { label: 'KL Divergence', key: 'klDivergence', better: 'lower' },
-    { label: 'Max Steps', key: 'maxSteps', better: null },
-    { label: 'Algorithm', key: 'algorithm', better: null },
-  ] as const;
+    { label: 'Final Reward', key: 'finalReward' as const, better: 'higher' as const },
+    { label: 'KL Divergence', key: 'klDivergence' as const, better: 'lower' as const },
+    { label: 'Max Steps', key: 'maxSteps' as const, better: null },
+    { label: 'Algorithm', key: 'algorithm' as const, better: null },
+  ];
 
   return (
     <div className="space-y-7">
@@ -78,63 +87,108 @@ export function Evaluate() {
       <div className="grid grid-cols-4 gap-4">
         {metrics.map((m, i) => (
           <motion.div key={m.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
-            className="relative p-4 rounded-xl overflow-hidden" style={{ background: '#0a0a0a', border: '1px solid #1a1a1a' }}>
+            className="relative p-4 rounded-xl overflow-hidden transition-all duration-150 cursor-default"
+            style={{ background: '#0a0a0a', border: '1px solid #1a1a1a' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#2a2a2a'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#1a1a1a'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}>
             <div className="absolute top-0 left-0 right-0 h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent)' }} />
             <div className="font-mono text-[9px] uppercase tracking-widest mb-2" style={{ color: '#525252' }}>{m.label}</div>
-            <div className="font-syne font-extrabold text-2xl" style={{ color: m.color }}>{m.value}</div>
+            <div className="font-syne font-extrabold text-2xl" style={{ color: m.color }}>{m.displayValue}</div>
           </motion.div>
         ))}
       </div>
 
-      {/* Run comparison */}
+      {/* Run comparison — defaults to split view */}
       {rlRuns.length >= 2 ? (
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
           className="rounded-xl overflow-hidden" style={{ border: '1px solid #1a1a1a' }}>
           <div className="flex items-center justify-between px-5 py-3" style={{ background: '#0a0a0a', borderBottom: '1px solid #1a1a1a' }}>
             <h3 className="font-syne font-bold text-sm text-[#fafafa]">Run Comparison</h3>
             <div className="flex gap-2">
-              {['Split view', 'Unified'].map(v => (
-                <button key={v} onClick={() => setSplitView(v === 'Split view')}
-                  className="px-3 py-1 rounded-full font-mono text-[10px] transition-all"
-                  style={{ background: (splitView && v === 'Split view') || (!splitView && v === 'Unified') ? 'rgba(56,189,248,0.1)' : 'transparent', border: `1px solid ${(splitView && v === 'Split view') || (!splitView && v === 'Unified') ? 'rgba(56,189,248,0.4)' : '#1a1a1a'}`, color: (splitView && v === 'Split view') || (!splitView && v === 'Unified') ? '#38bdf8' : '#525252' }}>
-                  {v}
-                </button>
-              ))}
+              {['Split view', 'Unified'].map(v => {
+                const active = (splitView && v === 'Split view') || (!splitView && v === 'Unified');
+                return (
+                  <button key={v} onClick={() => setSplitView(v === 'Split view')}
+                    className="px-3 py-1 rounded-full font-mono text-[10px] transition-all"
+                    style={{ background: active ? 'rgba(56,189,248,0.1)' : 'transparent', border: `1px solid ${active ? 'rgba(56,189,248,0.4)' : '#1a1a1a'}`, color: active ? '#38bdf8' : '#525252' }}>
+                    {v}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <div className="grid grid-cols-2">
-            {[run1, run2].map((run, col) => {
-              const other = col === 0 ? run2 : run1;
-              const headerColor = col === 0 ? '#f472b6' : '#38bdf8';
-              return (
-                <div key={run.id} style={{ borderRight: col === 0 ? '1px solid #1a1a1a' : 'none' }}>
-                  <div className="px-4 py-2.5 font-mono text-[10px] font-bold" style={{ background: `${headerColor}10`, borderBottom: '1px solid #1a1a1a', color: headerColor }}>
-                    {run.id} · {run.algorithm} {bestRun?.id === run.id ? '★' : ''}
+          {/* GitHub-style diff — green = better, red = worse */}
+          {splitView ? (
+            <div className="grid grid-cols-2">
+              {([run1, run2] as const).map((run, col) => {
+                const other = col === 0 ? run2 : run1;
+                const headerColor = col === 0 ? '#f472b6' : '#38bdf8';
+                return (
+                  <div key={run.id} style={{ borderRight: col === 0 ? '1px solid #1a1a1a' : 'none' }}>
+                    <div className="px-4 py-2.5 font-mono text-[10px] font-bold" style={{ background: `${headerColor}10`, borderBottom: '1px solid #1a1a1a', color: headerColor }}>
+                      {run.id} · {run.algorithm} {bestRun?.id === run.id ? '★ Best' : ''}
+                    </div>
+                    {DIFF_ROWS.map(row => {
+                      const val = run[row.key];
+                      const otherVal = other[row.key];
+                      let highlight: 'better' | 'worse' | null = null;
+                      if (row.better === 'higher' && typeof val === 'number' && typeof otherVal === 'number') {
+                        highlight = val > otherVal ? 'better' : val < otherVal ? 'worse' : null;
+                      } else if (row.better === 'lower' && typeof val === 'number' && typeof otherVal === 'number') {
+                        highlight = val < otherVal ? 'better' : val > otherVal ? 'worse' : null;
+                      }
+                      const bgColor = highlight === 'better' ? 'rgba(52,211,153,0.08)' : highlight === 'worse' ? 'rgba(244,63,94,0.08)' : 'transparent';
+                      const borderLeftColor = highlight === 'better' ? '#34d399' : highlight === 'worse' ? '#f43f5e' : 'transparent';
+                      const textColor = highlight === 'better' ? '#34d399' : highlight === 'worse' ? '#f87171' : '#a3a3a3';
+                      return (
+                        <div key={row.label} className="flex items-center gap-3 px-4 py-3.5 transition-colors"
+                          style={{ background: bgColor, borderBottom: '1px solid #0f0f0f', borderLeft: `3px solid ${borderLeftColor}` }}>
+                          <span className="font-mono text-[10px] w-28 shrink-0" style={{ color: '#525252' }}>{row.label}</span>
+                          <span className="font-mono text-[11px] font-bold" style={{ color: textColor }}>
+                            {typeof val === 'number' ? (row.key === 'klDivergence' ? val.toFixed(4) : row.key === 'maxSteps' ? val.toString() : val.toFixed(3)) : val}
+                          </span>
+                          {highlight === 'better' && <span className="ml-auto font-mono text-[9px]" style={{ color: '#34d399' }}>▲ Better</span>}
+                          {highlight === 'worse' && <span className="ml-auto font-mono text-[9px]" style={{ color: '#f87171' }}>▼ Worse</span>}
+                        </div>
+                      );
+                    })}
                   </div>
-                  {DIFF_ROWS.map(row => {
-                    const val = run[row.key];
-                    const otherVal = other[row.key];
-                    let highlight: 'better' | 'worse' | null = null;
-                    if (row.better === 'higher' && typeof val === 'number' && typeof otherVal === 'number') {
-                      highlight = val > otherVal ? 'better' : val < otherVal ? 'worse' : null;
-                    } else if (row.better === 'lower' && typeof val === 'number' && typeof otherVal === 'number') {
-                      highlight = val < otherVal ? 'better' : val > otherVal ? 'worse' : null;
-                    }
-                    return (
-                      <div key={row.label} className="flex items-center gap-3 px-4 py-3"
-                        style={{ background: highlight === 'better' ? 'rgba(52,211,153,0.07)' : highlight === 'worse' ? 'rgba(244,63,94,0.07)' : 'transparent', borderBottom: '1px solid #0f0f0f', borderLeft: highlight === 'better' ? '2px solid #34d399' : highlight === 'worse' ? '2px solid #f43f5e' : '2px solid transparent' }}>
-                        <span className="font-mono text-[10px] w-28 shrink-0" style={{ color: '#525252' }}>{row.label}</span>
-                        <span className="font-mono text-[11px] font-bold" style={{ color: highlight === 'better' ? '#34d399' : highlight === 'worse' ? '#f87171' : '#a3a3a3' }}>
-                          {typeof val === 'number' ? val.toFixed(4) : val}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          ) : (
+            /* Unified view */
+            <div>
+              <div className="grid grid-cols-5 px-4 py-2 font-mono text-[9px] uppercase tracking-widest" style={{ background: '#0a0a0a', borderBottom: '1px solid #1a1a1a', color: '#525252' }}>
+                <span>Metric</span>
+                <span style={{ color: '#f472b6' }}>{run1.id}</span>
+                <span style={{ color: '#38bdf8' }}>{run2.id}</span>
+                <span>Delta</span>
+                <span>Winner</span>
+              </div>
+              {DIFF_ROWS.map(row => {
+                const v1 = run1[row.key];
+                const v2 = run2[row.key];
+                let winner: string | null = null;
+                let delta = '';
+                if (row.better && typeof v1 === 'number' && typeof v2 === 'number') {
+                  const diff = v2 - v1;
+                  delta = (diff > 0 ? '+' : '') + diff.toFixed(4);
+                  winner = row.better === 'higher' ? (v1 > v2 ? run1.id : run2.id) : (v1 < v2 ? run1.id : run2.id);
+                }
+                return (
+                  <div key={row.label} className="grid grid-cols-5 px-4 py-3" style={{ borderBottom: '1px solid #0f0f0f' }}>
+                    <span className="font-mono text-[10px]" style={{ color: '#525252' }}>{row.label}</span>
+                    <span className="font-mono text-[11px]" style={{ color: '#f472b6' }}>{typeof v1 === 'number' ? v1.toFixed(3) : v1}</span>
+                    <span className="font-mono text-[11px]" style={{ color: '#38bdf8' }}>{typeof v2 === 'number' ? v2.toFixed(3) : v2}</span>
+                    <span className="font-mono text-[10px]" style={{ color: delta.startsWith('+') ? '#34d399' : delta.startsWith('-') ? '#f87171' : '#525252' }}>{delta || '—'}</span>
+                    <span className="font-mono text-[10px]" style={{ color: '#a3a3a3' }}>{winner || '—'}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           {/* Overlay chart */}
           <div className="p-5" style={{ borderTop: '1px solid #1a1a1a' }}>
@@ -146,13 +200,13 @@ export function Evaluate() {
                   <XAxis dataKey="step" stroke="#333" fontSize={9} tick={{ fill: '#333' }} fontFamily="Space Mono" />
                   <YAxis stroke="#333" fontSize={9} tick={{ fill: '#333' }} fontFamily="Space Mono" />
                   <Tooltip contentStyle={{ background: '#0a0a0a', border: '1px solid #1a1a1a', fontSize: 10, fontFamily: 'Space Mono' }} />
-                  <Line type="monotone" dataKey="PPO" stroke="#38bdf8" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="GRPO" stroke="#f472b6" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="PPO" stroke="#38bdf8" strokeWidth={2} dot={false} isAnimationActive={false} />
+                  <Line type="monotone" dataKey="GRPO" stroke="#f472b6" strokeWidth={2} dot={false} isAnimationActive={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
             <div className="flex items-center gap-4 mt-3">
-              {[{ label: run1.id, color: '#38bdf8' }, { label: run2.id, color: '#f472b6' }].map(l => (
+              {[{ label: run1.id, color: '#f472b6' }, { label: run2.id, color: '#38bdf8' }].map(l => (
                 <div key={l.label} className="flex items-center gap-1.5">
                   <div className="w-3 h-0.5 rounded" style={{ background: l.color }} />
                   <span className="font-mono text-[9px]" style={{ color: '#525252' }}>{l.label}</span>
@@ -239,7 +293,8 @@ export function Evaluate() {
 
       {/* Export panel */}
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-        className="p-5 rounded-xl space-y-4" style={{ background: '#0a0a0a', border: '1px solid #1a1a1a' }}>
+        className="relative p-5 rounded-xl space-y-4 overflow-hidden" style={{ background: '#0a0a0a', border: '1px solid #1a1a1a' }}>
+        <div className="absolute top-0 left-0 right-0 h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent)' }} />
         <h3 className="font-syne font-bold text-sm text-[#fafafa]">Export Model</h3>
         <div className="grid grid-cols-3 gap-4">
           <div>
@@ -268,8 +323,8 @@ export function Evaluate() {
           </div>
         </div>
         <button onClick={handleExport}
-          className="w-full py-3 rounded-full font-syne font-bold text-sm flex items-center justify-center gap-2 transition-opacity hover:opacity-90"
-          style={{ background: '#fafafa', color: '#000' }}>
+          className="w-full py-3 rounded-full font-syne font-bold text-sm flex items-center justify-center gap-2 transition-opacity hover:opacity-90 cursor-pointer"
+          style={{ background: '#fafafa', color: '#000', borderRadius: '9999px' }}>
           <Download size={15} /> Export Model →
         </button>
       </motion.div>
