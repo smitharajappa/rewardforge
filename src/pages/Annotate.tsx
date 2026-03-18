@@ -407,7 +407,7 @@ function RateTab() {
                     </td>
                     {['helpfulness', 'accuracy', 'safety', 'coherence', 'creativity'].map(k => (
                       <td key={k} className="px-3 py-2 font-mono text-[10px]" style={{ color: '#525252' }}>
-                        {(r as Record<string, number>)[k].toFixed(1)}
+                        {(r as unknown as Record<string, number>)[k].toFixed(1)}
                       </td>
                     ))}
                     <td className="px-3 py-2 font-mono font-bold text-[10px]" style={{ color }}>{r.overall.toFixed(1)}</td>

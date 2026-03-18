@@ -310,7 +310,7 @@ export function TrainRM() {
                             className="inline-block ml-0.5 w-[7px] h-[12px] rounded-[1px]"
                             style={{ background: '#34d399', display: 'inline-block' }}
                             animate={{ opacity: [1, 0, 1] }}
-                            transition={{ duration: 1, repeat: Infinity, ease: 'steps(1)' }}
+                            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                           />
                         )}
                       </motion.div>
