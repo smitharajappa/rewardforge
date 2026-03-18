@@ -8,9 +8,7 @@ export default {
     container: {
       center: true,
       padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
+      screens: { "2xl": "1400px" },
     },
     extend: {
       colors: {
@@ -22,6 +20,8 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          dim: "rgba(56,189,248,0.12)",
+          border: "rgba(56,189,248,0.25)",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -38,6 +38,10 @@ export default {
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
+          pink: "#f472b6",
+          green: "#34d399",
+          purple: "#a78bfa",
+          amber: "#f59e0b",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -57,6 +61,22 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Brand surfaces
+        surface: "#0a0a0a",
+        surface2: "#0d0d0d",
+        surface3: "#111111",
+        "brand-border": "#1a1a1a",
+        "brand-border-hover": "#2a2a2a",
+        "brand-border-active": "#3a3a3a",
+        "text-primary": "#fafafa",
+        "text-secondary": "#a3a3a3",
+        "text-muted": "#525252",
+        "text-dim": "#333333",
+        "sky": "#38bdf8",
+      },
+      fontFamily: {
+        syne: ["Syne", "sans-serif"],
+        mono: ["Space Mono", "monospace"],
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -65,25 +85,32 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        shimmer: {
+          "0%": { backgroundPosition: "200% 0" },
+          "100%": { backgroundPosition: "-200% 0" },
+        },
+        "pulse-slow": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.5" },
+        },
+        blink: {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        shimmer: "shimmer 1.5s infinite",
+        "pulse-slow": "pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        blink: "blink 1s step-end infinite",
       },
     },
   },
