@@ -120,50 +120,54 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const addComparison = useCallback((c: Comparison) => {
     setComparisons(prev => [c, ...prev]);
-    setActivityLog(prev => [{
+    const item: ActivityItem = {
       id: crypto.randomUUID(),
       type: 'comparison',
       message: `Comparison saved — preferred `,
       value: `Response ${c.preferred}`,
       valueColor: c.preferred === 'A' ? '#38bdf8' : c.preferred === 'B' ? '#f472b6' : '#a3a3a3',
       timestamp: new Date(),
-    }, ...prev].slice(0, 50));
+    };
+    setActivityLog(prev => [item, ...prev].slice(0, 50));
   }, []);
 
   const addRating = useCallback((r: Rating) => {
     setRatings(prev => [r, ...prev]);
-    setActivityLog(prev => [{
+    const item: ActivityItem = {
       id: crypto.randomUUID(),
       type: 'rating',
       message: `Rating submitted — score `,
       value: `${r.overall.toFixed(1)}/10`,
       valueColor: r.overall >= 8 ? '#34d399' : r.overall >= 5 ? '#38bdf8' : '#f472b6',
       timestamp: new Date(),
-    }, ...prev].slice(0, 50));
+    };
+    setActivityLog(prev => [item, ...prev].slice(0, 50));
   }, []);
 
   const addRewardModel = useCallback((rm: RewardModel) => {
     setRewardModels(prev => [rm, ...prev]);
-    setActivityLog(prev => [{
+    const item: ActivityItem = {
       id: crypto.randomUUID(),
       type: 'training',
       message: `Model trained — `,
       value: `${rm.name} · ${(rm.accuracy * 100).toFixed(1)}% acc`,
       valueColor: '#34d399',
       timestamp: new Date(),
-    }, ...prev].slice(0, 50));
+    };
+    setActivityLog(prev => [item, ...prev].slice(0, 50));
   }, []);
 
   const addRlRun = useCallback((run: RLRun) => {
     setRlRuns(prev => [run, ...prev]);
-    setActivityLog(prev => [{
+    const item: ActivityItem = {
       id: crypto.randomUUID(),
       type: 'rl_run',
       message: `${run.algorithm} run complete — reward `,
       value: run.finalReward.toFixed(3),
       valueColor: '#a78bfa',
       timestamp: new Date(),
-    }, ...prev].slice(0, 50));
+    };
+    setActivityLog(prev => [item, ...prev].slice(0, 50));
   }, []);
 
   const addActivity = useCallback((a: Omit<ActivityItem, 'id' | 'timestamp'>) => {
