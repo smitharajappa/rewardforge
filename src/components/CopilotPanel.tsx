@@ -182,14 +182,16 @@ export function CopilotPanel() {
                 </div>
               )}
 
-              {/* Suggestions (only when just the welcome message) */}
-              {copilotHistory.length === 1 && !isThinking && !isStreaming && (
+              {/* Suggestions — shown when only the welcome message exists */}
+              {copilotHistory.length <= 1 && !isThinking && !isStreaming && (
                 <div className="space-y-2 mt-2">
-                  <p className="font-mono text-[9px] text-[#333] uppercase tracking-widest">Suggested</p>
+                  <p className="font-mono text-[9px] text-[#333] uppercase tracking-widest">Suggested prompts</p>
                   {SUGGESTIONS.map((s, i) => (
                     <button key={i} onClick={() => handleSend(s)}
-                      className="w-full text-left px-3 py-2 rounded-lg text-xs transition-all"
-                      style={{ background: '#0a0a0a', border: '1px solid #1a1a1a', color: '#a3a3a3' }}>
+                      className="w-full text-left px-3 py-2 rounded-lg text-xs transition-all cursor-pointer"
+                      style={{ background: '#0a0a0a', border: '1px solid #1a1a1a', color: '#a3a3a3' }}
+                      onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = '#38bdf8'}
+                      onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = '#1a1a1a'}>
                       {s}
                     </button>
                   ))}

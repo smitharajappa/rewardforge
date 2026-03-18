@@ -213,18 +213,24 @@ export function RLLoop() {
       {/* Live run */}
       {isRunning && (
         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-          {/* Live metrics */}
+          {/* Live metrics — pulsing amber border while running */}
           <div className="grid grid-cols-4 gap-4">
             {[
               { label: 'MEAN REWARD', value: liveMetrics.reward.toFixed(4), color: '#38bdf8' },
               { label: 'STD DEV', value: liveMetrics.std.toFixed(4), color: '#f472b6' },
               { label: 'KL DIV', value: liveMetrics.kl.toFixed(4), color: '#34d399' },
-              { label: 'STEPS', value: currentStep.toString(), color: '#525252' },
+              { label: 'STEPS', value: currentStep.toString(), color: '#f59e0b' },
             ].map(m => (
-              <div key={m.label} className="p-3 rounded-xl" style={{ background: '#0a0a0a', border: `1px solid ${m.color}30` }}>
+              <motion.div key={m.label}
+                className="relative p-3 rounded-xl overflow-hidden"
+                style={{ background: '#0a0a0a', border: `1px solid rgba(245,158,11,0.4)` }}
+                animate={{ borderColor: ['rgba(245,158,11,0.4)', 'rgba(245,158,11,0.8)', 'rgba(245,158,11,0.4)'] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <div className="absolute top-0 left-0 right-0 h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, rgba(245,158,11,0.2), transparent)' }} />
                 <div className="font-mono text-[9px] mb-1.5 uppercase tracking-widest" style={{ color: '#525252' }}>{m.label}</div>
                 <div className="font-syne font-extrabold text-xl" style={{ color: m.color }}>{m.value}</div>
-              </div>
+              </motion.div>
             ))}
           </div>
 
