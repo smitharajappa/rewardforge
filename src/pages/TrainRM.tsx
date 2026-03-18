@@ -285,18 +285,38 @@ export function TrainRM() {
               </div>
             </div>
 
-            {/* Training log */}
+            {/* Training log — animated line-by-line */}
             <div className="p-4 rounded-xl flex flex-col" style={{ background: '#0a0a0a', border: '1px solid #1a1a1a' }}>
               <div className="flex items-center gap-1.5 mb-3">
                 {['#f43f5e', '#f59e0b', '#34d399'].map(c => <div key={c} className="w-2 h-2 rounded-full" style={{ background: c }} />)}
                 <span className="font-mono text-[9px] ml-1" style={{ color: '#333' }}>training.log</span>
               </div>
               <div ref={logRef} className="flex-1 overflow-y-auto h-[140px] space-y-0.5">
-                {logLines.map((line, i) => (
-                  <div key={i} className={`font-mono text-[10px] leading-relaxed ${i === logLines.length - 1 ? 'cursor-blink' : ''}`} style={{ color: '#34d399' }}>
-                    {line}
-                  </div>
-                ))}
+                <AnimatePresence initial={false}>
+                  {logLines.map((line, i) => {
+                    const isLast = i === logLines.length - 1;
+                    return (
+                      <motion.div
+                        key={`log-${i}`}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.2, ease: 'easeOut' }}
+                        className="font-mono text-[10px] leading-relaxed flex items-center gap-0"
+                        style={{ color: '#34d399' }}
+                      >
+                        <span>{line}</span>
+                        {isLast && isTraining && (
+                          <motion.span
+                            className="inline-block ml-0.5 w-[7px] h-[12px] rounded-[1px]"
+                            style={{ background: '#34d399', display: 'inline-block' }}
+                            animate={{ opacity: [1, 0, 1] }}
+                            transition={{ duration: 1, repeat: Infinity, ease: 'steps(1)' }}
+                          />
+                        )}
+                      </motion.div>
+                    );
+                  })}
+                </AnimatePresence>
               </div>
             </div>
           </div>
