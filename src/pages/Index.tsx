@@ -1,7 +1,9 @@
+import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { LogoMark, Wordmark } from '@/components/Logo';
-import { ArrowRight, MessageSquare, Cpu, RefreshCw, Sparkles, Package, Bot } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { ArrowRight, MessageSquare, Cpu, RefreshCw, Sparkles, Package, Bot, ChevronDown } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useApp } from '@/context/AppContext';
 
 const FEATURES = [
   { icon: MessageSquare, color: '#38bdf8', title: 'Pairwise Annotation', desc: 'Compare AI response pairs with keyboard shortcuts. Collect human preference data in under 60 seconds.' },
@@ -14,29 +16,142 @@ const FEATURES = [
 
 const MODELS = ['LLaMA 3', 'Mistral 7B', 'Gemma', 'Falcon', 'Qwen'];
 
+const PRODUCT_ITEMS = [
+  { label: 'Annotation Interface', path: '/annotate' },
+  { label: 'Reward Model Training', path: '/train-rm' },
+  { label: 'RL Fine-Tuning', path: '/rl-loop' },
+  { label: 'Evaluation & Export', path: '/evaluate' },
+];
+
 export default function HomePage() {
   const navigate = useNavigate();
+  const { addToast } = useApp();
+  const [productOpen, setProductOpen] = useState(false);
+  const [signInOpen, setSignInOpen] = useState(false);
+  const productRef = useRef<HTMLDivElement>(null);
+  const signInRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (productRef.current && !productRef.current.contains(e.target as Node)) setProductOpen(false);
+      if (signInRef.current && !signInRef.current.contains(e.target as Node)) setSignInOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const handleAuthToast = () => {
+    addToast({ type: 'info', message: 'Google auth launching soon — join waitlist at rewardforge.ai' });
+    setSignInOpen(false);
+  };
 
   return (
     <div className="min-h-screen" style={{ background: '#000', color: '#fafafa', fontFamily: 'Syne, sans-serif' }}>
       {/* Navbar */}
       <header className="sticky top-0 z-50 flex items-center justify-between px-6 h-12"
         style={{ background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #1a1a1a' }}>
-        {/* Logo links to / */}
+        {/* Logo */}
         <Link to="/" className="flex items-center gap-2 cursor-pointer" style={{ textDecoration: 'none' }}>
           <LogoMark size={26} />
           <Wordmark size="sm" />
         </Link>
         <nav className="hidden md:flex items-center gap-6">
-          {['Product', 'Docs', 'Pricing', 'Blog'].map(l => (
-            <a key={l} href="#" className="text-xs font-syne font-semibold transition-colors" style={{ color: '#525252' }}
+          {/* Product dropdown */}
+          <div ref={productRef} className="relative">
+            <button
+              onClick={() => setProductOpen(v => !v)}
+              className="flex items-center gap-1 text-xs font-syne font-semibold transition-colors"
+              style={{ color: productOpen ? '#a3a3a3' : '#525252' }}
               onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#a3a3a3'}
-              onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#525252'}>{l}</a>
-          ))}
+              onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = productOpen ? '#a3a3a3' : '#525252'}
+            >
+              Product <ChevronDown size={11} className={`transition-transform ${productOpen ? 'rotate-180' : ''}`} />
+            </button>
+            <AnimatePresence>
+              {productOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -4, scale: 0.97 }}
+                  transition={{ duration: 0.12 }}
+                  className="absolute top-8 left-0 rounded-xl overflow-hidden shadow-2xl min-w-[200px]"
+                  style={{ background: '#0a0a0a', border: '1px solid #1a1a1a', zIndex: 100 }}
+                >
+                  {PRODUCT_ITEMS.map(item => (
+                    <button
+                      key={item.label}
+                      onClick={() => { navigate(item.path); setProductOpen(false); }}
+                      className="w-full text-left px-4 py-2.5 text-xs font-syne transition-colors"
+                      style={{ color: '#a3a3a3', borderBottom: '1px solid #0f0f0f' }}
+                      onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#fafafa'}
+                      onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#a3a3a3'}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          <Link to="/docs" className="text-xs font-syne font-semibold transition-colors" style={{ color: '#525252', textDecoration: 'none' }}
+            onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#a3a3a3'}
+            onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#525252'}>
+            Docs
+          </Link>
+          <Link to="/pricing" className="text-xs font-syne font-semibold transition-colors" style={{ color: '#525252', textDecoration: 'none' }}
+            onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#a3a3a3'}
+            onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#525252'}>
+            Pricing
+          </Link>
+          <Link to="/blog" className="text-xs font-syne font-semibold transition-colors" style={{ color: '#525252', textDecoration: 'none' }}
+            onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#a3a3a3'}
+            onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#525252'}>
+            Blog
+          </Link>
         </nav>
         <div className="flex items-center gap-2">
-          <button className="px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer" style={{ border: '1px solid #1a1a1a', color: '#a3a3a3' }}>Sign in</button>
-          <button onClick={() => navigate('/dashboard')} className="px-4 py-1.5 rounded-full text-xs font-bold transition-opacity hover:opacity-88 flex items-center gap-1.5 cursor-pointer" style={{ background: '#fafafa', color: '#000' }}>
+          {/* Sign in dropdown */}
+          <div ref={signInRef} className="relative">
+            <button
+              onClick={() => setSignInOpen(v => !v)}
+              className="px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer"
+              style={{ border: '1px solid #1a1a1a', color: '#a3a3a3' }}
+            >
+              Sign in
+            </button>
+            <AnimatePresence>
+              {signInOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -4, scale: 0.97 }}
+                  transition={{ duration: 0.12 }}
+                  className="absolute top-9 right-0 rounded-xl overflow-hidden shadow-2xl min-w-[200px]"
+                  style={{ background: '#0a0a0a', border: '1px solid #1a1a1a', zIndex: 100 }}
+                >
+                  <button onClick={handleAuthToast}
+                    className="w-full text-left px-4 py-3 text-xs font-syne transition-colors"
+                    style={{ color: '#a3a3a3', borderBottom: '1px solid #0f0f0f' }}
+                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#fafafa'}
+                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#a3a3a3'}>
+                    Continue with Google
+                  </button>
+                  <button onClick={handleAuthToast}
+                    className="w-full text-left px-4 py-3 text-xs font-syne transition-colors"
+                    style={{ color: '#a3a3a3' }}
+                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#fafafa'}
+                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#a3a3a3'}>
+                    Continue with email
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+          <button onClick={() => navigate('/dashboard')}
+            className="px-4 py-1.5 rounded-full text-xs font-bold transition-opacity hover:opacity-88 flex items-center gap-1.5 cursor-pointer"
+            style={{ background: '#fafafa', color: '#000' }}>
             Get started <ArrowRight size={12} />
           </button>
         </div>
@@ -56,7 +171,7 @@ export default function HomePage() {
             <span className="font-mono text-[10px]" style={{ color: '#a3a3a3' }}>Now in beta · rewardforge.ai</span>
           </div>
 
-          {/* Centered logo mark */}
+          {/* Logo mark */}
           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4 }}
             className="flex justify-center mb-5">
             <LogoMark size={64} />
@@ -73,7 +188,7 @@ export default function HomePage() {
             The end-to-end RLHF platform that takes your raw model to production-ready in hours — not months. Annotation, reward model training, and RL fine-tuning. One workspace.
           </motion.p>
 
-          {/* Pill CTA buttons */}
+          {/* CTA buttons */}
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.18 }}
             className="flex items-center justify-center gap-2.5">
             <button onClick={() => navigate('/dashboard')}
@@ -81,20 +196,18 @@ export default function HomePage() {
               style={{ background: '#fafafa', color: '#000', borderRadius: '9999px' }}>
               <LogoMark size={16} /> Start for free →
             </button>
-            <button onClick={() => navigate('/dashboard')}
+            <button onClick={() => navigate('/annotate')}
               className="px-5 py-2.5 text-sm font-bold transition-all cursor-pointer"
               style={{ border: '1px solid #1a1a1a', color: '#fafafa', background: 'transparent', borderRadius: '9999px' }}>
               View live demo →
             </button>
           </motion.div>
 
-          {/* Floating app preview card / browser mockup */}
+          {/* Browser mockup */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }}
             className="mt-10 mx-auto max-w-[680px] rounded-xl overflow-hidden relative"
             style={{ background: '#0a0a0a', border: '1px solid #1a1a1a' }}>
-            {/* Aurora shimmer top line */}
             <div className="absolute top-0 left-0 right-0 h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, rgba(56,189,248,0.3), transparent)' }} />
-            {/* Browser chrome topbar */}
             <div className="flex items-center gap-2 px-4 py-3" style={{ borderBottom: '1px solid #1a1a1a' }}>
               <div className="flex gap-1.5">
                 {['#f43f5e', '#f59e0b', '#34d399'].map(c => <div key={c} className="w-2.5 h-2.5 rounded-full" style={{ background: c }} />)}
@@ -103,9 +216,7 @@ export default function HomePage() {
                 rewardforge.ai/dashboard
               </div>
             </div>
-            {/* Mini app preview */}
             <div className="flex" style={{ height: 200 }}>
-              {/* Mini sidebar */}
               <div className="w-[110px] flex flex-col py-3 px-2 gap-1.5 shrink-0" style={{ borderRight: '1px solid #1a1a1a' }}>
                 <div className="flex items-center gap-1.5 mb-2 px-1">
                   <LogoMark size={16} />
@@ -115,7 +226,6 @@ export default function HomePage() {
                   <div key={l as string} className="px-2 py-1 rounded text-[9px] font-syne" style={{ background: active ? '#111' : 'transparent', color: active ? '#fafafa' : '#333', borderLeft: active ? '2px solid #38bdf8' : '2px solid transparent' }}>{l as string}</div>
                 ))}
               </div>
-              {/* Mini dashboard content */}
               <div className="flex-1 p-3 bg-grid-main relative overflow-hidden">
                 <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 30% 30%, rgba(56,189,248,0.06) 0%, transparent 60%)' }} />
                 <div className="grid grid-cols-4 gap-1.5 mb-2">
@@ -150,7 +260,6 @@ export default function HomePage() {
                 style={{ background: '#0a0a0a', border: '1px solid #1a1a1a' }}
                 onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = '#2a2a2a'}
                 onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = '#1a1a1a'}>
-                {/* Card shimmer top line */}
                 <div className="absolute top-0 left-0 right-0 h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent)' }} />
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-4" style={{ background: `${f.color}18` }}>
                   <f.icon size={16} style={{ color: f.color }} />
@@ -173,7 +282,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Bottom CTA */}
+      {/* Bottom CTA — ONE button only */}
       <div className="px-6 py-8">
         <div className="max-w-4xl mx-auto relative p-8 rounded-xl text-center overflow-hidden"
           style={{ background: '#050d1a', border: '1px solid rgba(56,189,248,0.12)' }}>
@@ -181,10 +290,11 @@ export default function HomePage() {
           <div className="relative z-10">
             <h2 className="font-syne font-extrabold text-[22px] text-[#fafafa] mb-2">Start forging aligned models today.</h2>
             <p className="text-sm mb-6" style={{ color: '#525252' }}>Free plan. 1,000 comparisons. 3 training runs. No CC.</p>
-            <div className="flex items-center justify-center gap-3">
-              <button onClick={() => navigate('/dashboard')} className="px-5 py-2.5 text-sm font-bold transition-opacity hover:opacity-88 cursor-pointer" style={{ background: '#fafafa', color: '#000', borderRadius: '9999px' }}>Get started →</button>
-              <button className="px-5 py-2.5 text-sm font-bold transition-all cursor-pointer" style={{ border: '1px solid #1a1a1a', color: '#fafafa', borderRadius: '9999px' }}>Read docs</button>
-            </div>
+            <button onClick={() => navigate('/dashboard')}
+              className="px-5 py-2.5 text-sm font-bold transition-opacity hover:opacity-88 cursor-pointer"
+              style={{ background: '#fafafa', color: '#000', borderRadius: '9999px' }}>
+              Get started →
+            </button>
           </div>
         </div>
       </div>
@@ -193,12 +303,22 @@ export default function HomePage() {
       <footer className="flex items-center justify-between px-6 py-4" style={{ borderTop: '1px solid #1a1a1a' }}>
         <Link to="/" className="flex items-center gap-2 cursor-pointer" style={{ textDecoration: 'none' }}>
           <LogoMark size={18} />
-          <span className="font-mono text-[10px]" style={{ color: '#333' }}>© 2025 RewardForge</span>
+          <span className="font-mono text-[10px]" style={{ color: '#333' }}>© 2026 RewardForge</span>
         </Link>
         <div className="flex items-center gap-4">
-          {['Privacy', 'Terms', 'Docs', 'GitHub'].map(l => (
-            <a key={l} href="#" className="font-mono text-[10px] transition-colors" style={{ color: '#333' }}>{l}</a>
-          ))}
+          <a href="#" className="font-mono text-[10px] transition-colors" style={{ color: '#333' }}
+            onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#525252'}
+            onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#333'}>Privacy</a>
+          <a href="#" className="font-mono text-[10px] transition-colors" style={{ color: '#333' }}
+            onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#525252'}
+            onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#333'}>Terms</a>
+          <Link to="/docs" className="font-mono text-[10px] transition-colors" style={{ color: '#333', textDecoration: 'none' }}
+            onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#525252'}
+            onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#333'}>Docs</Link>
+          <a href="https://github.com/smitharajappa/rewardforge" target="_blank" rel="noopener noreferrer"
+            className="font-mono text-[10px] transition-colors" style={{ color: '#333' }}
+            onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#525252'}
+            onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#333'}>GitHub</a>
         </div>
       </footer>
     </div>
