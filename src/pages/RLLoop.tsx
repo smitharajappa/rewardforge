@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Search, AlertTriangle } from 'lucide-react';
+import { Play, Search, Lock } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { useApp, type RLRun } from '@/context/AppContext';
 import { useNavigate } from 'react-router-dom';
@@ -30,6 +30,7 @@ export function RLLoop() {
   const [filterAlgo, setFilterAlgo] = useState('All');
   const [filterStatus, setFilterStatus] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showEvalBanner, setShowEvalBanner] = useState(false);
 
   const [isRunning, setIsRunning] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
@@ -104,11 +105,41 @@ export function RLLoop() {
         setFinalRun(newRun);
         addRlRun(newRun);
         addToast({ type: 'success', message: `✓ Run complete · Reward: ${reward.toFixed(3)}` });
+        setShowEvalBanner(true);
       }
     }, 400);
   };
 
   useEffect(() => () => { if (intervalRef.current) clearInterval(intervalRef.current); }, []);
+
+  // ── LOCKED STATE ─────────────────────────────────────────────
+  if (rewardModels.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="font-syne font-extrabold text-3xl tracking-tight text-[#fafafa]">RL Loop</h1>
+          <p className="text-sm mt-1" style={{ color: '#525252' }}>Reinforcement learning fine-tuning with PPO, GRPO, or DPO.</p>
+        </div>
+        <div className="flex flex-col items-center justify-center" style={{ minHeight: '50vh' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center gap-4 text-center max-w-sm"
+          >
+            <Lock size={48} style={{ color: '#525252' }} />
+            <h2 className="font-syne font-bold text-xl text-[#fafafa]">Train a reward model first</h2>
+            <p className="text-sm leading-relaxed" style={{ color: '#525252' }}>
+              You need at least one trained reward model before launching an RL run.
+            </p>
+            <button onClick={() => navigate('/train-rm')}
+              className="px-5 py-2.5 rounded-full font-syne font-bold text-sm transition-opacity hover:opacity-88 mt-2"
+              style={{ background: '#fafafa', color: '#000' }}>
+              Go to Train RM →
+            </button>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -117,22 +148,33 @@ export function RLLoop() {
         <p className="text-sm mt-1" style={{ color: '#525252' }}>Reinforcement learning fine-tuning with PPO, GRPO, or DPO.</p>
       </div>
 
+      {/* Evaluate banner */}
+      <AnimatePresence>
+        {showEvalBanner && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+            className="flex items-center justify-between px-4 py-3 rounded-xl"
+            style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.25)' }}>
+            <span className="text-sm font-syne font-bold" style={{ color: '#34d399' }}>
+              ✓ RL run complete — view results in Evaluate!
+            </span>
+            <div className="flex items-center gap-2">
+              <button onClick={() => navigate('/evaluate')}
+                className="px-3 py-1.5 rounded-full font-syne font-bold text-xs transition-opacity hover:opacity-80"
+                style={{ background: '#34d399', color: '#000' }}>
+                View in Evaluate →
+              </button>
+              <button onClick={() => setShowEvalBanner(false)} style={{ color: '#525252' }}>✕</button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Config */}
       {!isRunning && !isComplete && (
         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
           className="p-5 rounded-xl space-y-5" style={{ background: '#0a0a0a', border: '1px solid #1a1a1a' }}>
           <h3 className="font-syne font-bold text-sm text-[#fafafa]">Configure Run</h3>
-
-          {/* No RM warning */}
-          {rewardModels.length === 0 && algorithm !== 'DPO' && (
-            <div className="flex items-center gap-3 p-3 rounded-lg" style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)' }}>
-              <AlertTriangle size={14} style={{ color: '#f59e0b' }} />
-              <div className="flex-1">
-                <p className="text-xs" style={{ color: '#f59e0b' }}>No reward model found. Train one first.</p>
-              </div>
-              <button onClick={() => navigate('/train-rm')} className="px-3 py-1 rounded-full font-syne font-bold text-xs" style={{ background: '#f59e0b', color: '#000' }}>Train RM</button>
-            </div>
-          )}
 
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -144,14 +186,10 @@ export function RLLoop() {
             </div>
             <div>
               <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>Reward Model</label>
-              {rewardModels.length > 0 ? (
-                <select value={rmId} onChange={e => setRmId(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-lg text-sm outline-none appearance-none" style={{ background: '#000', border: '1px solid #1a1a1a', color: '#fafafa' }}>
-                  {rewardModels.map(m => <option key={m.id} value={m.id}>{m.name} · {m.baseModel} · {(m.accuracy * 100).toFixed(1)}% acc</option>)}
-                </select>
-              ) : (
-                <div className="px-3 py-2.5 rounded-lg text-sm" style={{ background: '#000', border: '1px solid #1a1a1a', color: '#525252' }}>— No models trained</div>
-              )}
+              <select value={rmId} onChange={e => setRmId(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-lg text-sm outline-none appearance-none" style={{ background: '#000', border: '1px solid #1a1a1a', color: '#fafafa' }}>
+                {rewardModels.map(m => <option key={m.id} value={m.id}>{m.name} · {m.baseModel} · {(m.accuracy * 100).toFixed(1)}% acc</option>)}
+              </select>
             </div>
           </div>
 
@@ -200,7 +238,7 @@ export function RLLoop() {
             </div>
           </div>
 
-          <button onClick={startRun} disabled={rewardModels.length === 0 && algorithm !== 'DPO'}
+          <button onClick={startRun}
             className="w-full py-4 rounded-full font-syne font-bold text-sm flex items-center justify-center gap-2 transition-all"
             style={{ background: '#fafafa', color: '#000', boxShadow: '0 0 0 0 transparent' }}
             onMouseEnter={e => (e.currentTarget as HTMLElement).style.boxShadow = '0 0 24px rgba(255,255,255,0.08)'}
@@ -213,7 +251,6 @@ export function RLLoop() {
       {/* Live run */}
       {isRunning && (
         <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-          {/* Live metrics — pulsing amber border while running */}
           <div className="grid grid-cols-4 gap-4">
             {[
               { label: 'MEAN REWARD', value: liveMetrics.reward.toFixed(4), color: '#38bdf8' },
@@ -236,7 +273,7 @@ export function RLLoop() {
 
           <div className="grid grid-cols-3 gap-4">
             {[
-              { title: 'Reward', data: rewardHistory, key: 'reward', color: '#38bdf8', label: `${algorithm} Reward` },
+              { title: 'Reward', data: rewardHistory, key: 'reward', color: '#38bdf8' },
               { title: 'KL Divergence', data: klHistory, key: 'kl', color: '#34d399', refLine: klPenalty, refLabel: `β = ${klPenalty.toFixed(2)}` },
               { title: 'Policy Loss', data: lossHistory, key: 'loss', color: '#f472b6' },
             ].map(chart => (
@@ -249,7 +286,7 @@ export function RLLoop() {
                       <XAxis dataKey="step" stroke="#333" fontSize={9} tick={{ fill: '#333' }} fontFamily="Space Mono" />
                       <YAxis stroke="#333" fontSize={9} tick={{ fill: '#333' }} fontFamily="Space Mono" />
                       <Tooltip contentStyle={{ background: '#0a0a0a', border: '1px solid #1a1a1a', fontSize: 10, fontFamily: 'Space Mono' }} />
-                      {chart.refLine !== undefined && (
+                      {'refLine' in chart && chart.refLine !== undefined && (
                         <ReferenceLine y={chart.refLine} stroke={chart.color} strokeDasharray="4 4" label={{ value: chart.refLabel, fill: chart.color, fontSize: 9, fontFamily: 'Space Mono' }} />
                       )}
                       <Line type="monotone" dataKey={chart.key} stroke={chart.color} strokeWidth={2} dot={false} isAnimationActive={false} />
