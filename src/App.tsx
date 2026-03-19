@@ -24,12 +24,12 @@ const App = () => (
           {/* Landing page */}
           <Route path="/" element={<HomePage />} />
 
-          {/* App pages — AppShell provides sidebar + topbar */}
-          <Route path="/dashboard"  element={<AppShell page="dashboard" />} />
-          <Route path="/annotate"   element={<AppShell page="annotate" />} />
-          <Route path="/train-rm"   element={<AppShell page="train-rm" />} />
-          <Route path="/rl-loop"    element={<AppShell page="rl-loop" />} />
-          <Route path="/evaluate"   element={<AppShell page="evaluate" />} />
+          {/* App shell handles all dashboard routes internally */}
+          <Route path="/dashboard"  element={<AppShell />} />
+          <Route path="/annotate"   element={<AppShell />} />
+          <Route path="/train-rm"   element={<AppShell />} />
+          <Route path="/rl-loop"    element={<AppShell />} />
+          <Route path="/evaluate"   element={<AppShell />} />
 
           {/* Legacy / convenience redirects */}
           <Route path="/trainrm"  element={<Navigate to="/train-rm"  replace />} />
