@@ -62,20 +62,35 @@ function PairwiseTab() {
   const { addComparison, comparisons, addToast } = useApp();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
-  const [selection, setSelection] = useState<null | 'A' | 'B' | 'Tie'>(null);
-  const [reasoning, setReasoning] = useState('');
   const [done, setDone] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [showReadyBanner, setShowReadyBanner] = useState(false);
 
-  const handleSelect = useCallback((c: 'A' | 'B' | 'Tie') => setSelection(c), []);
+  // Use ref for selection so choosing A/B never triggers re-render of textarea
+  const selectionRef = useRef<'A' | 'B' | 'Tie' | null>(null);
+  // Mirror to state only for visual border/button enabled state
+  const [selectionDisplay, setSelectionDisplay] = useState<'A' | 'B' | 'Tie' | null>(null);
+  const [reasoning, setReasoning] = useState('');
+
+  // Show banner when comparisons hit 5
+  useEffect(() => {
+    if (comparisons.length === 5) {
+      setShowReadyBanner(true);
+    }
+  }, [comparisons.length]);
+
+  const handleSelect = useCallback((c: 'A' | 'B' | 'Tie') => {
+    selectionRef.current = c;
+    setSelectionDisplay(c);
+  }, []);
 
   const handleNext = useCallback(() => {
-    if (!selection) return;
+    if (!selectionRef.current) return;
     addComparison({
       id: crypto.randomUUID(),
       promptIndex: step,
       prompt: PROMPTS[step].text,
-      preferred: selection,
+      preferred: selectionRef.current,
       reasoning,
       timestamp: new Date(),
     });
@@ -86,28 +101,30 @@ function PairwiseTab() {
     if (step + 1 >= TOTAL) {
       setDone(true);
       setShowConfetti(true);
-      // Auto-hide confetti after 3.5s
       setTimeout(() => setShowConfetti(false), 3500);
       return;
     }
     setStep(s => s + 1);
-    setSelection(null);
+    selectionRef.current = null;
+    setSelectionDisplay(null);
     setReasoning('');
-  }, [selection, step, reasoning, addComparison, addToast, comparisons.length]);
+  }, [step, reasoning, addComparison, addToast, comparisons.length]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (done) return;
+      // Don't intercept keyboard shortcuts when typing in textarea
+      if (document.activeElement?.tagName === 'TEXTAREA') return;
       if (e.key === 'a') handleSelect('A');
       if (e.key === 'b') handleSelect('B');
       if (e.key === 't') handleSelect('Tie');
-      if (e.key === 's') { setStep(s => Math.min(s + 1, TOTAL - 1)); setSelection(null); setReasoning(''); }
-      if (e.key === 'Enter' && selection) handleNext();
-      if (e.key === 'Escape') setSelection(null);
+      if (e.key === 's') { setStep(s => Math.min(s + 1, TOTAL - 1)); selectionRef.current = null; setSelectionDisplay(null); setReasoning(''); }
+      if (e.key === 'Enter' && selectionRef.current) handleNext();
+      if (e.key === 'Escape') { selectionRef.current = null; setSelectionDisplay(null); }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [done, handleSelect, handleNext, selection]);
+  }, [done, handleSelect, handleNext]);
 
   if (done) {
     const countA = comparisons.filter(c => c.preferred === 'A').length;
@@ -122,7 +139,6 @@ function PairwiseTab() {
           transition={{ duration: 0.4, ease: 'easeOut' }}
           className="flex flex-col items-center justify-center py-20 gap-6"
         >
-          {/* Animated logo mark */}
           <motion.div
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -169,7 +185,7 @@ function PairwiseTab() {
               style={{ background: '#fafafa', color: '#000' }}>
               View in Evaluate
             </button>
-            <button onClick={() => { setStep(0); setSelection(null); setReasoning(''); setDone(false); setShowConfetti(false); }}
+            <button onClick={() => { setStep(0); selectionRef.current = null; setSelectionDisplay(null); setReasoning(''); setDone(false); setShowConfetti(false); }}
               className="px-5 py-2.5 rounded-full font-syne font-bold text-sm transition-all"
               style={{ border: '1px solid #1a1a1a', color: '#fafafa' }}>
               Restart
@@ -181,8 +197,34 @@ function PairwiseTab() {
   }
 
   const prompt = PROMPTS[step];
+  const isSelected = selectionDisplay !== null;
+
   return (
     <div className="space-y-5 max-w-4xl mx-auto">
+      {/* Ready-to-train banner */}
+      <AnimatePresence>
+        {showReadyBanner && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
+            className="flex items-center justify-between px-4 py-3 rounded-xl"
+            style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.25)' }}>
+            <span className="text-sm font-syne font-bold" style={{ color: '#34d399' }}>
+              🎯 5 comparisons collected — ready to train!
+            </span>
+            <div className="flex items-center gap-2">
+              <button onClick={() => navigate('/train-rm')}
+                className="px-3 py-1.5 rounded-full font-syne font-bold text-xs transition-opacity hover:opacity-80"
+                style={{ background: '#34d399', color: '#000' }}>
+                Train Reward Model →
+              </button>
+              <button onClick={() => setShowReadyBanner(false)} style={{ color: '#525252' }}>
+                ✕
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Progress */}
       <div className="flex items-center justify-between">
         <span className="flex items-center gap-2 font-mono text-[10px] px-3 py-1.5 rounded-full"
@@ -212,12 +254,12 @@ function PairwiseTab() {
         {(['A', 'B'] as const).map(id => {
           const content = id === 'A' ? prompt.responseA : prompt.responseB;
           const color = id === 'A' ? '#38bdf8' : '#f472b6';
-          const isSelected = selection === id;
+          const cardSelected = selectionDisplay === id;
           return (
             <div key={id} onClick={() => handleSelect(id)}
               style={{
-                background: '#0a0a0a', border: `2px solid ${isSelected ? color : '#1a1a1a'}`,
-                boxShadow: isSelected ? `0 0 0 3px ${color}14` : 'none',
+                background: '#0a0a0a', border: `2px solid ${cardSelected ? color : '#1a1a1a'}`,
+                boxShadow: cardSelected ? `0 0 0 3px ${color}14` : 'none',
                 borderRadius: 10, padding: '14px', cursor: 'pointer', height: 280,
                 display: 'flex', flexDirection: 'column', transition: 'all 0.12s',
               }}>
@@ -226,10 +268,10 @@ function PairwiseTab() {
                   style={{ background: `${color}18`, border: `1px solid ${color}30`, color }}>
                   RESPONSE {id}
                 </span>
-                {isSelected && <CheckCircle2 size={16} style={{ color }} />}
+                {cardSelected && <CheckCircle2 size={16} style={{ color }} />}
               </div>
               <div className="flex-1 overflow-y-auto text-[13px] leading-relaxed pr-1 transition-colors"
-                style={{ color: isSelected ? '#fafafa' : '#a3a3a3' }}>
+                style={{ color: cardSelected ? '#fafafa' : '#a3a3a3' }}>
                 <pre className="whitespace-pre-wrap font-syne">{content}</pre>
               </div>
               <div className="mt-3 pt-3 text-center font-mono text-[10px] uppercase tracking-widest"
@@ -248,12 +290,12 @@ function PairwiseTab() {
           <button key={action}
             onClick={() => action === 'Tie'
               ? handleSelect('Tie')
-              : (setStep(s => Math.min(s + 1, TOTAL - 1)), setSelection(null), setReasoning(''))}
+              : (setStep(s => Math.min(s + 1, TOTAL - 1)), selectionRef.current = null, setSelectionDisplay(null), setReasoning(''))}
             className="px-5 py-2 rounded-lg font-syne font-bold text-sm flex items-center gap-2 transition-all"
             style={{
-              background: selection === 'Tie' && action === 'Tie' ? '#fafafa' : 'transparent',
-              color: selection === 'Tie' && action === 'Tie' ? '#000' : '#525252',
-              border: `1px solid ${selection === 'Tie' && action === 'Tie' ? '#fafafa' : '#1a1a1a'}`,
+              background: selectionDisplay === 'Tie' && action === 'Tie' ? '#fafafa' : 'transparent',
+              color: selectionDisplay === 'Tie' && action === 'Tie' ? '#000' : '#525252',
+              border: `1px solid ${selectionDisplay === 'Tie' && action === 'Tie' ? '#fafafa' : '#1a1a1a'}`,
             }}>
             {action}{' '}
             <kbd className="rounded text-[10px] px-1.5 py-0.5"
@@ -264,29 +306,54 @@ function PairwiseTab() {
         ))}
       </div>
 
-      {/* Reasoning */}
-      <AnimatePresence>
-        {selection && (
-          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
-            className="p-5 rounded-xl space-y-4" style={{ background: '#0a0a0a', border: '1px solid #1a1a1a' }}>
-            <label className="text-sm font-syne font-bold" style={{ color: '#a3a3a3' }}>
-              Why did you prefer this? (optional)
-            </label>
-            <textarea value={reasoning} onChange={e => setReasoning(e.target.value)} rows={3}
-              placeholder="Explain your reasoning..."
-              className="w-full px-4 py-3 rounded-lg text-sm resize-none outline-none transition-all"
-              style={{ background: '#000', border: '1px solid #1a1a1a', color: '#fafafa' }}
-              onFocus={e => e.currentTarget.style.borderColor = '#38bdf8'}
-              onBlur={e => e.currentTarget.style.borderColor = '#1a1a1a'}
-            />
-            <button onClick={handleNext}
-              className="w-full py-4 rounded-full font-syne font-bold text-sm flex items-center justify-center gap-2 transition-opacity hover:opacity-90"
-              style={{ background: '#fafafa', color: '#000' }}>
-              Submit & Next <ChevronRight size={16} />
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Reasoning + Submit — ALWAYS in DOM, never conditionally mounted */}
+      <div
+        className="p-5 rounded-xl space-y-4"
+        style={{
+          background: '#0a0a0a',
+          border: '1px solid #1a1a1a',
+          visibility: 'visible',
+          opacity: 1,
+        }}
+      >
+        <label className="text-sm font-syne font-bold" style={{ color: '#a3a3a3' }}>
+          Why did you prefer this? (optional)
+        </label>
+        <textarea
+          value={reasoning}
+          onChange={e => setReasoning(e.target.value)}
+          rows={3}
+          placeholder="Explain your reasoning..."
+          className="w-full px-4 py-3 rounded-lg text-sm resize-none outline-none transition-all"
+          style={{ background: '#000', border: '1px solid #1a1a1a', color: '#fafafa' }}
+          onFocus={e => e.currentTarget.style.borderColor = '#38bdf8'}
+          onBlur={e => e.currentTarget.style.borderColor = '#1a1a1a'}
+        />
+        <div className="relative group">
+          <button
+            onClick={isSelected ? handleNext : undefined}
+            disabled={!isSelected}
+            className="w-full py-4 rounded-full font-syne font-bold text-sm flex items-center justify-center gap-2"
+            style={{
+              background: isSelected ? '#fafafa' : '#1a1a1a',
+              color: isSelected ? '#000' : '#525252',
+              cursor: isSelected ? 'pointer' : 'not-allowed',
+              opacity: isSelected ? 1 : 0.4,
+              transition: 'all 0.15s',
+            }}
+          >
+            Submit & Next <ChevronRight size={16} />
+          </button>
+          {!isSelected && (
+            <div
+              className="absolute -top-8 left-1/2 -translate-x-1/2 px-3 py-1 rounded font-mono text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+              style={{ background: '#111', border: '1px solid #1a1a1a', color: '#f59e0b', zIndex: 10 }}
+            >
+              Select a response first
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

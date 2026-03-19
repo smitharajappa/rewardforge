@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Download, Search } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Download, Search, Lock } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useApp } from '@/context/AppContext';
 import { useNavigate } from 'react-router-dom';
@@ -28,6 +28,75 @@ const MOCK_CHART = Array.from({ length: 25 }, (_, i) => ({
   GRPO: +(0.35 + i * 0.13 + (Math.cos(i) * 0.1)).toFixed(3),
 }));
 
+// ── HF Hub Modal ──────────────────────────────────────────────
+function HFHubModal({ onClose, modelName, onToast }: { onClose: () => void; modelName: string; onToast: (msg: string, type: 'info' | 'success') => void }) {
+  const [token, setToken] = useState('');
+  const [repo, setRepo] = useState(`rewardforge-demo/${modelName.toLowerCase().replace(/\s/g, '-')}`);
+
+  const handlePush = () => {
+    onClose();
+    onToast('Pushing to huggingface.co...', 'info');
+    setTimeout(() => onToast(`✓ Model pushed to huggingface.co/${repo}`, 'success'), 2000);
+  };
+
+  return (
+    <>
+      <motion.div
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[49]"
+        style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(6px)' }}
+        onClick={onClose}
+      />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 8 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96 }}
+        style={{
+          position: 'fixed', top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)',
+          zIndex: 50, width: '90%', maxWidth: 440,
+          background: '#0a0a0a', border: '1px solid #1a1a1a',
+          borderRadius: 12, padding: 24,
+        }}
+      >
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="font-syne font-bold text-base text-[#fafafa]">Push to HuggingFace Hub</h2>
+          <button onClick={onClose} style={{ color: '#525252' }}>✕</button>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>HuggingFace Token</label>
+            <input type="password" value={token} onChange={e => setToken(e.target.value)}
+              placeholder="hf_xxxxxxxxxxxx"
+              className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
+              style={{ background: '#000', border: '1px solid #1a1a1a', color: '#fafafa' }}
+              onFocus={e => e.currentTarget.style.borderColor = '#38bdf8'}
+              onBlur={e => e.currentTarget.style.borderColor = '#1a1a1a'}
+            />
+            <p className="font-mono text-[9px] mt-1" style={{ color: '#525252' }}>
+              Get yours at huggingface.co/settings/tokens
+            </p>
+          </div>
+          <div>
+            <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>Destination repository</label>
+            <input type="text" value={repo} onChange={e => setRepo(e.target.value)}
+              className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
+              style={{ background: '#000', border: '1px solid #1a1a1a', color: '#fafafa' }}
+              onFocus={e => e.currentTarget.style.borderColor = '#38bdf8'}
+              onBlur={e => e.currentTarget.style.borderColor = '#1a1a1a'}
+            />
+          </div>
+          <button onClick={handlePush}
+            className="w-full py-3 rounded-full font-syne font-bold text-sm transition-opacity hover:opacity-90"
+            style={{ background: '#fafafa', color: '#000' }}>
+            Push model →
+          </button>
+        </div>
+      </motion.div>
+    </>
+  );
+}
+
 export function Evaluate() {
   const { rlRuns, rewardModels, addToast } = useApp();
   const navigate = useNavigate();
@@ -38,6 +107,36 @@ export function Evaluate() {
   const [exportRunId, setExportRunId] = useState('');
   const [exportFormat, setExportFormat] = useState('safetensors');
   const [hfDest, setHfDest] = useState(`rewardforge/model-v${rewardModels.length}`);
+  const [hfHubModel, setHfHubModel] = useState<string | null>(null);
+
+  // ── LOCKED STATE ─────────────────────────────────────────────
+  if (rlRuns.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="font-syne font-extrabold text-3xl tracking-tight text-[#fafafa]">Evaluate</h1>
+          <p className="text-sm mt-1" style={{ color: '#525252' }}>Compare RL runs, inspect models, and export to HuggingFace.</p>
+        </div>
+        <div className="flex flex-col items-center justify-center" style={{ minHeight: '50vh' }}>
+          <motion.div
+            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center gap-4 text-center max-w-sm"
+          >
+            <Lock size={48} style={{ color: '#525252' }} />
+            <h2 className="font-syne font-bold text-xl text-[#fafafa]">Run the RL loop first</h2>
+            <p className="text-sm leading-relaxed" style={{ color: '#525252' }}>
+              Complete a PPO, GRPO, or DPO run to generate results to evaluate.
+            </p>
+            <button onClick={() => navigate('/rl-loop')}
+              className="px-5 py-2.5 rounded-full font-syne font-bold text-sm transition-opacity hover:opacity-88 mt-2"
+              style={{ background: '#fafafa', color: '#000' }}>
+              Go to RL Loop →
+            </button>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
 
   const bestRun = rlRuns.reduce<(typeof rlRuns)[0] | null>((b, r) => (!b || r.finalReward > b.finalReward ? r : b), null);
   const run1 = rlRuns[0];
@@ -56,10 +155,10 @@ export function Evaluate() {
   const stepsCount = useCountUp(stepsTarget);
 
   const metrics = [
-    { label: 'Best Reward', rawValue: bestRun?.finalReward, displayValue: bestRun ? (bestRewardCount / 1000).toFixed(3) : '—', color: '#38bdf8' },
-    { label: 'KL Divergence', rawValue: bestRun?.klDivergence, displayValue: bestRun?.klDivergence.toFixed(4) ?? '—', color: '#34d399' },
-    { label: 'RM Accuracy', rawValue: rewardModels[0]?.accuracy, displayValue: rewardModels[0] ? `${(rmAccCount / 10).toFixed(1)}%` : '—', color: '#f472b6' },
-    { label: 'Total Steps', rawValue: bestRun?.maxSteps, displayValue: bestRun ? stepsCount.toString() : '—', color: '#a78bfa' },
+    { label: 'Best Reward', displayValue: bestRun ? (bestRewardCount / 1000).toFixed(3) : '—', color: '#38bdf8' },
+    { label: 'KL Divergence', displayValue: bestRun?.klDivergence.toFixed(4) ?? '—', color: '#34d399' },
+    { label: 'RM Accuracy', displayValue: rewardModels[0] ? `${(rmAccCount / 10).toFixed(1)}%` : '—', color: '#f472b6' },
+    { label: 'Total Steps', displayValue: bestRun ? stepsCount.toString() : '—', color: '#a78bfa' },
   ];
 
   const handleExport = () => {
@@ -98,7 +197,7 @@ export function Evaluate() {
         ))}
       </div>
 
-      {/* Run comparison — defaults to split view */}
+      {/* Run comparison */}
       {rlRuns.length >= 2 ? (
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
           className="rounded-xl overflow-hidden" style={{ border: '1px solid #1a1a1a' }}>
@@ -118,7 +217,6 @@ export function Evaluate() {
             </div>
           </div>
 
-          {/* GitHub-style diff — green = better, red = worse */}
           {splitView ? (
             <div className="grid grid-cols-2">
               {([run1, run2] as const).map((run, col) => {
@@ -158,7 +256,6 @@ export function Evaluate() {
               })}
             </div>
           ) : (
-            /* Unified view */
             <div>
               <div className="grid grid-cols-5 px-4 py-2 font-mono text-[9px] uppercase tracking-widest" style={{ background: '#0a0a0a', borderBottom: '1px solid #1a1a1a', color: '#525252' }}>
                 <span>Metric</span>
@@ -219,11 +316,11 @@ export function Evaluate() {
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
           className="flex flex-col items-center justify-center py-16 gap-4 rounded-xl" style={{ border: '1px dashed #1a1a1a' }}>
           <div className="font-syne font-bold text-sm" style={{ color: '#525252' }}>
-            {rlRuns.length === 0 ? 'No runs yet — launch your first RL run' : 'Run at least 2 RL runs to compare them'}
+            Run at least 2 RL runs to compare them
           </div>
           <button onClick={() => navigate('/rl-loop')} className="px-4 py-2 rounded-full font-syne font-bold text-sm transition-opacity hover:opacity-90"
             style={{ background: '#fafafa', color: '#000' }}>
-            {rlRuns.length === 0 ? 'Launch RL Run →' : 'Launch Another Run →'}
+            Launch Another Run →
           </button>
         </motion.div>
       )}
@@ -280,7 +377,7 @@ export function Evaluate() {
                   <button className="flex-1 py-2 rounded-lg font-mono text-[10px] transition-all" style={{ border: '1px solid #1a1a1a', color: '#a3a3a3' }}>
                     Download
                   </button>
-                  <button onClick={() => { setHfDest(`rewardforge/${m.name.toLowerCase()}`); handleExport(); }}
+                  <button onClick={() => setHfHubModel(m.name)}
                     className="flex-1 py-2 rounded-lg font-mono text-[10px] transition-all" style={{ border: '1px solid rgba(56,189,248,0.3)', color: '#38bdf8' }}>
                     Push to HF Hub
                   </button>
@@ -328,6 +425,17 @@ export function Evaluate() {
           <Download size={15} /> Export Model →
         </button>
       </motion.div>
+
+      {/* HF Hub Modal */}
+      <AnimatePresence>
+        {hfHubModel && (
+          <HFHubModal
+            modelName={hfHubModel}
+            onClose={() => setHfHubModel(null)}
+            onToast={(msg, type) => addToast({ type, message: msg })}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

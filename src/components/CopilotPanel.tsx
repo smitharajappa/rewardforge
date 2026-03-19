@@ -7,17 +7,20 @@ import { useApp } from '@/context/AppContext';
 const SUGGESTIONS = [
   "Why is my KL divergence high?",
   "How many comparisons do I need?",
-  "Which algorithm should I use?",
+  "PPO or DPO — which should I use?",
+  "What does my reward score mean?",
 ];
 
 function buildSystemPrompt(comparisons: number, ratings: number, rewardModels: number, rlRuns: number, lastReward?: number, lastAccuracy?: number) {
-  return `You are the RewardForge AI Copilot, an expert in RLHF (Reinforcement Learning from Human Feedback). You help users understand and navigate their RLHF training pipeline. Answer in plain English. Keep responses concise (2–4 sentences max). Use specific numbers from the user's context when available.
-Current user state:
-- Comparisons collected: ${comparisons}
-- Ratings collected: ${ratings}
-- Reward models trained: ${rewardModels}
-- RL runs completed: ${rlRuns}${lastReward !== undefined ? `\n- Latest RL run reward: ${lastReward.toFixed(3)}` : ''}${lastAccuracy !== undefined ? `\n- Latest RM accuracy: ${(lastAccuracy * 100).toFixed(1)}%` : ''}
-Be helpful, precise, and encouraging.`;
+  return `You are the RewardForge AI Copilot, an expert in RLHF (Reinforcement Learning from Human Feedback). The user currently has:
+- ${comparisons} comparisons collected
+- ${ratings} ratings submitted
+- ${rewardModels} reward models trained
+- ${rlRuns} RL runs completed
+- Latest RM accuracy: ${lastAccuracy !== undefined ? `${(lastAccuracy * 100).toFixed(1)}%` : 'none'}
+- Latest RL reward: ${lastReward !== undefined ? lastReward.toFixed(3) : 'none'}
+
+Answer each question in 2-3 sentences. Be specific — use their actual numbers when answering. Never repeat the same response twice. Always end with one actionable next step they can take right now in the app.`;
 }
 
 export function CopilotPanel() {
@@ -42,25 +45,27 @@ export function CopilotPanel() {
     setCopilotHistory(updatedHistory);
     setIsThinking(true);
 
-    // Simulate response (Claude API would go here)
     await new Promise(r => setTimeout(r, 900));
     setIsThinking(false);
 
+    const lastRun = rlRuns[0];
+    const lastRM = rewardModels[0];
+
     const responses: Record<string, string> = {
-      "Why is my KL divergence high?": "High KL divergence means your policy is drifting far from the base model. Try increasing your β penalty to 0.15–0.2 in the RL Loop settings. This keeps the model closer to the reference weights while still improving the reward signal.",
-      "How many comparisons do I need?": "For a first working reward model, 5–10 comparisons is enough to start, but 50–200 yields much better signal. You currently have " + comparisons.length + " — " + (comparisons.length >= 5 ? "you're ready to train!" : "collect a few more before training."),
-      "Which algorithm should I use?": "For most use cases, start with PPO — it's stable and well-understood. GRPO (used by DeepSeek R1) is great if you want group-relative optimization. DPO skips the reward model entirely and trains directly on preferences — fastest to iterate but less flexible.",
+      "Why is my KL divergence high?": `High KL divergence means your policy is drifting far from the base model. You have ${rlRuns.length} run${rlRuns.length !== 1 ? 's' : ''} — try increasing your β penalty to 0.15–0.2 in the RL Loop settings. This keeps the model closer to the reference weights while still improving the reward signal.`,
+      "How many comparisons do I need?": `For a first working reward model, 5–10 comparisons is enough to start, but 50–200 yields much better signal. You currently have ${comparisons.length} — ${comparisons.length >= 5 ? "you're ready to train! Head to Train RM." : "collect " + (5 - comparisons.length) + " more in Annotate, then you can train."}`,
+      "PPO or DPO — which should I use?": `Start with PPO — it's stable and well-understood${lastRM ? `, and your ${lastRM.name} reward model with ${(lastRM.accuracy * 100).toFixed(1)}% accuracy is a solid foundation` : ""}. Use DPO if you want to skip reward model training entirely and train directly on preferences. GRPO (used by DeepSeek R1) is great for group-relative optimization if you have multiple responses per prompt.`,
+      "What does my reward score mean?": `Your reward score measures how well the policy has learned to produce responses preferred by your reward model${lastRun ? `. Your latest run achieved ${lastRun.finalReward.toFixed(3)} — ${lastRun.finalReward > 2 ? "that's strong performance" : lastRun.finalReward > 1 ? "good progress" : "early stage, keep training"}` : ""}. Higher is better, but watch for reward hacking — unusually long or sycophantic responses may inflate scores artificially.`,
     };
 
     const fallback = comparisons.length === 0
-      ? "Start by collecting at least 5 pairwise comparisons in the Annotate tab. This preference data is the foundation of your reward model."
+      ? "Start by collecting at least 5 pairwise comparisons in the Annotate tab — use keyboard shortcuts A, B, T to annotate faster."
       : rewardModels.length === 0
-      ? `You have ${comparisons.length} comparisons — great! Head to Train RM to train your first reward model. GPT-2 trains fastest if you want quick results.`
-      : `Your pipeline is looking good! You have ${rewardModels.length} reward model(s) and ${rlRuns.length} RL run(s). ${rlRuns.length === 0 ? "Try launching a PPO run in the RL Loop tab." : "Check the Evaluate tab to compare your runs side by side."}`;
+      ? `You have ${comparisons.length} comparison${comparisons.length !== 1 ? 's' : ''} — ${comparisons.length >= 5 ? 'head to Train RM to train your first reward model. GPT-2 trains fastest.' : `collect ${5 - comparisons.length} more before training.`}`
+      : `Your pipeline has ${rewardModels.length} reward model${rewardModels.length !== 1 ? 's' : ''} and ${rlRuns.length} RL run${rlRuns.length !== 1 ? 's' : ''}. ${rlRuns.length === 0 ? "Launch a PPO run in the RL Loop tab to start fine-tuning." : "Check the Evaluate tab to compare your runs side by side and export the best one."}`;
 
     const assistantContent = responses[msg] ?? fallback;
 
-    // Typewriter effect
     setIsStreaming(true);
     const words = assistantContent.split(' ');
     let built = '';
@@ -171,18 +176,17 @@ export function CopilotPanel() {
                   <div className="max-w-[85%] p-3 text-[12px] leading-relaxed"
                     style={{ background: '#071020', border: '1px solid rgba(56,189,248,0.15)', borderRadius: '10px 10px 10px 2px', color: '#e2e8f0' }}>
                     {streamedText}
-                    {/* Blinking blue cursor */}
                     <motion.span
                       className="inline-block ml-0.5 w-[7px] h-[13px] rounded-[1px] align-text-bottom"
                       style={{ background: '#38bdf8' }}
-                    animate={{ opacity: [1, 0, 1] }}
-                    transition={{ duration: 0.9, repeat: Infinity, ease: 'linear' }}
+                      animate={{ opacity: [1, 0, 1] }}
+                      transition={{ duration: 0.9, repeat: Infinity, ease: 'linear' }}
                     />
                   </div>
                 </div>
               )}
 
-              {/* Suggestions — shown when only the welcome message exists */}
+              {/* Suggestions */}
               {copilotHistory.length <= 1 && !isThinking && !isStreaming && (
                 <div className="space-y-2 mt-2">
                   <p className="font-mono text-[9px] text-[#333] uppercase tracking-widest">Suggested prompts</p>

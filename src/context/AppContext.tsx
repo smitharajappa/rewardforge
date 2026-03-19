@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -97,16 +97,56 @@ interface AppContextType {
   activeProject: string;
   isLoading: boolean;
   setIsLoading: (v: boolean) => void;
+  resetDemoData: () => void;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
 
+// ── localStorage helpers ──────────────────────────────────────
+function parseWithDates<T extends { timestamp: Date | string }>(json: string): T[] {
+  const arr = JSON.parse(json) as T[];
+  return arr.map(item => ({ ...item, timestamp: new Date(item.timestamp) }));
+}
+
+function loadLS<T extends { timestamp: Date | string }>(key: string): T[] {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return [];
+    return parseWithDates<T>(raw);
+  } catch {
+    return [];
+  }
+}
+
+const DEFAULT_WELCOME_NOTIFS = [
+  {
+    id: 'welcome-1',
+    type: 'info' as const,
+    message: 'Welcome to RewardForge! Start by collecting 5 comparisons in the Annotate tab.',
+    time: 'just now',
+  },
+  {
+    id: 'welcome-2',
+    type: 'info' as const,
+    message: 'Tip: Use keyboard shortcuts A/B/T/S to annotate faster and hit 10 comparisons in under 2 minutes.',
+    time: 'just now',
+  },
+  {
+    id: 'welcome-3',
+    type: 'info' as const,
+    message: 'Free plan includes 1,000 comparisons and 3 training runs. No credit card required.',
+    time: 'just now',
+  },
+];
+
+export { DEFAULT_WELCOME_NOTIFS };
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [comparisons, setComparisons] = useState<Comparison[]>([]);
-  const [ratings, setRatings] = useState<Rating[]>([]);
-  const [rewardModels, setRewardModels] = useState<RewardModel[]>([]);
-  const [rlRuns, setRlRuns] = useState<RLRun[]>([]);
-  const [activityLog, setActivityLog] = useState<ActivityItem[]>([]);
+  const [comparisons, setComparisons] = useState<Comparison[]>(() => loadLS<Comparison>('rf_comparisons'));
+  const [ratings, setRatings] = useState<Rating[]>(() => loadLS<Rating>('rf_ratings'));
+  const [rewardModels, setRewardModels] = useState<RewardModel[]>(() => loadLS<RewardModel>('rf_models'));
+  const [rlRuns, setRlRuns] = useState<RLRun[]>(() => loadLS<RLRun>('rf_runs'));
+  const [activityLog, setActivityLog] = useState<ActivityItem[]>(() => loadLS<ActivityItem>('rf_activity'));
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [copilotHistory, setCopilotHistory] = useState<CopilotMessage[]>([
     {
@@ -117,6 +157,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   ]);
   const [copilotOpen, setCopilotOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // ── Persist to localStorage on every state change ────────────
+  useEffect(() => { localStorage.setItem('rf_comparisons', JSON.stringify(comparisons)); }, [comparisons]);
+  useEffect(() => { localStorage.setItem('rf_ratings', JSON.stringify(ratings)); }, [ratings]);
+  useEffect(() => { localStorage.setItem('rf_models', JSON.stringify(rewardModels)); }, [rewardModels]);
+  useEffect(() => { localStorage.setItem('rf_runs', JSON.stringify(rlRuns)); }, [rlRuns]);
+  useEffect(() => { localStorage.setItem('rf_activity', JSON.stringify(activityLog)); }, [activityLog]);
+
+  const resetDemoData = useCallback(() => {
+    localStorage.removeItem('rf_comparisons');
+    localStorage.removeItem('rf_ratings');
+    localStorage.removeItem('rf_models');
+    localStorage.removeItem('rf_runs');
+    localStorage.removeItem('rf_activity');
+    setComparisons([]);
+    setRatings([]);
+    setRewardModels([]);
+    setRlRuns([]);
+    setActivityLog([]);
+  }, []);
 
   const addComparison = useCallback((c: Comparison) => {
     setComparisons(prev => [c, ...prev]);
@@ -200,6 +260,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       copilotOpen, setCopilotOpen,
       activeProject: 'My RLHF Project',
       isLoading, setIsLoading,
+      resetDemoData,
     }}>
       {children}
     </AppContext.Provider>

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Eye, EyeOff, Copy } from 'lucide-react';
+import { useApp } from '@/context/AppContext';
+import { useNavigate } from 'react-router-dom';
 
 interface SettingsModalProps {
   open: boolean;
@@ -8,30 +10,65 @@ interface SettingsModalProps {
 }
 
 export function SettingsModal({ open, onClose }: SettingsModalProps) {
+  const { resetDemoData, addToast } = useApp();
+  const navigate = useNavigate();
   const [projectName, setProjectName] = useState('My RLHF Project');
   const [apiKeyVisible, setApiKeyVisible] = useState(false);
   const apiKey = 'rf-sk-••••••••4f9a';
+  const realApiKey = 'rf-sk-a9b2c3d4e5f64f9a';
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(realApiKey);
+    addToast({ type: 'success', message: 'Copied!' });
+  };
+
+  const handleReset = () => {
+    resetDemoData();
+    addToast({ type: 'success', message: 'Demo data cleared — fresh start! ✓' });
+    onClose();
+  };
 
   return (
     <AnimatePresence>
       {open && (
         <>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center"
-            style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(6px)' }}
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[49]"
+            style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)' }}
             onClick={onClose}
           />
+          {/* Modal — properly centered */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: 8 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }}
-            className="fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] p-6 rounded-xl"
-            style={{ background: '#0a0a0a', border: '1px solid #1a1a1a' }}
+            initial={{ opacity: 0, scale: 0.96, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96 }}
+            transition={{ duration: 0.18 }}
+            style={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 50,
+              width: '90%',
+              maxWidth: 480,
+              background: '#0a0a0a',
+              border: '1px solid #1a1a1a',
+              borderRadius: 12,
+              padding: 24,
+            }}
           >
+            {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <h2 className="font-syne font-bold text-base text-[#fafafa]">Settings</h2>
-              <button onClick={onClose} style={{ color: '#525252' }}><X size={16} /></button>
+              <button onClick={onClose} style={{ color: '#525252' }} className="hover:text-[#a3a3a3] transition-colors">
+                <X size={16} />
+              </button>
             </div>
 
             <div className="space-y-5">
+              {/* Project Name */}
               <div>
                 <label className="font-mono text-[10px] uppercase tracking-widest text-[#525252] block mb-2">Project Name</label>
                 <input
@@ -44,23 +81,27 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
                 />
               </div>
 
+              {/* API Key */}
               <div>
-                <label className="font-mono text-[10px] uppercase tracking-widest text-[#525252] block mb-2">API Key</label>
+                <label className="font-mono text-[10px] uppercase tracking-widest text-[#525252] block mb-1">API Key</label>
+                <p className="font-mono text-[9px] mb-2" style={{ color: '#525252' }}>
+                  Use this to access RewardForge programmatically. Never share or commit to code.
+                </p>
                 <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg"
                   style={{ background: '#000', border: '1px solid #1a1a1a' }}>
                   <span className="flex-1 font-mono text-xs text-[#a3a3a3]">
-                    {apiKeyVisible ? 'rf-sk-a9b2c3d4e5f64f9a' : apiKey}
+                    {apiKeyVisible ? realApiKey : apiKey}
                   </span>
                   <button onClick={() => setApiKeyVisible(v => !v)} className="text-[#525252] hover:text-[#a3a3a3] transition-colors">
                     {apiKeyVisible ? <EyeOff size={13} /> : <Eye size={13} />}
                   </button>
-                  <button onClick={() => navigator.clipboard.writeText('rf-sk-a9b2c3d4e5f64f9a')}
-                    className="text-[#525252] hover:text-[#a3a3a3] transition-colors">
+                  <button onClick={handleCopy} className="text-[#525252] hover:text-[#a3a3a3] transition-colors">
                     <Copy size={13} />
                   </button>
                 </div>
               </div>
 
+              {/* Plan */}
               <div>
                 <label className="font-mono text-[10px] uppercase tracking-widest text-[#525252] block mb-3">Plan</label>
                 <div className="p-4 rounded-lg" style={{ background: '#000', border: '1px solid #1a1a1a' }}>
@@ -86,10 +127,25 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
                 </div>
               </div>
 
-              <button className="w-full py-2.5 rounded-full font-syne font-bold text-sm transition-opacity hover:opacity-90"
+              <button
+                onClick={() => { onClose(); navigate('/pricing'); }}
+                className="w-full py-2.5 rounded-full font-syne font-bold text-sm transition-opacity hover:opacity-90"
                 style={{ background: '#fafafa', color: '#000' }}>
-                Upgrade to Pro →
+                Upgrade Plan →
               </button>
+
+              {/* Reset demo data */}
+              <div style={{ borderTop: '1px solid #1a1a1a', paddingTop: 16 }}>
+                <button
+                  onClick={handleReset}
+                  className="w-full py-2.5 rounded-full font-syne font-bold text-sm transition-all hover:opacity-80"
+                  style={{ border: '1px solid rgba(244,63,94,0.4)', color: '#f43f5e', background: 'rgba(244,63,94,0.06)' }}>
+                  Reset demo data
+                </button>
+                <p className="font-mono text-[9px] text-center mt-1.5" style={{ color: '#333' }}>
+                  Clears all comparisons, models, and runs
+                </p>
+              </div>
             </div>
           </motion.div>
         </>

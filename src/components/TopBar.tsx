@@ -18,19 +18,34 @@ interface Notification {
   time: string;
 }
 
-const MOCK_NOTIFS: Notification[] = [
-  { id: '1', type: 'success', message: 'RM-v1 training complete · 84.2% acc', time: '2m ago' },
-  { id: '2', type: 'info', message: 'PPO run finished · Reward 2.341', time: '8m ago' },
-  { id: '3', type: 'info', message: '5 comparisons reached — ready to train!', time: '15m ago' },
+const WELCOME_NOTIFS: Notification[] = [
+  { id: 'w1', type: 'info', message: 'Welcome to RewardForge! Start by collecting 5 comparisons in the Annotate tab.', time: 'just now' },
+  { id: 'w2', type: 'info', message: 'Tip: Use keyboard shortcuts A/B/T/S to annotate faster and hit 10 comparisons in under 2 minutes.', time: 'just now' },
+  { id: 'w3', type: 'info', message: 'Free plan includes 1,000 comparisons and 3 training runs. No credit card required.', time: 'just now' },
 ];
 
 const dotColors = { success: '#34d399', info: '#38bdf8', warning: '#f59e0b' };
+
+const LS_KEY = 'rf_notifs_dismissed';
 
 export function TopBar() {
   const location = useLocation();
   const title = PAGE_TITLES[location.pathname] ?? 'RewardForge';
   const [notifOpen, setNotifOpen] = useState(false);
-  const [notifs, setNotifs] = useState(MOCK_NOTIFS);
+  const [notifs, setNotifs] = useState<Notification[]>(() => {
+    try {
+      const dismissed = localStorage.getItem(LS_KEY);
+      if (dismissed) return [];
+      return WELCOME_NOTIFS;
+    } catch {
+      return WELCOME_NOTIFS;
+    }
+  });
+
+  const clearAll = () => {
+    setNotifs([]);
+    try { localStorage.setItem(LS_KEY, 'true'); } catch { /* ignore */ }
+  };
 
   return (
     <div
@@ -40,7 +55,17 @@ export function TopBar() {
       <div className="flex items-center gap-2">
         <span className="font-syne font-extrabold text-base text-[#fafafa]">{title}</span>
         <span className="text-[#333] text-sm">/</span>
-        <span className="font-mono text-[10px] text-[#525252]">rewardforge.ai</span>
+        <a
+          href="https://rewardforge.lovable.app"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-mono text-[10px] transition-colors"
+          style={{ color: '#525252', textDecoration: 'none' }}
+          onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#38bdf8'}
+          onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#525252'}
+        >
+          rewardforge.ai
+        </a>
       </div>
 
       <div className="flex items-center gap-3 relative">
@@ -70,12 +95,12 @@ export function TopBar() {
               initial={{ opacity: 0, y: -6, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -6, scale: 0.97 }}
-              className="absolute top-10 right-0 w-[280px] rounded-xl overflow-hidden shadow-2xl z-50"
+              className="absolute top-10 right-0 w-[300px] rounded-xl overflow-hidden shadow-2xl z-50"
               style={{ background: '#0a0a0a', border: '1px solid #1a1a1a' }}
             >
               <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid #1a1a1a' }}>
                 <span className="font-syne font-bold text-xs text-[#fafafa]">Notifications</span>
-                <button onClick={() => setNotifs([])} className="font-mono text-[9px]" style={{ color: '#525252' }}>
+                <button onClick={clearAll} className="font-mono text-[9px]" style={{ color: '#525252' }}>
                   Clear all
                 </button>
               </div>
@@ -83,7 +108,7 @@ export function TopBar() {
                 <div className="px-4 py-6 text-center font-mono text-[10px]" style={{ color: '#525252' }}>No notifications</div>
               ) : (
                 notifs.map(n => (
-                  <div key={n.id} className="flex items-start gap-3 px-4 py-3 transition-colors hover:bg-surface"
+                  <div key={n.id} className="flex items-start gap-3 px-4 py-3 transition-colors"
                     style={{ borderBottom: '1px solid #0f0f0f' }}>
                     <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" style={{ background: dotColors[n.type] }} />
                     <div className="flex-1 min-w-0">
