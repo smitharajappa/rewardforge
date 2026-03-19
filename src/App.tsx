@@ -7,6 +7,7 @@ import { ToastSystem } from "@/components/ToastSystem";
 import { CommandPalette } from "@/components/CommandPalette";
 import { ShortcutsModal } from "@/components/ShortcutsModal";
 import HomePage from "./pages/Index";
+import BlogPage from "./pages/Blog";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -18,6 +19,9 @@ const App = () => (
         <Routes>
           {/* Landing page */}
           <Route path="/" element={<HomePage />} />
+
+          {/* Blog */}
+          <Route path="/blog" element={<BlogPage />} />
 
           {/* Single AppShell instance handles all app routes via nested Routes */}
           <Route path="/*" element={<AppShell />} />
