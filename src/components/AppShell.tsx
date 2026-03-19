@@ -85,7 +85,7 @@ export function AppShell() {
                   exit={{ opacity: 0, y: 8 }}
                   transition={{ duration: 0.15, ease: 'easeOut' }}
                 >
-                  <Routes location={location}>
+                  <Routes>
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/annotate" element={<Annotate />} />
                     <Route path="/train-rm" element={<TrainRM />} />
