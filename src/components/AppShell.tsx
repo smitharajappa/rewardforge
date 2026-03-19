@@ -13,21 +13,30 @@ import { PageSkeleton } from './PageSkeleton';
 export function AppShell() {
   const location = useLocation();
   const mainRef = useRef<HTMLDivElement>(null);
-  const [prevPath, setPrevPath] = useState(location.pathname);
-  const [showSkeleton, setShowSkeleton] = useState(false);
+  // Start with skeleton visible — hides after 1.2 s on every mount/navigation
+  const [showSkeleton, setShowSkeleton] = useState(true);
+  const prevPathRef = useRef(location.pathname);
 
+  // Scroll to top on navigation
   useEffect(() => {
     mainRef.current?.scrollTo({ top: 0 });
   }, [location.pathname]);
 
+  // Show skeleton for 1.2 s on initial mount
   useEffect(() => {
-    if (location.pathname !== prevPath) {
+    const t = setTimeout(() => setShowSkeleton(false), 1200);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Show skeleton again on every subsequent route change
+  useEffect(() => {
+    if (location.pathname !== prevPathRef.current) {
+      prevPathRef.current = location.pathname;
       setShowSkeleton(true);
-      setPrevPath(location.pathname);
       const t = setTimeout(() => setShowSkeleton(false), 1200);
       return () => clearTimeout(t);
     }
-  }, [location.pathname, prevPath]);
+  }, [location.pathname]);
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: '#000' }}>
