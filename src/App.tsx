@@ -14,11 +14,11 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AppProvider>
-      <BrowserRouter>
+      <BrowserRouter basename="/rewardforge">  {/* ← ADD basename */}
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/*" element={<AppShell />} />
-          <Route path="*" element={<NotFound />} />
+          <Route path="/*" element={<AppShell />} />  {/* AppShell handles its own sub-routes */}
+          <Route path="*" element={<NotFound />} />   {/* ← REMOVE this, AppShell's * handles it */}
         </Routes>
         <CopilotPanel />
         <ToastSystem />
