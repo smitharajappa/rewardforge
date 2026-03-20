@@ -1,25 +1,26 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useApp } from '@/context/AppContext';
+import { MarketingNav, BackLink } from '@/components/MarketingNav';
 
 const ARTICLES = [
   {
     tag: 'Tutorial', tagColor: '#38bdf8',
     title: 'Building RLHF pipelines with open-source models',
     date: 'March 15, 2026', read: '8 min read',
-    preview: 'LLaMA 3, Mistral, and Gemma have made powerful base models free. But raw models hallucinate, harm, and fail. Here\'s how to build a complete RLHF pipeline — and why RewardForge makes it 10x faster.',
+    preview: "LLaMA 3, Mistral, and Gemma have made powerful base models free. But raw models hallucinate, harm, and fail. Here's how to build a complete RLHF pipeline — and why RewardForge makes it 10x faster.",
   },
   {
     tag: 'Deep Dive', tagColor: '#a78bfa',
     title: 'PPO vs DPO: when to use each algorithm',
     date: 'March 10, 2026', read: '5 min read',
-    preview: 'Proximal Policy Optimization and Direct Preference Optimization both align language models with human feedback — but they work very differently. Here\'s the decision framework we use with customers.',
+    preview: "Proximal Policy Optimization and Direct Preference Optimization both align language models with human feedback — but they work very differently. Here's the decision framework we use with customers.",
   },
   {
     tag: 'Best Practices', tagColor: '#34d399',
     title: 'Reward hacking: how to detect and prevent it',
     date: 'March 5, 2026', read: '6 min read',
-    preview: 'When your reward model learns the wrong thing, your policy exploits it. Responses get longer or more sycophantic — and your model gets worse, not better. Here\'s how to catch it early.',
+    preview: "When your reward model learns the wrong thing, your policy exploits it. Responses get longer or more sycophantic — and your model gets worse, not better. Here's how to catch it early.",
   },
 ];
 
@@ -38,8 +39,15 @@ export default function BlogPage() {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: '#000', color: '#fafafa' }}>
-      <div className="max-w-4xl mx-auto px-6 py-16">
+    <div className="min-h-screen" style={{ background: '#000', color: '#fafafa', fontFamily: 'Syne, sans-serif' }}>
+      <MarketingNav />
+
+      <div className="max-w-4xl mx-auto px-6 py-10">
+        {/* Back link */}
+        <div className="mb-8">
+          <BackLink />
+        </div>
+
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-12">
           <h1 className="font-syne font-extrabold text-[32px] tracking-tight text-[#fafafa] mb-2">Blog</h1>

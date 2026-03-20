@@ -1,12 +1,41 @@
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Zap, BookOpen, Plug } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
+import { MarketingNav, BackLink } from '@/components/MarketingNav';
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const LS_KEY = 'rf_waitlist_email';
 
 export default function DocsPage() {
   const navigate = useNavigate();
   const { addToast } = useApp();
   const [waitlistEmail, setWaitlistEmail] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [savedEmail, setSavedEmail] = useState('');
+
+  // Check localStorage for prior submission
+  useEffect(() => {
+    const stored = localStorage.getItem(LS_KEY);
+    if (stored) {
+      setSubmitted(true);
+      setSavedEmail(stored);
+    }
+  }, []);
+
+  const handleJoin = () => {
+    setEmailError('');
+    if (!EMAIL_RE.test(waitlistEmail.trim())) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+    localStorage.setItem(LS_KEY, waitlistEmail.trim());
+    setSavedEmail(waitlistEmail.trim());
+    setSubmitted(true);
+    addToast({ type: 'success', message: "You're on the list! ✓" });
+    setWaitlistEmail('');
+  };
 
   const steps = [
     { label: 'Go to Annotate — collect 5 pairwise comparisons', path: '/annotate' },
@@ -39,7 +68,14 @@ export default function DocsPage() {
       className="min-h-screen"
       style={{ background: '#000', color: '#fafafa', fontFamily: 'Syne, sans-serif' }}
     >
-      <div className="max-w-[800px] mx-auto px-6 py-16">
+      <MarketingNav />
+
+      <div className="max-w-[800px] mx-auto px-6 py-10">
+        {/* Back link */}
+        <div className="mb-8">
+          <BackLink />
+        </div>
+
         {/* Header */}
         <div className="mb-12">
           <h1 className="font-syne font-extrabold text-4xl tracking-tight text-[#fafafa] mb-3">
@@ -128,25 +164,52 @@ export default function DocsPage() {
           <p className="text-sm mb-5 leading-relaxed" style={{ color: '#525252' }}>
             Full REST API docs launching with our backend in Q2 2026. Join the waitlist for early access.
           </p>
-          <div className="flex gap-3">
-            <input
-              type="email"
-              value={waitlistEmail}
-              onChange={e => setWaitlistEmail(e.target.value)}
-              placeholder="your@email.com"
-              className="flex-1 px-3 py-2.5 rounded-lg text-sm outline-none"
-              style={{ background: '#000', border: '1px solid #1a1a1a', color: '#fafafa' }}
-              onFocus={e => (e.currentTarget.style.borderColor = '#38bdf8')}
-              onBlur={e => (e.currentTarget.style.borderColor = '#1a1a1a')}
-            />
-            <button
-              onClick={() => { addToast({ type: 'success', message: "You're on the waitlist! ✓" }); setWaitlistEmail(''); }}
-              className="px-5 py-2.5 rounded-lg font-syne font-bold text-sm transition-opacity hover:opacity-90 shrink-0"
-              style={{ background: '#fafafa', color: '#000' }}
+
+          {submitted ? (
+            <div
+              className="flex items-center gap-2 px-4 py-3 rounded-lg"
+              style={{ background: 'rgba(52,211,153,0.06)', border: '1px solid rgba(52,211,153,0.2)' }}
             >
-              Join waitlist →
-            </button>
-          </div>
+              <span style={{ color: '#34d399' }}>✓</span>
+              <span className="text-sm" style={{ color: '#a3a3a3' }}>
+                We'll email you at <span style={{ color: '#fafafa' }}>{savedEmail}</span> when API docs launch in Q2 2026.
+              </span>
+            </div>
+          ) : (
+            <>
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <input
+                    type="email"
+                    value={waitlistEmail}
+                    onChange={e => { setWaitlistEmail(e.target.value); setEmailError(''); }}
+                    onKeyDown={e => e.key === 'Enter' && handleJoin()}
+                    placeholder="your@email.com"
+                    className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
+                    style={{
+                      background: '#000',
+                      border: emailError ? '1px solid #ef4444' : '1px solid #1a1a1a',
+                      color: '#fafafa',
+                    }}
+                    onFocus={e => { if (!emailError) e.currentTarget.style.borderColor = '#38bdf8'; }}
+                    onBlur={e => { if (!emailError) e.currentTarget.style.borderColor = '#1a1a1a'; }}
+                  />
+                  {emailError && (
+                    <p className="mt-1.5 font-mono" style={{ color: '#ef4444', fontSize: '12px' }}>
+                      {emailError}
+                    </p>
+                  )}
+                </div>
+                <button
+                  onClick={handleJoin}
+                  className="px-5 py-2.5 rounded-lg font-syne font-bold text-sm transition-opacity hover:opacity-90 shrink-0 self-start"
+                  style={{ background: '#fafafa', color: '#000' }}
+                >
+                  Join waitlist →
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
