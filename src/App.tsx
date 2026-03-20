@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { HashRouter, Route, Routes, Navigate } from "react-router-dom";
+import { HashRouter, Route, Routes } from "react-router-dom";
 import { AppProvider } from "@/context/AppContext";
 import { AppShell } from "@/components/AppShell";
 import { CopilotPanel } from "@/components/CopilotPanel";
@@ -8,6 +8,8 @@ import { CommandPalette } from "@/components/CommandPalette";
 import { ShortcutsModal } from "@/components/ShortcutsModal";
 import HomePage from "./pages/Index";
 import BlogPage from "./pages/Blog";
+import DocsPage from "./pages/Docs";
+import PricingPage from "./pages/Pricing";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,8 +22,10 @@ const App = () => (
           {/* Landing page */}
           <Route path="/" element={<HomePage />} />
 
-          {/* Blog */}
+          {/* Standalone pages */}
           <Route path="/blog" element={<BlogPage />} />
+          <Route path="/docs" element={<DocsPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
 
           {/* Single AppShell instance handles all app routes via nested Routes */}
           <Route path="/*" element={<AppShell />} />
