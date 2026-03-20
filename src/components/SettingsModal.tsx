@@ -31,15 +31,14 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
   return (
     <AnimatePresence>
       {open && (
-        <>
-          {/* Backdrop + centering wrapper */}
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[49] flex items-center justify-center p-4"
-            style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)' }}
-            onClick={onClose}
-          >
-          {/* Modal card */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[49] flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)' }}
+          onClick={onClose}
+        >
           <motion.div
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -146,8 +145,8 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
               </div>
             </div>
           </motion.div>
-          </motion.div>
-        )}
+        </motion.div>
+      )}
     </AnimatePresence>
   );
 }
