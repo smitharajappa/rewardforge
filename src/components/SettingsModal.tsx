@@ -146,8 +146,8 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
               </div>
             </div>
           </motion.div>
-        </>
-      )}
+          </motion.div>
+        )}
     </AnimatePresence>
   );
 }
