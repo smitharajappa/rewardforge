@@ -29,6 +29,7 @@ export default function HomePage() {
   const { addToast } = useApp();
   const [productOpen, setProductOpen] = useState(false);
   const [signInOpen, setSignInOpen] = useState(false);
+  const [demoModalOpen, setDemoModalOpen] = useState(false);
   const productRef = useRef<HTMLDivElement>(null);
   const signInRef = useRef<HTMLDivElement>(null);
 
