@@ -198,7 +198,7 @@ export default function HomePage() {
               style={{ background: '#fafafa', color: '#000', borderRadius: '9999px' }}>
               <LogoMark size={16} /> Start for free →
             </button>
-            <button onClick={() => navigate('/annotate')}
+            <button onClick={() => setDemoModalOpen(true)}
               className="px-5 py-2.5 text-sm font-bold transition-all cursor-pointer"
               style={{ border: '1px solid #1a1a1a', color: '#fafafa', background: 'transparent', borderRadius: '9999px' }}>
               View live demo →
