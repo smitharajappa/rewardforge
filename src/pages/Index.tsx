@@ -4,6 +4,7 @@ import { LogoMark, Wordmark } from '@/components/Logo';
 import { ArrowRight, MessageSquare, Cpu, RefreshCw, Sparkles, Package, Bot, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useApp } from '@/context/AppContext';
+import { MarcusDemoModal } from '@/components/MarcusDemoModal';
 
 const FEATURES = [
   { icon: MessageSquare, color: '#38bdf8', title: 'Pairwise Annotation', desc: 'Compare AI response pairs with keyboard shortcuts. Collect human preference data in under 60 seconds.' },
