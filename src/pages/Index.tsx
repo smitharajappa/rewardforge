@@ -323,6 +323,9 @@ export default function HomePage() {
             onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#333'}>GitHub</a>
         </div>
       </footer>
+
+      {/* Marcus Demo Modal */}
+      <MarcusDemoModal open={demoModalOpen} onClose={() => setDemoModalOpen(false)} />
     </div>
   );
 }
