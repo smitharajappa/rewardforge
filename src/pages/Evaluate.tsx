@@ -92,7 +92,7 @@ function HFHubModal({ onClose, modelName, onToast }: { onClose: () => void; mode
           </button>
         </div>
       </motion.div>
-    </>
+    </motion.div>
   );
 }
 

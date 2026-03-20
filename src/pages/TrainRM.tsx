@@ -92,7 +92,7 @@ function ModelDetailsModal({ model, onClose, onHFHub }: { model: RewardModel; on
           </button>
         </div>
       </motion.div>
-    </>
+    </motion.div>
   );
 }
 
