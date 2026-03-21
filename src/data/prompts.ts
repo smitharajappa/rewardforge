@@ -6,80 +6,53 @@ export interface Prompt {
 
 export const PROMPTS: Prompt[] = [
   {
-    text: "Explain quantum entanglement to a 10-year-old",
-    responseA: `Quantum entanglement is when two particles become connected in a special way — like magic coins. When you flip one and it lands heads, the other instantly lands tails, no matter how far apart they are. Even if one coin is on Earth and the other is on the Moon! Scientists call this "spooky action at a distance." Neither coin decides what it will be until you look at it. Once you look at one, both instantly know what to be. Einstein thought this was the strangest thing in physics — and he was right.`,
-    responseB: `Think of best friend bracelets with a superpower. When two particles get entangled, they become partners forever — check one and you instantly know something about the other, even across the universe. The particles don't send messages. They don't travel. They just... know. Scientists use this today to build ultra-secure communication systems. One day it'll power quantum computers that can solve problems today's computers never could.`,
+    text: "My landlord hasn't fixed the heating for 3 weeks. What are my options?",
+    responseA: `Under the implied warranty of habitability, which has been established in virtually all US jurisdictions through case law and statutory provisions, a landlord bears the legal obligation to maintain rental premises in a habitable condition. The failure to provide adequate heating systems, particularly during winter months, constitutes a material breach of this warranty. Tenants may pursue several remedies including rent withholding, repair and deduct (in jurisdictions permitting same), constructive eviction claims, or housing code violation complaints with municipal authorities. Documentation of all communications and conditions is essential. [294 words with 6 more paragraphs of legal citation]`,
+    responseB: `Your landlord is breaking the law. Here's what to do this week: 1) Send written notice by certified mail today documenting the issue. 2) Photograph everything with timestamps. 3) In most states you can withhold rent or hire someone to fix it after 30 days of no action. 4) File a complaint with your local housing authority — it's free and fast. Want me to look up the specific rules for your state?`,
   },
   {
-    text: "Write a Python function to reverse a linked list",
-    responseA: `def reverse_linked_list(head):
-    prev = None
-    current = head
-    while current:
-        next_node = current.next
-        current.next = prev
-        prev = current
-        current = next_node
-    return prev
-
-Iterative approach using three pointers. Time: O(n), Space: O(1). The key: save next_node before overwriting current.next, then advance all three pointers forward.`,
-    responseB: `def reverse_linked_list(head):
-    if not head or not head.next:
-        return head
-    new_head = reverse_linked_list(head.next)
-    head.next.next = head
-    head.next = None
-    return new_head
-
-Recursive — elegant but uses O(n) stack space. Recurses to the end, then on the way back sets each node's next pointer to point backward. More readable, less production-safe.`,
+    text: "I was fired without warning after 4 years. Do I have a case for wrongful termination?",
+    responseA: `The determination of wrongful termination liability requires analysis under multiple legal frameworks. In at-will employment states, which constitute the majority of US jurisdictions, employers generally retain broad discretion to terminate employment relationships absent contractual provisions to the contrary. However, exceptions exist for terminations predicated upon protected characteristics enumerated under Title VII of the Civil Rights Act, the Americans with Disabilities Act, Age Discrimination in Employment Act, and analogous state statutes. Additionally, claims may arise under promissory estoppel, implied covenant of good faith, or public policy exceptions. [continues for 312 more words]`,
+    responseB: `It depends on WHY you were fired. Quick check: Were you fired because of your race, gender, age, disability, or religion? That's illegal discrimination. Did you recently report something illegal (whistleblower)? Also protected. Did you have a written employment contract? That changes everything. If none of those apply and you're in an at-will state, unfortunately most firings are legal even if unfair. Tell me more about your situation and I can be more specific.`,
   },
   {
-    text: "What are the pros and cons of remote work?",
-    responseA: `Pros: Eliminates commuting (1–2hrs/day reclaimed), global talent access, reduced real-estate overhead, productivity gains for deep work. Cons: Async adds latency to decisions, onboarding suffers without in-person mentorship, team cohesion erodes over time, home distractions, career visibility reduced for some roles. The research is mixed — it depends heavily on role type, personality, and company culture.`,
-    responseB: `Remote work is a trade-off that cuts both ways. The biggest win is autonomy — you design your own day. The biggest loss is spontaneous collaboration — the hallway conversation that solves a problem in 30 seconds now needs a Slack thread and a calendar invite. Companies save on office space; employees save on commutes. But junior employees develop slower without osmotic learning, and some people genuinely work better with structure.`,
+    text: "My business partner wants to dissolve our LLC but I don't agree. What are my rights?",
+    responseA: `LLC dissolution disputes are governed primarily by the operating agreement executed between the members, supplemented by applicable state LLC statutes where the operating agreement is silent or ambiguous. Under most state frameworks including Delaware, California, and New York LLC acts, dissolution may require unanimous member consent absent contrary provisions in the operating agreement. Members opposing dissolution may petition for judicial intervention, seek injunctive relief, or invoke buy-out provisions if stipulated. The fiduciary duties owed between members may also give rise to claims for breach in circumstances involving improper dissolution attempts. [continues 280 more words]`,
+    responseB: `Check your LLC operating agreement first — it should spell out exactly how dissolution works. If it requires unanimous agreement, your partner can't force it without you. If they're trying to push through dissolution anyway, you can: 1) Demand a buyout at fair market value, 2) Go to court for an injunction to stop it, 3) Negotiate — sometimes one partner buys out the other. What does your operating agreement say about dissolution?`,
   },
   {
-    text: "How do I negotiate a higher salary?",
-    responseA: `1. Research: Glassdoor, Levels.fyi, LinkedIn Salary. Know your number before any conversation. 2. Timing: after a win, during review, or when you have a competing offer. 3. Lead with value: "Based on X contribution and market data, I'm targeting $Y." 4. Give a specific number, not a range. 5. Stay silent after making your ask. 6. If no, ask what it would take to get there and get it in writing.`,
-    responseB: `The single most important thing: have a competing offer or be willing to walk away. Everything else is tactics. With real leverage, the conversation is straightforward. Without it, you're asking for a favor. Research your number, ask for 15–20% above your floor, say it confidently, and don't apologize for negotiating. Companies expect it. The biggest mistake is vagueness — be specific or lose.`,
+    text: "A customer is threatening to sue me for a product that broke. What should I do?",
+    responseA: `Upon receipt of litigation threats, businesses should immediately implement litigation hold protocols to preserve all potentially relevant documentation. The merits analysis requires examination of applicable product liability theories including manufacturing defects, design defects, and failure to warn under both negligence and strict liability frameworks. Warranty claims under the Uniform Commercial Code, specifically implied warranties of merchantability, may also be implicated. Risk assessment should consider the customer's damages, the strength of their claim, litigation costs, reputational costs, and insurance coverage availability. [continues 265 more words]`,
+    responseB: `Don't panic, but do act fast. Steps to take today: 1) Don't admit fault or apologize in writing — this can hurt you later. 2) Document everything: the product, photos, customer communications. 3) Check if you have product liability insurance — call your insurer now. 4) Depending on the dollar amount, it may be cheaper to offer a refund or replacement than to fight it. What's the product and roughly how much money is involved?`,
   },
   {
-    text: "Explain the difference between TCP and UDP",
-    responseA: `TCP (Transmission Control Protocol) is reliable and ordered — every packet arrives, in sequence, confirmed by a three-way handshake. Great for web, email, file transfers. UDP is fire-and-forget — sends packets without confirming receipt. Much faster, but packets can drop. Ideal for live video, gaming, VoIP. Think of TCP as certified mail and UDP as dropping flyers from a plane.`,
-    responseB: `TCP = phone call. You establish a connection, both sides confirm they're listening, every word gets through, and if something drops it gets resent. UDP = shouting across a crowded room. Fast, simple, no guarantee. Use TCP when data integrity matters (banking, files). Use UDP when speed beats perfection (live games, streaming). QUIC — used by YouTube — combines both ideas.`,
+    text: "I signed a non-compete clause. Can my old employer stop me from starting a new business?",
+    responseA: `Non-compete enforceability varies dramatically across jurisdictions, with California, North Dakota, and Minnesota generally prohibiting such agreements, while other states apply a reasonableness standard examining temporal scope, geographic limitations, and legitimate business interest protection. Courts engage in blue-penciling analysis to modify overly broad provisions in many jurisdictions. The FTC Non-Compete Rule, subject to ongoing litigation, would significantly restrict enforcement in the private sector. Material consideration adequacy at contract formation may also affect enforceability. [continues 298 more words]`,
+    responseB: `Good news: non-competes are very hard to enforce and often unenforceable. Key questions: What state are you in? (California bans them entirely.) How long does it last? (Courts reject anything over 1-2 years.) How broad is the geographic area? Are you actually competing with them, or just in the same general industry? In most cases, if you're starting something in a different niche, you're fine. Send me the specific language and I'll tell you what the real risk is.`,
   },
   {
-    text: "Write a haiku about machine learning",
-    responseA: `Data flows like rain
-Weights adjust through endless nights
-Patterns slowly wake`,
-    responseB: `Gradient descends
-Loss shrinks with each epoch passed
-Model learns to see`,
+    text: "My contractor didn't finish the work but wants full payment. What should I do?",
+    responseA: `Construction contract disputes implicating incomplete performance are evaluated under substantial performance doctrine principles, whereby courts assess whether the deviation from contractual specifications is material or merely nominal. Remedies available to property owners include withholding of payment proportionate to incomplete work, seeking specific performance requiring completion, pursuing breach of contract damages including cost of completion, or asserting claims for defective workmanship. Mechanic's lien implications must also be assessed given contractor rights to encumber property for unpaid work claims. [continues 251 more words]`,
+    responseB: `Do not pay the full amount. Here's the simple approach: 1) Write down exactly what's unfinished with photos. 2) Calculate the reasonable cost to finish the work yourself. 3) Offer to pay the full contract minus that amount. 4) Get everything in writing. 5) If they threaten a lien, most states require contractors to finish work before they can file one. Small claims court handles this well if it's under $10-15k. What specifically wasn't finished?`,
   },
   {
-    text: "What causes inflation and how can it be controlled?",
-    responseA: `Inflation has three root causes: demand-pull (too much money chasing too few goods), cost-push (input costs rising), and built-in (wage-price spiral). Central banks fight it with interest rates — raising rates makes borrowing expensive, reduces spending, cools demand. Works with a 12–18 month lag. The 2022 surge was pandemic supply shocks plus unprecedented fiscal stimulus colliding.`,
-    responseB: `Inflation means your money buys less. The main causes: too much money printed, supply chains breaking, or companies raising prices because they can. The Fed fights it by raising rates — making loans more expensive slows borrowing and spending. The risk: too fast causes recession, too slow embeds inflation in expectations. It's a balancing act with delayed feedback — which is why central banks often get it wrong.`,
+    text: "I received a cease and desist letter for my small business logo. Is this legitimate?",
+    responseA: `Trademark infringement cease and desist correspondence requires careful analysis under the Lanham Act likelihood of confusion standard, which considers factors including mark similarity, goods and services proximity, evidence of actual confusion, marketing channels, purchaser sophistication, and the strength of the senior user's mark. Reverse confusion doctrine may apply where a larger entity uses a mark similar to that of a smaller prior user. Response options include challenging infringement allegations, negotiating coexistence agreements, or modifying the allegedly infringing mark. [continues 289 more words]`,
+    responseB: `C&D letters are often scare tactics — receiving one doesn't mean you're actually infringing. First, check: Is their trademark actually registered? (Search USPTO.gov, it's free.) How similar are the logos really? Are you in the same industry serving the same customers? Many small businesses successfully push back on these letters. Don't just change your logo out of fear. But also don't ignore it — you have 30 days to respond. Want help figuring out if this has merit?`,
   },
   {
-    text: "How does the immune system fight viruses?",
-    responseA: `Two-layer defense. Innate immune system responds first (hours): natural killer cells and macrophages attack anything foreign. Then adaptive kicks in (days): B cells produce antibodies specific to the virus's antigens, T cells kill infected cells directly, memory cells form for future encounters. This is why symptoms peak at day 2–3 (immune response ramping) and improve by day 7 (adaptive winning).`,
-    responseB: `Your body has a two-stage defense. Stage 1: general alarm — fever, inflammation, fatigue. Your body heats up to make it hostile for the virus. Stage 2: precision strike — your immune system identifies the specific virus, builds custom antibodies, destroys infected cells. After recovery it keeps memory. Next exposure, the response is 10× faster. That's also how vaccines work — training Stage 2 safely.`,
+    text: "My employee filed a workers comp claim I think is fraudulent. What can I do?",
+    responseA: `Workers' compensation fraud investigation and dispute procedures are administered through state workers' compensation boards and insurers. Employers suspecting fraudulent claims may report concerns to their insurer's Special Investigation Unit, request independent medical examinations, engage surveillance within legally permissible parameters, and challenge claims through formal hearing procedures. Documentation of the employee's job duties, the alleged incident circumstances, witness statements, and medical records is essential. Retaliatory discharge claims under applicable state law must be carefully avoided throughout the dispute process. [continues 267 more words]`,
+    responseB: `You have the right to dispute the claim but you must follow the process carefully. Steps: 1) Report your suspicion to your workers comp insurance carrier immediately — they have investigators for this. 2) Gather evidence: witness accounts, surveillance footage, social media (public posts are fair game), prior medical history if relevant. 3) Request an Independent Medical Exam (IME) — your insurer can arrange this. Critical warning: Do NOT fire or retaliate against the employee while the claim is pending — that's a separate lawsuit waiting to happen.`,
   },
   {
-    text: "Explain recursion with a simple example",
-    responseA: `Recursion is a function calling itself on a smaller version of the same problem. Example — factorial:
-def factorial(n):
-    if n <= 1: return 1
-    return n * factorial(n - 1)
-factorial(5) = 5 × 4 × 3 × 2 × 1 = 120.
-Two requirements: base case (n<=1) to stop, recursive case that moves toward it. Without a base case: infinite recursion, stack overflow.`,
-    responseB: `Imagine a line of people. You want to know your position. You ask the person in front. They ask the person in front. This continues until the first person says "I'm #1." Everyone adds 1 and passes the answer back. That's recursion. Each instance solves a tiny piece and relies on the next. In code, a function calls itself with simpler input until it hits a case it can answer directly.`,
+    text: "A vendor is not delivering what was in our contract. Can I cancel and get a refund?",
+    responseA: `Contract rescission and cancellation rights arising from vendor non-performance require analysis of material breach doctrine, anticipatory repudiation principles, and applicable cure provisions within the agreement. The non-breaching party's obligations to mitigate damages are relevant to recovery calculations. Remedies may include rescission with restitution, expectation damages, consequential damages where foreseeable at contract formation, and specific performance in appropriate circumstances. Force majeure clause applicability should also be assessed given recent supply chain disruptions. [continues 274 more words]`,
+    responseB: `Yes, in most cases you can cancel and get a refund if they're not delivering what was promised. Here's the quick path: 1) Send a formal written notice giving them a specific deadline to perform (usually 10-30 days). 2) Document every missed delivery or failure in writing as it happens. 3) If they miss the deadline, send a written cancellation notice citing breach of contract. 4) Demand a refund of any prepayment. If they refuse, small claims court for amounts under $10-15k is fast and cheap. What does the contract say about breach and termination?`,
   },
   {
-    text: "What are the ethical implications of AI?",
-    responseA: `Key concerns: (1) Bias amplification at scale. (2) Labor displacement of white-collar roles. (3) Mass surveillance becoming cheap. (4) Autonomous weapons with no accountability. (5) Power concentration in a handful of companies. (6) Alignment — ensuring advanced AI pursues human values remains unsolved with potentially existential stakes if we get it wrong.`,
-    responseB: `AI ethics comes down to three questions: Who decides? Who benefits? Who's harmed? The people building the most powerful AI are a small, homogeneous group. Benefits flow disproportionately to capital. Harms — job loss, surveillance, bias — fall on those with less power. The hard questions aren't technical. They're about governance and whether we want a world optimized for engagement and profit.`,
+    text: "I want to trademark my business name. What's the process and what can go wrong?",
+    responseA: `Federal trademark registration through the United States Patent and Trademark Office requires submission of a use-based application under 15 U.S.C. § 1051(a) or an intent-to-use application under § 1051(b), accompanied by identification of goods and services in the appropriate International Classification. The examination process involves USPTO review for descriptiveness, genericness, likelihood of confusion with existing registrations, and other statutory bars. Opposition proceedings before the Trademark Trial and Appeal Board may be initiated by third parties within 30 days of publication. [continues 315 more words]`,
+    responseB: `Great move — here's the practical guide: 1) First search the USPTO database (USPTO.gov/trademarks) to make sure no one has it already. 2) Choose the right 'class' — there are 45 categories. File in every class where you do business. 3) Cost: $250-350 per class to file. Takes 8-12 months. 4) What goes wrong: picking a too-generic name (can't trademark 'Fast Food'), not searching thoroughly, or filing the wrong class. Most common mistake: waiting too long — register early before someone beats you to it.`,
   },
 ];

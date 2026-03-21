@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
+import { DemoBanner } from './DemoBanner';
 import { Dashboard } from '@/pages/Dashboard';
 import { Annotate } from '@/pages/Annotate';
 import { TrainRM } from '@/pages/TrainRM';
@@ -61,6 +62,7 @@ export function AppShell() {
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopBar />
+        <DemoBanner />
         <main ref={mainRef} className="flex-1 overflow-y-auto bg-grid-main relative">
           {/* Radial glows */}
           <div className="fixed top-0 left-[220px] w-[500px] h-[400px] pointer-events-none z-0"

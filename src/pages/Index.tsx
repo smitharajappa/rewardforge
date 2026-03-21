@@ -4,6 +4,7 @@ import { LogoMark, Wordmark } from '@/components/Logo';
 import { ArrowRight, MessageSquare, Cpu, RefreshCw, Sparkles, Package, Bot, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useApp } from '@/context/AppContext';
+import { MarcusDemoModal } from '@/components/MarcusDemoModal';
 
 const FEATURES = [
   { icon: MessageSquare, color: '#38bdf8', title: 'Pairwise Annotation', desc: 'Compare AI response pairs with keyboard shortcuts. Collect human preference data in under 60 seconds.' },
@@ -28,6 +29,7 @@ export default function HomePage() {
   const { addToast } = useApp();
   const [productOpen, setProductOpen] = useState(false);
   const [signInOpen, setSignInOpen] = useState(false);
+  const [demoModalOpen, setDemoModalOpen] = useState(false);
   const productRef = useRef<HTMLDivElement>(null);
   const signInRef = useRef<HTMLDivElement>(null);
 
@@ -196,7 +198,7 @@ export default function HomePage() {
               style={{ background: '#fafafa', color: '#000', borderRadius: '9999px' }}>
               <LogoMark size={16} /> Start for free →
             </button>
-            <button onClick={() => navigate('/annotate')}
+            <button onClick={() => setDemoModalOpen(true)}
               className="px-5 py-2.5 text-sm font-bold transition-all cursor-pointer"
               style={{ border: '1px solid #1a1a1a', color: '#fafafa', background: 'transparent', borderRadius: '9999px' }}>
               View live demo →
@@ -321,6 +323,9 @@ export default function HomePage() {
             onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#333'}>GitHub</a>
         </div>
       </footer>
+
+      {/* Marcus Demo Modal */}
+      <MarcusDemoModal open={demoModalOpen} onClose={() => setDemoModalOpen(false)} />
     </div>
   );
 }
