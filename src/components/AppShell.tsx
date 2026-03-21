@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
+import { DemoBanner } from './DemoBanner';
 import { Dashboard } from '@/pages/Dashboard';
 import { Annotate } from '@/pages/Annotate';
 import { TrainRM } from '@/pages/TrainRM';
