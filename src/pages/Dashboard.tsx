@@ -260,7 +260,7 @@ function GovernanceTimeline() {
 }
 
 export function Dashboard() {
-  const { comparisons, ratings, rewardModels, rlRuns, activityLog } = useApp();
+  const { comparisons, ratings, rewardModels, rlRuns, activityLog, setComparisons, setRatings, setRewardModels, setRlRuns } = useApp();
   const navigate = useNavigate();
 
   const avgRating = ratings.length ? ratings.reduce((a, r) => a + r.overall, 0) / ratings.length : 0;
