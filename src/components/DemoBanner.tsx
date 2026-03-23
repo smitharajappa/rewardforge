@@ -21,6 +21,10 @@ export function DemoBanner() {
     localStorage.removeItem('rf_models');
     localStorage.removeItem('rf_runs');
     localStorage.removeItem('rf_activity');
+    localStorage.removeItem('rf_generated_prompts');
+    localStorage.removeItem('rf_banner_team');
+    localStorage.removeItem('rf_banner_audit');
+    localStorage.removeItem('rf_banner_drift');
     setActive(false);
     navigate('/');
   };
@@ -28,24 +32,14 @@ export function DemoBanner() {
   return (
     <div
       className="flex items-center justify-between px-6"
-      style={{
-        background: 'rgba(56,189,248,0.06)',
-        borderBottom: '1px solid rgba(56,189,248,0.15)',
-        padding: '10px 24px',
-        minHeight: 38,
-        flexShrink: 0,
-      }}
+      style={{ background: 'rgba(56,189,248,0.06)', borderBottom: '1px solid rgba(56,189,248,0.15)', padding: '10px 24px', minHeight: 38, flexShrink: 0 }}
     >
       <span className="font-mono text-[13px]" style={{ color: '#38bdf8' }}>
         👤 Demo: Marcus's Legal AI Project · LexAI
       </span>
-      <button
-        onClick={exitDemo}
-        className="font-mono text-[12px] transition-colors"
-        style={{ color: '#525252' }}
+      <button onClick={exitDemo} className="font-mono text-[12px] transition-colors" style={{ color: '#525252' }}
         onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#a3a3a3'}
-        onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#525252'}
-      >
+        onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#525252'}>
         Exit demo ×
       </button>
     </div>

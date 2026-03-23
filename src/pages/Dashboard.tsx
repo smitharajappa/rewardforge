@@ -34,10 +34,8 @@ function StatCard({ label, value, displayValue, icon: Icon, color, trend, trendC
       onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#2a2a2a'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; }}
       onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#1a1a1a'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}
     >
-      <div className="absolute top-0 left-0 right-0 h-[1px]"
-        style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent)' }} />
-      <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-4"
-        style={{ background: `${color}18` }}>
+      <div className="absolute top-0 left-0 right-0 h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent)' }} />
+      <div className="w-8 h-8 rounded-lg flex items-center justify-center mb-4" style={{ background: `${color}18` }}>
         <Icon size={17} style={{ color }} />
       </div>
       <div className="text-[26px] font-syne font-extrabold tracking-tight" style={{ color }}>
@@ -56,17 +54,10 @@ const MOCK_CHART_DATA = Array.from({ length: 20 }, (_, i) => ({
 }));
 
 const ACTIVITY_ICONS: Record<string, React.ElementType> = {
-  comparison: MessageSquare,
-  rating: Sparkles,
-  training: Cpu,
-  rl_run: RefreshCw,
+  comparison: MessageSquare, rating: Sparkles, training: Cpu, rl_run: RefreshCw,
 };
-
 const ACTIVITY_COLORS: Record<string, string> = {
-  comparison: '#38bdf8',
-  rating: '#f472b6',
-  training: '#34d399',
-  rl_run: '#a78bfa',
+  comparison: '#38bdf8', rating: '#f472b6', training: '#34d399', rl_run: '#a78bfa',
 };
 
 function relativeTime(date: Date) {
@@ -74,6 +65,176 @@ function relativeTime(date: Date) {
   if (s < 60) return `${s}s ago`;
   if (s < 3600) return `${Math.floor(s / 60)}m ago`;
   return `${Math.floor(s / 3600)}h ago`;
+}
+
+// ── Behavioral Standards Card ─────────────────────────────────
+function BehavioralStandardsCard() {
+  const { addToast } = useApp();
+  const isDemoMode = localStorage.getItem('rf_demo_mode') === 'marcus';
+  const useCase = localStorage.getItem('rf_use_case') || 'developer';
+
+  const standards: Record<string, string[]> = {
+    legal: [
+      'Always recommend consulting a local attorney for jurisdiction-specific questions',
+      'Keep responses under 100 words unless client requests detail',
+      'Never cite specific cases without flagging independent verification is needed',
+    ],
+    medical: [
+      'Always recommend consulting a doctor for diagnosis and treatment decisions',
+      'Never provide specific dosage advice without physician guidance',
+      'Always mention when symptoms require emergency care',
+    ],
+    financial: [
+      'Always disclose this is general information not personalized financial advice',
+      'Never recommend specific securities without suitability assessment',
+      'Always recommend consulting a licensed financial advisor for major decisions',
+    ],
+  };
+
+  const items = isDemoMode
+    ? standards.legal
+    : standards[useCase] ?? standards.legal;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }}
+      className="p-5 rounded-xl"
+      style={{ background: '#0a0a0a', border: '1px solid #1a1a1a' }}
+    >
+      <div className="flex items-center justify-between mb-2">
+        <span className="font-syne font-semibold text-sm text-[#fafafa]">AI Behavioral Standards</span>
+        <span className="font-mono text-[10px] px-2.5 py-1 rounded-full"
+          style={{ background: 'rgba(56,189,248,0.1)', border: '1px solid rgba(56,189,248,0.2)', color: '#38bdf8' }}>
+          Coming Q2 2026
+        </span>
+      </div>
+      <p className="text-[13px] mb-4 leading-relaxed" style={{ color: '#525252' }}>
+        Define plain-language rules that govern how your AI responds. Version, approve, and monitor compliance automatically.
+      </p>
+      <div className="space-y-0">
+        {items.map((s, i) => (
+          <div key={i} className="flex items-start gap-2.5 py-2" style={{ borderBottom: i < items.length - 1 ? '1px solid #111' : 'none' }}>
+            <span className="text-[12px] mt-0.5" style={{ color: '#34d399' }}>✓</span>
+            <span className="text-[12px] leading-relaxed text-[#fafafa]">{s}</span>
+          </div>
+        ))}
+      </div>
+      <div className="flex items-center justify-between mt-4">
+        <span className="font-mono text-[11px]" style={{ color: '#333' }}>3 example standards shown</span>
+        <button
+          onClick={() => addToast({ type: 'info', message: 'Behavioral standards launching Q2 2026. You\'re on the early access list! ✓' })}
+          className="font-mono text-[11px] px-3 py-1.5 rounded-lg transition-all"
+          style={{ border: '1px solid #2a2a2a', color: '#a3a3a3' }}
+          onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = '#525252'}
+          onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = '#2a2a2a'}
+        >
+          Define your standards →
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
+// ── Governance Timeline ───────────────────────────────────────
+function GovernanceTimeline() {
+  const { comparisons, rewardModels, rlRuns, addToast } = useApp();
+  const navigate = useNavigate();
+
+  const items: { color: string; title: string; detail: string; time: string }[] = [];
+
+  comparisons.forEach((c, i) => {
+    if (i === 0 || i === 4 || i === 9 || i === comparisons.length - 1) {
+      items.push({
+        color: '#38bdf8',
+        title: `${i + 1} comparison${i > 0 ? 's' : ''} collected`,
+        detail: `AI preference prompts · ${new Date(c.timestamp).toLocaleDateString()}`,
+        time: 'Today',
+      });
+    }
+  });
+
+  rewardModels.forEach(m => {
+    items.push({
+      color: '#34d399',
+      title: `Reward model trained · ${m.name}`,
+      detail: `${m.baseModel} · ${(m.accuracy * 100).toFixed(1)}% accuracy`,
+      time: 'Today',
+    });
+  });
+
+  rlRuns.forEach(r => {
+    items.push({
+      color: '#a78bfa',
+      title: `RL run complete · ${r.id}`,
+      detail: `${r.algorithm} · Reward: ${r.finalReward.toFixed(3)} · ${r.maxSteps} steps`,
+      time: 'Today',
+    });
+  });
+
+  items.reverse();
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.38 }}>
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h3 className="font-syne font-semibold text-base text-[#fafafa]">Governance Timeline</h3>
+          <p className="font-mono text-[11px] mt-0.5" style={{ color: '#525252' }}>Complete record of your AI's evolution</p>
+        </div>
+        <button
+          onClick={() => addToast({ type: 'info', message: 'Full audit trail on Growth plan. Upgrade to access complete history.' })}
+          className="font-mono text-[11px] transition-colors"
+          style={{ color: '#333' }}
+          onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#525252'}
+          onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#333'}
+        >
+          View full audit →
+        </button>
+      </div>
+
+      {items.length === 0 ? (
+        <div className="py-8 text-center">
+          <p className="font-mono text-[12px]" style={{ color: '#333' }}>
+            Your governance timeline will appear here<br />as you complete pipeline steps.
+          </p>
+        </div>
+      ) : (
+        <div>
+          {items.map((item, i) => (
+            <div key={i} className="flex gap-3 py-2.5" style={{ borderBottom: i < items.length - 1 ? '1px solid #111' : 'none' }}>
+              <div className="flex flex-col items-center">
+                <div className="w-2.5 h-2.5 rounded-full mt-1 shrink-0" style={{ background: item.color }} />
+                {i < items.length - 1 && <div className="w-px flex-1 mt-1" style={{ background: '#111', minHeight: 16 }} />}
+              </div>
+              <div className="flex-1 pb-1">
+                <p className="font-syne font-medium text-[13px] text-[#fafafa]">{item.title}</p>
+                <p className="font-mono text-[11px] mt-0.5" style={{ color: '#525252' }}>{item.detail}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Coming soon */}
+      <div className="mt-3 p-4 rounded-lg" style={{ background: '#0a0a0a', border: '1px solid #1a1a1a' }}>
+        <p className="font-mono text-[11px] mb-3" style={{ color: '#38bdf8' }}>Coming in Q2 2026</p>
+        <div className="flex items-center gap-6 mb-3">
+          {['📋 Standards changes', '🔔 Drift alerts', '📅 Review reminders'].map(item => (
+            <span key={item} className="font-mono text-[11px]" style={{ color: '#525252' }}>{item}</span>
+          ))}
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="font-mono text-[11px]" style={{ color: '#333' }}>Full audit trail on Growth plan</span>
+          <button
+            onClick={() => navigate('/pricing')}
+            className="font-mono text-[11px] px-3 py-1 rounded transition-all"
+            style={{ border: '1px solid #2a2a2a', color: '#a3a3a3' }}
+          >
+            Upgrade →
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  );
 }
 
 export function Dashboard() {
@@ -133,6 +294,9 @@ export function Dashboard() {
           trend={lastRun ? `Latest: ${lastRun.algorithm}` : 'No runs yet'} delay={0.15} />
       </div>
 
+      {/* Behavioral Standards Card */}
+      <BehavioralStandardsCard />
+
       {/* Pipeline progress */}
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
         className="relative p-5 rounded-xl overflow-hidden"
@@ -154,13 +318,9 @@ export function Dashboard() {
                   style={{ background: s.done ? 'rgba(52,211,153,0.15)' : i === pipelineStep - 1 ? 'rgba(56,189,248,0.15)' : '#111', border: `2px solid ${s.done ? '#34d399' : i === pipelineStep - 1 ? '#38bdf8' : '#1a1a1a'}` }}>
                   {s.done ? <CheckCircle2 size={14} style={{ color: '#34d399' }} /> : i === pipelineStep - 1 ? <Clock size={14} className="animate-pulse" style={{ color: '#38bdf8' }} /> : <div className="w-2 h-2 rounded-full" style={{ background: '#333' }} />}
                 </div>
-                <span className="font-mono text-[9px] uppercase tracking-widest" style={{ color: s.done ? '#34d399' : i === pipelineStep - 1 ? '#38bdf8' : '#333' }}>
-                  {s.label}
-                </span>
+                <span className="font-mono text-[9px] uppercase tracking-widest" style={{ color: s.done ? '#34d399' : i === pipelineStep - 1 ? '#38bdf8' : '#333' }}>{s.label}</span>
               </div>
-              {i < 3 && (
-                <div className="flex-1 h-[2px] mx-2 mb-5" style={{ background: s.done ? '#34d399' : '#1a1a1a' }} />
-              )}
+              {i < 3 && <div className="flex-1 h-[2px] mx-2 mb-5" style={{ background: s.done ? '#34d399' : '#1a1a1a' }} />}
             </div>
           ))}
         </div>
@@ -171,12 +331,10 @@ export function Dashboard() {
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
           className="col-span-2 relative p-5 rounded-xl overflow-hidden"
           style={{ background: '#0a0a0a', border: '1px solid #1a1a1a' }}>
-          <div className="absolute top-0 left-0 right-0 h-[1px]"
-            style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent)' }} />
+          <div className="absolute top-0 left-0 right-0 h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent)' }} />
           <div className="flex items-center gap-2 mb-5">
             <h3 className="font-syne font-bold text-sm text-[#fafafa]">Reward Improvement</h3>
-            <span className="font-mono text-[9px] px-2 py-0.5 rounded"
-              style={{ background: '#111', border: '1px solid #1a1a1a', color: '#525252' }}>SIMULATED</span>
+            <span className="font-mono text-[9px] px-2 py-0.5 rounded" style={{ background: '#111', border: '1px solid #1a1a1a', color: '#525252' }}>SIMULATED</span>
           </div>
           <div className="h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -194,10 +352,7 @@ export function Dashboard() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#1a1a1a" vertical={false} />
                 <XAxis dataKey="step" stroke="#333" fontSize={9} fontFamily="Space Mono" tick={{ fill: '#333' }} />
                 <YAxis stroke="#333" fontSize={9} fontFamily="Space Mono" tick={{ fill: '#333' }} />
-                <Tooltip
-                  contentStyle={{ background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 8, fontFamily: 'Space Mono', fontSize: 11 }}
-                  labelStyle={{ color: '#525252' }}
-                />
+                <Tooltip contentStyle={{ background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 8, fontFamily: 'Space Mono', fontSize: 11 }} labelStyle={{ color: '#525252' }} />
                 <Area type="monotone" dataKey="PPO" stroke="#38bdf8" fill="url(#colorPPO)" strokeWidth={2} dot={false} />
                 <Area type="monotone" dataKey="GRPO" stroke="#f472b6" fill="url(#colorGRPO)" strokeWidth={2} dot={false} />
               </AreaChart>
@@ -217,8 +372,7 @@ export function Dashboard() {
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
           className="relative p-5 rounded-xl overflow-hidden"
           style={{ background: '#0a0a0a', border: '1px solid #1a1a1a' }}>
-          <div className="absolute top-0 left-0 right-0 h-[1px]"
-            style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent)' }} />
+          <div className="absolute top-0 left-0 right-0 h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent)' }} />
           <div className="flex justify-between items-center mb-5">
             <h3 className="font-syne font-bold text-sm text-[#fafafa]">Recent Activity</h3>
             <button className="font-mono text-[9px] hover:underline" style={{ color: '#38bdf8' }}>VIEW ALL</button>
@@ -248,9 +402,7 @@ export function Dashboard() {
                         {item.message}
                         {item.value && <span className="font-bold" style={{ color: item.valueColor ?? '#fafafa' }}>{item.value}</span>}
                       </p>
-                      <span className="font-mono text-[9px]" style={{ color: '#333' }}>
-                        {relativeTime(item.timestamp)}
-                      </span>
+                      <span className="font-mono text-[9px]" style={{ color: '#333' }}>{relativeTime(item.timestamp)}</span>
                     </div>
                   </div>
                 );
@@ -258,6 +410,12 @@ export function Dashboard() {
             </div>
           )}
         </motion.div>
+      </div>
+
+      {/* Governance Timeline */}
+      <div className="relative p-5 rounded-xl overflow-hidden" style={{ background: '#0a0a0a', border: '1px solid #1a1a1a' }}>
+        <div className="absolute top-0 left-0 right-0 h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent)' }} />
+        <GovernanceTimeline />
       </div>
 
       {/* Quick actions */}
@@ -269,8 +427,7 @@ export function Dashboard() {
               className="text-left p-4 rounded-xl transition-all duration-150"
               style={{ background: '#0a0a0a', border: '1px solid #1a1a1a' }}
               onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = '#2a2a2a'}
-              onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = '#1a1a1a'}
-            >
+              onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = '#1a1a1a'}>
               <div className="w-8 h-8 rounded-lg mb-3 flex items-center justify-center" style={{ background: `${a.color}18` }}>
                 <div className="w-2.5 h-2.5 rounded-full" style={{ background: a.color }} />
               </div>
