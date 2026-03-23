@@ -200,10 +200,7 @@ export default function HomePage() {
           {/* CTA buttons */}
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.18 }}
             className="flex items-center justify-center gap-2.5">
-          <button onClick={() => {
-              const hasUseCase = localStorage.getItem('rf_use_case');
-              navigate(hasUseCase ? '/dashboard' : '/onboarding');
-            }}
+          <button onClick={handleGetStarted}
             className="px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-opacity hover:opacity-88 cursor-pointer"
             style={{ background: '#fafafa', color: '#000', borderRadius: '9999px' }}>
             <LogoMark size={16} /> Start for free →
