@@ -299,7 +299,7 @@ export default function HomePage() {
           <div className="relative z-10">
             <h2 className="font-syne font-extrabold text-[22px] text-[#fafafa] mb-2">Start forging aligned models today.</h2>
             <p className="text-sm mb-6" style={{ color: '#525252' }}>Free plan. 1,000 comparisons. 3 training runs. No CC.</p>
-            <button onClick={() => navigate('/dashboard')}
+            <button onClick={handleGetStarted}
               className="px-5 py-2.5 text-sm font-bold transition-opacity hover:opacity-88 cursor-pointer"
               style={{ background: '#fafafa', color: '#000', borderRadius: '9999px' }}>
               Get started →
