@@ -5,6 +5,15 @@ import { useNavigate } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useApp } from '@/context/AppContext';
 
+const USE_CASE_META: Record<string, { emoji: string; label: string }> = {
+  legal: { emoji: '⚖️', label: 'Legal Services' },
+  medical: { emoji: '🏥', label: 'Medical & Health' },
+  financial: { emoji: '💰', label: 'Financial Services' },
+  customer_service: { emoji: '🎧', label: 'Customer Service' },
+  education: { emoji: '📚', label: 'Education' },
+  developer: { emoji: '⚙️', label: 'Developer / Other' },
+};
+
 function useCountUp(target: number, duration = 800) {
   const [value, setValue] = useState(0);
   useEffect(() => {
