@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Eye, EyeOff, Copy } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { useNavigate } from 'react-router-dom';
+import { clearPipelineData } from '@/lib/clearPipelineData';
 
 interface SettingsModalProps {
   open: boolean;
@@ -24,15 +25,22 @@ function planHasApiAccess(): boolean {
 }
 
 export function SettingsModal({ open, onClose }: SettingsModalProps) {
-  const { resetDemoData, addToast } = useApp();
+  const { resetDemoData, addToast, setComparisons, setRatings, setRewardModels, setRlRuns } = useApp();
   const navigate = useNavigate();
-  const [projectName, setProjectName] = useState('My RLHF Project');
+  const [projectName, setProjectName] = useState(
+    () => localStorage.getItem('rf_project_name') || 'My RLHF Project'
+  );
   const [apiKeyVisible, setApiKeyVisible] = useState(false);
   const apiKey = 'rf-sk-••••••••4f9a';
   const realApiKey = 'rf-sk-a9b2c3d4e5f64f9a';
 
   const useCase = localStorage.getItem('rf_use_case') || '';
   const useCaseInfo = USE_CASE_MAP[useCase];
+
+  // Persist project name on every keystroke
+  useEffect(() => {
+    localStorage.setItem('rf_project_name', projectName);
+  }, [projectName]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(realApiKey);
@@ -46,8 +54,12 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
   };
 
   const handleSwitchUseCase = () => {
+    clearPipelineData();
     localStorage.removeItem('rf_use_case');
-    localStorage.removeItem('rf_generated_prompts');
+    setComparisons([]);
+    setRatings([]);
+    setRewardModels([]);
+    setRlRuns([]);
     onClose();
     navigate('/onboarding');
   };
@@ -86,11 +98,14 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
               {/* Project Name */}
               <div>
                 <label className="font-mono text-[10px] uppercase tracking-widest text-[#525252] block mb-2">Project Name</label>
-                <input value={projectName} onChange={e => setProjectName(e.target.value)}
+                <input
+                  value={projectName}
+                  onChange={e => setProjectName(e.target.value)}
                   className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
                   style={{ background: '#000', border: '1px solid #1a1a1a', color: '#fafafa' }}
                   onFocus={e => e.currentTarget.style.borderColor = '#38bdf8'}
-                  onBlur={e => e.currentTarget.style.borderColor = '#1a1a1a'} />
+                  onBlur={e => e.currentTarget.style.borderColor = '#1a1a1a'}
+                />
               </div>
 
               {/* Use Case */}

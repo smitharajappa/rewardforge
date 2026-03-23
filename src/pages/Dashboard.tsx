@@ -4,6 +4,7 @@ import { LayoutGrid, MessageSquare, Cpu, RefreshCw, CheckCircle2, Clock, BarChar
 import { useNavigate } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useApp } from '@/context/AppContext';
+import { clearPipelineData } from '@/lib/clearPipelineData';
 
 const USE_CASE_META: Record<string, { emoji: string; label: string }> = {
   legal: { emoji: '⚖️', label: 'Legal Services' },
@@ -259,16 +260,18 @@ function GovernanceTimeline() {
 }
 
 export function Dashboard() {
-  const { comparisons, ratings, rewardModels, rlRuns, activityLog } = useApp();
+  const { comparisons, ratings, rewardModels, rlRuns, activityLog, setComparisons, setRatings, setRewardModels, setRlRuns } = useApp();
   const navigate = useNavigate();
 
   const avgRating = ratings.length ? ratings.reduce((a, r) => a + r.overall, 0) / ratings.length : 0;
   const bestRM = rewardModels[0];
   const lastRun = rlRuns[0];
-  const pipelineStep = comparisons.length >= 5 ? (rewardModels.length > 0 ? (rlRuns.length > 0 ? 4 : 3) : 2) : 1;
+  // 5-step pipeline: Upload(1), Annotate(2), Train RM(3), RL Loop(4), Evaluate(5)
+  const pipelineStep = rlRuns.length > 0 ? 5 : rewardModels.length > 0 ? 4 : comparisons.length >= 5 ? 3 : comparisons.length > 0 ? 2 : 1;
 
   const pipelineSteps = [
-    { label: 'Annotate', done: comparisons.length > 0 },
+    { label: 'Upload', done: comparisons.length > 0 },
+    { label: 'Annotate', done: comparisons.length >= 5 },
     { label: 'Train RM', done: rewardModels.length > 0 },
     { label: 'RL Loop', done: rlRuns.length > 0 },
     { label: 'Evaluate', done: rlRuns.length > 1 },
@@ -283,6 +286,16 @@ export function Dashboard() {
 
   const currentUseCase = localStorage.getItem('rf_use_case');
   const ucMeta = currentUseCase ? USE_CASE_META[currentUseCase] : null;
+
+  const handleSwitchUseCase = () => {
+    clearPipelineData();
+    localStorage.removeItem('rf_use_case');
+    setComparisons([]);
+    setRatings([]);
+    setRewardModels([]);
+    setRlRuns([]);
+    navigate('/onboarding');
+  };
 
   return (
     <div className="space-y-7">
@@ -311,11 +324,7 @@ export function Dashboard() {
             {ucMeta.emoji} {ucMeta.label} workspace
           </span>
           <button
-            onClick={() => {
-              localStorage.removeItem('rf_use_case');
-              localStorage.removeItem('rf_generated_prompts');
-              navigate('/onboarding');
-            }}
+            onClick={handleSwitchUseCase}
             className="font-mono text-[11px] transition-opacity hover:opacity-80"
             style={{ color: '#38bdf8', background: 'none', border: 'none', cursor: 'pointer' }}
           >
@@ -350,8 +359,8 @@ export function Dashboard() {
         <div className="flex items-center justify-between mb-5">
           <h3 className="font-syne font-bold text-sm text-[#fafafa]">RLHF Pipeline</h3>
           <span className="font-mono text-[9px] px-2 py-0.5 rounded-full"
-            style={{ background: pipelineStep === 4 ? 'rgba(52,211,153,0.1)' : 'rgba(245,158,11,0.1)', border: `1px solid ${pipelineStep === 4 ? '#34d39930' : '#f59e0b30'}`, color: pipelineStep === 4 ? '#34d399' : '#f59e0b' }}>
-            {pipelineStep === 4 ? '✓ Pipeline complete' : `Step ${pipelineStep} of 4`}
+            style={{ background: pipelineStep === 5 ? 'rgba(52,211,153,0.1)' : 'rgba(245,158,11,0.1)', border: `1px solid ${pipelineStep === 5 ? '#34d39930' : '#f59e0b30'}`, color: pipelineStep === 5 ? '#34d399' : '#f59e0b' }}>
+            {pipelineStep === 5 ? '✓ Pipeline complete' : `Step ${pipelineStep} of 5`}
           </span>
         </div>
         <div className="flex items-center gap-0">
@@ -364,7 +373,7 @@ export function Dashboard() {
                 </div>
                 <span className="font-mono text-[9px] uppercase tracking-widest" style={{ color: s.done ? '#34d399' : i === pipelineStep - 1 ? '#38bdf8' : '#333' }}>{s.label}</span>
               </div>
-              {i < 3 && <div className="flex-1 h-[2px] mx-2 mb-5" style={{ background: s.done ? '#34d399' : '#1a1a1a' }} />}
+              {i < 4 && <div className="flex-1 h-[2px] mx-2 mb-5" style={{ background: s.done ? '#34d399' : '#1a1a1a' }} />}
             </div>
           ))}
         </div>

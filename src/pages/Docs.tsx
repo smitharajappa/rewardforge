@@ -38,10 +38,36 @@ export default function DocsPage() {
   };
 
   const steps = [
-    { label: 'Go to Annotate — collect 5 pairwise comparisons', path: '/annotate' },
-    { label: 'Go to Train RM — click Start Training', path: '/train-rm' },
-    { label: 'Go to RL Loop — launch PPO or DPO run', path: '/rl-loop' },
-    { label: 'Go to Evaluate — compare results and export model', path: '/evaluate' },
+    {
+      label: 'Select your use case',
+      desc: "Tell RewardForge what you're building — legal, medical, financial, or other. We personalize your prompts and Copilot for your specific domain automatically.",
+      path: '/onboarding',
+    },
+    {
+      label: 'Upload your practice documents',
+      desc: "Upload your firm's FAQ, intake forms, or client emails. We extract your real client questions and generate AI response pairs from YOUR actual practice. Your data never leaves your browser.",
+      path: '/annotate',
+    },
+    {
+      label: 'Annotate AI responses',
+      desc: 'Compare two AI responses and pick which one better serves your clients. No ML knowledge needed — just your professional judgment. 10 comparisons takes 15 minutes.',
+      path: '/annotate',
+    },
+    {
+      label: 'Train your reward model',
+      desc: 'One button trains your AI on your preferences. RewardForge automatically selects the right model and settings. Takes about 2 minutes.',
+      path: '/train-rm',
+    },
+    {
+      label: 'Launch RL fine-tuning',
+      desc: 'Run PPO, GRPO, or DPO to align your AI to your professional standards. Watch the reward score climb in real time.',
+      path: '/rl-loop',
+    },
+    {
+      label: 'Export your alignment certificate',
+      desc: "Get your official compliance certificate with your experts' credentials, quality score, and complete audit trail. Share with regulators, insurers, and clients.",
+      path: '/evaluate',
+    },
   ];
 
   const concepts = [
@@ -93,27 +119,30 @@ export default function DocsPage() {
         >
           <div className="flex items-center gap-2.5 mb-5">
             <Zap size={16} style={{ color: '#38bdf8' }} />
-            <h2 className="font-syne font-bold text-base text-[#fafafa]">Quick Start (5 minutes)</h2>
+            <h2 className="font-syne font-bold text-base text-[#fafafa]">Quick Start (6 minutes)</h2>
           </div>
           <div className="space-y-3">
             {steps.map((step, i) => (
               <div
                 key={i}
-                className="flex items-center justify-between py-3 px-3 rounded-lg"
+                className="flex items-start justify-between py-3 px-3 rounded-lg gap-4"
                 style={{ background: '#000', border: '1px solid #111' }}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-start gap-3">
                   <span
-                    className="font-mono text-[10px] w-5 h-5 rounded-full flex items-center justify-center shrink-0"
+                    className="font-mono text-[10px] w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5"
                     style={{ background: 'rgba(56,189,248,0.1)', border: '1px solid rgba(56,189,248,0.25)', color: '#38bdf8' }}
                   >
                     {i + 1}
                   </span>
-                  <span className="text-sm" style={{ color: '#a3a3a3' }}>{step.label}</span>
+                  <div>
+                    <div className="text-sm font-syne font-semibold mb-1" style={{ color: '#fafafa' }}>{step.label}</div>
+                    <div className="text-[12px] leading-relaxed" style={{ color: '#525252' }}>{step.desc}</div>
+                  </div>
                 </div>
                 <button
                   onClick={() => navigate(step.path)}
-                  className="font-mono text-[10px] px-3 py-1.5 rounded-full transition-all shrink-0 ml-4"
+                  className="font-mono text-[10px] px-3 py-1.5 rounded-full transition-all shrink-0"
                   style={{ border: '1px solid #1a1a1a', color: '#525252' }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.color = '#38bdf8'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(56,189,248,0.4)'; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.color = '#525252'; (e.currentTarget as HTMLElement).style.borderColor = '#1a1a1a'; }}

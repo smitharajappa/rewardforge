@@ -399,16 +399,47 @@ export function Evaluate() {
           </div>
           <div className="grid grid-cols-2 gap-6 p-6">
             <div className="space-y-4">
-              {[
-                { label: 'ORGANIZATION', value: 'Your Organization' },
-                { label: 'CERTIFIED BY', value: localStorage.getItem('rf_demo_mode') === 'marcus' ? 'Marcus Chen · Managing Partner' : 'Your Name · Your Role' },
-                { label: 'PROFESSIONAL STANDARDS', value: localStorage.getItem('rf_demo_mode') === 'marcus' ? 'California Bar Association Guidelines' : `${(localStorage.getItem('rf_use_case') || 'general')} professional standards` },
-              ].map(({ label, value }) => (
-                <div key={label}>
-                  <p className="font-mono text-[9px] uppercase tracking-widest mb-1" style={{ color: '#525252' }}>{label}</p>
-                  <p className="text-[13px] text-[#fafafa]">{value}</p>
-                </div>
-              ))}
+              {(() => {
+                const isDemoMode = localStorage.getItem('rf_demo_mode') === 'marcus';
+                const useCase = localStorage.getItem('rf_use_case') || 'developer';
+                const projectName = localStorage.getItem('rf_project_name') || '';
+
+                const ORG_FALLBACK: Record<string, string> = {
+                  legal: 'Chen & Associates Legal Group',
+                  medical: 'Your Medical Practice',
+                  financial: 'Your Financial Advisory',
+                  customer_service: 'Your Support Team',
+                  education: 'Your Educational Institution',
+                  developer: 'Your Organization',
+                };
+                const STANDARDS_MAP: Record<string, string> = {
+                  legal: 'California Bar Association Guidelines',
+                  medical: 'Clinical practice & patient care standards',
+                  financial: 'FINRA suitability & disclosure guidelines',
+                  customer_service: 'Customer experience best practices',
+                  education: 'Academic integrity & pedagogy standards',
+                  developer: 'Software engineering best practices',
+                };
+
+                const org = projectName || ORG_FALLBACK[useCase] || 'Your Organization';
+                const certifiedBy = isDemoMode
+                  ? 'Marcus Chen · Managing Partner'
+                  : projectName ? `${projectName} · Administrator` : 'Your Name · Your Role';
+                const standards = isDemoMode
+                  ? 'California Bar Association Guidelines'
+                  : (STANDARDS_MAP[useCase] || 'Professional industry standards');
+
+                return [
+                  { label: 'ORGANIZATION', value: org },
+                  { label: 'CERTIFIED BY', value: certifiedBy },
+                  { label: 'PROFESSIONAL STANDARDS', value: standards },
+                ].map(({ label, value }) => (
+                  <div key={label}>
+                    <p className="font-mono text-[9px] uppercase tracking-widest mb-1" style={{ color: '#525252' }}>{label}</p>
+                    <p className="text-[13px] text-[#fafafa]">{value}</p>
+                  </div>
+                ));
+              })()}
             </div>
             <div className="space-y-4">
               <div>

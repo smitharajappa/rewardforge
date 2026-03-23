@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { LogoMark, Wordmark } from '@/components/Logo';
+import { clearPipelineData } from '@/lib/clearPipelineData';
 
 const USE_CASES = [
   { id: 'legal', emoji: '⚖️', label: 'Legal Services', desc: 'Law firms, attorneys, legal assistants' },
@@ -21,6 +22,12 @@ export default function OnboardingPage() {
 
   const handleContinue = () => {
     if (!selected) return;
+
+    // If switching to a different use case, clear all pipeline data
+    if (existingUseCase && existingUseCase !== selected) {
+      clearPipelineData();
+    }
+
     localStorage.setItem('rf_use_case', selected);
     const returnPath = localStorage.getItem('rf_return_path') || '/dashboard';
     localStorage.removeItem('rf_return_path');

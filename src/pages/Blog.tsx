@@ -29,7 +29,7 @@ export default function BlogPage() {
   const [email, setEmail] = useState('');
 
   const handleArticle = () => {
-    addToast({ type: 'info', message: 'Full article coming soon — follow @rewardforge for updates' });
+    addToast({ type: 'info', message: 'Full article coming soon — subscribe to our newsletter for early access.' });
   };
 
   const handleSubscribe = () => {
