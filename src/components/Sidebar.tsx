@@ -1,5 +1,5 @@
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { LayoutGrid, MessageSquare, Cpu, RefreshCw, BarChart2, Sparkles, Settings, Home, BookOpen, CreditCard, LogOut } from 'lucide-react';
+import { LayoutGrid, MessageSquare, Cpu, RefreshCw, BarChart2, Sparkles, Settings, Home, BookOpen, CreditCard, LogOut, FileText } from 'lucide-react';
 import { LogoMark, Wordmark } from './Logo';
 import { useApp } from '@/context/AppContext';
 import { useState, useRef, useEffect } from 'react';
