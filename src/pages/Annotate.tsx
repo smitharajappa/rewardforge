@@ -776,7 +776,18 @@ function RateTab({ prompts }: { prompts: GeneratedPrompt[] }) {
 
 // ── Main Annotate Page ────────────────────────────────────────
 export function Annotate() {
+  const navigate = useNavigate();
   const useCase = localStorage.getItem('rf_use_case') || 'developer';
+
+  // Fix 3: redirect to onboarding if no use case and not in demo mode
+  useEffect(() => {
+    const uc = localStorage.getItem('rf_use_case');
+    const isDemo = localStorage.getItem('rf_demo_mode') === 'marcus';
+    if (!isDemo && !uc) {
+      localStorage.setItem('rf_return_path', '/annotate');
+      navigate('/onboarding');
+    }
+  }, []);
 
   // Determine initial step: if prompts already exist skip to annotate
   const [annotateStep, setAnnotateStep] = useState<'upload' | 'generating' | 'annotate'>(() => {
