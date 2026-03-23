@@ -79,10 +79,9 @@ function relativeTime(date: Date) {
 // ── Behavioral Standards Card ─────────────────────────────────
 function BehavioralStandardsCard() {
   const { addToast } = useApp();
-  const isDemoMode = localStorage.getItem('rf_demo_mode') === 'marcus';
-  const useCase = localStorage.getItem('rf_use_case') || 'developer';
+  const useCase = localStorage.getItem('rf_use_case') || 'legal';
 
-  const standards: Record<string, string[]> = {
+  const STANDARDS_BY_USE_CASE: Record<string, string[]> = {
     legal: [
       'Always recommend consulting a local attorney for jurisdiction-specific questions',
       'Keep responses under 100 words unless client requests detail',
@@ -98,11 +97,24 @@ function BehavioralStandardsCard() {
       'Never recommend specific securities without suitability assessment',
       'Always recommend consulting a licensed financial advisor for major decisions',
     ],
+    customer_service: [
+      "Always acknowledge the customer's frustration before providing a solution",
+      'Never promise a specific resolution timeframe without checking availability',
+      'Always offer a follow-up contact method at the end of each response',
+    ],
+    education: [
+      'Always encourage students to attempt the problem before providing the answer',
+      'Never make a student feel bad for not understanding a concept',
+      'Always connect new concepts to something the student already knows',
+    ],
+    developer: [
+      'Always include working code examples for technical explanations',
+      'Never suggest deprecated libraries or outdated approaches',
+      'Always mention potential edge cases and error handling',
+    ],
   };
 
-  const items = isDemoMode
-    ? standards.legal
-    : standards[useCase] ?? standards.legal;
+  const items = STANDARDS_BY_USE_CASE[useCase] ?? STANDARDS_BY_USE_CASE['legal'];
 
   return (
     <motion.div
