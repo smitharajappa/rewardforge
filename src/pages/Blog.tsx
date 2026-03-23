@@ -78,7 +78,7 @@ export default function BlogPage() {
                   <h2 className="font-syne font-bold text-[17px] text-[#fafafa] mb-2 leading-snug">{a.title}</h2>
                   <p className="text-[13px] leading-relaxed mb-4" style={{ color: '#525252' }}>{a.preview}</p>
                   <button
-                    onClick={handleArticle}
+                    onClick={() => navigate(a.path)}
                     className="font-syne font-bold text-sm transition-opacity hover:opacity-80"
                     style={{ color: a.tagColor }}
                   >
