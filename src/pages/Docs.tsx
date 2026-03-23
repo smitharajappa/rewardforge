@@ -77,7 +77,11 @@ export default function DocsPage() {
     },
     {
       term: 'What is a reward model?',
-      def: 'A neural network trained on your preference data that learns to score AI responses. Higher score = better response for your use case.',
+      def: "A small neural network trained on your team's preferences. It learns what 'good' means for your specific use case and scores AI responses accordingly. After training on 200+ comparisons, it can rank responses nearly as well as a human expert in your field.",
+    },
+    {
+      term: 'What is the alignment certificate?',
+      def: "An automatically generated compliance document showing who trained your AI, what professional standards were applied, and how quality improved from before to after training. Your licensed professionals' names and credentials appear on it — not ours. Designed for bar associations, malpractice insurers, and regulatory audits.",
     },
     {
       term: 'What is KL divergence?',
@@ -86,6 +90,10 @@ export default function DocsPage() {
     {
       term: 'PPO vs DPO',
       def: 'PPO: stable, works for most cases. DPO: faster and simpler, trains directly on preference pairs without a separate RL loop.',
+    },
+    {
+      term: 'Why does private training matter?',
+      def: "Your client data stays in your browser during document upload and prompt generation. No third party sees your practice documents or client questions. Attorney-client privilege, HIPAA, and FINRA requirements are preserved by architecture — not just policy.",
     },
   ];
 

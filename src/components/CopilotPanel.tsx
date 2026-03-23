@@ -9,7 +9,7 @@ import { USE_CASE_LABEL } from '@/data/faqStrings';
 const SUGGESTION_GROUPS = [
   [
     "Why is my KL divergence at 0.038?",
-    "Is {n} comparisons enough to start?",
+    "Is {n} comparison{plural} enough to start?",
     "PPO or DPO — which should I use?",
     "What does my reward score mean?",
   ],
@@ -181,7 +181,9 @@ export function CopilotPanel() {
   }, [input, isThinking, isStreaming, copilotHistory, comparisons.length, ratings.length, rewardModels, rlRuns, isDemoMode, lastRM, lastRun, useCase, setCopilotHistory]);
 
   const resolvedSuggestions = SUGGESTION_GROUPS[suggestionGroup].map(s =>
-    s.replace('{n}', String(comparisons.length))
+    s
+      .replace('{n}', String(comparisons.length))
+      .replace('{plural}', comparisons.length !== 1 ? 's' : '')
   );
   const nextGroup = (suggestionGroup + 1) % SUGGESTION_GROUPS.length;
 

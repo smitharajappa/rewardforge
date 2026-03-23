@@ -1,36 +1,37 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useApp } from '@/context/AppContext';
+import { useNavigate } from 'react-router-dom';
 import { MarketingNav, BackLink } from '@/components/MarketingNav';
 
 const ARTICLES = [
   {
     tag: 'Tutorial', tagColor: '#38bdf8',
     title: 'Building RLHF pipelines with open-source models',
-    date: 'March 15, 2026', read: '8 min read',
+    date: 'March 15, 2026', read: '6 min read',
     preview: "LLaMA 3, Mistral, and Gemma have made powerful base models free. But raw models hallucinate, harm, and fail. Here's how to build a complete RLHF pipeline — and why RewardForge makes it 10x faster.",
+    path: '/blog/rlhf-pipelines',
   },
   {
     tag: 'Deep Dive', tagColor: '#a78bfa',
     title: 'PPO vs DPO: when to use each algorithm',
     date: 'March 10, 2026', read: '5 min read',
     preview: "Proximal Policy Optimization and Direct Preference Optimization both align language models with human feedback — but they work very differently. Here's the decision framework we use with customers.",
+    path: '/blog/ppo-vs-dpo',
   },
   {
     tag: 'Best Practices', tagColor: '#34d399',
     title: 'Reward hacking: how to detect and prevent it',
     date: 'March 5, 2026', read: '6 min read',
     preview: "When your reward model learns the wrong thing, your policy exploits it. Responses get longer or more sycophantic — and your model gets worse, not better. Here's how to catch it early.",
+    path: '/blog/reward-hacking',
   },
 ];
 
 export default function BlogPage() {
+  const navigate = useNavigate();
   const { addToast } = useApp();
   const [email, setEmail] = useState('');
-
-  const handleArticle = () => {
-    addToast({ type: 'info', message: 'Full article coming soon — subscribe to our newsletter for early access.' });
-  };
 
   const handleSubscribe = () => {
     if (!email.trim()) return;
@@ -77,7 +78,7 @@ export default function BlogPage() {
                   <h2 className="font-syne font-bold text-[17px] text-[#fafafa] mb-2 leading-snug">{a.title}</h2>
                   <p className="text-[13px] leading-relaxed mb-4" style={{ color: '#525252' }}>{a.preview}</p>
                   <button
-                    onClick={handleArticle}
+                    onClick={() => navigate(a.path)}
                     className="font-syne font-bold text-sm transition-opacity hover:opacity-80"
                     style={{ color: a.tagColor }}
                   >

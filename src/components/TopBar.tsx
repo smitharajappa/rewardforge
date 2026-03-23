@@ -215,7 +215,7 @@ export function TopBar() {
               className="absolute -top-0.5 -right-0.5 min-w-[14px] h-3.5 rounded-full font-mono text-[8px] flex items-center justify-center px-0.5"
               style={{ background: '#38bdf8', color: '#000' }}
             >
-              {unreadCount}
+              {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           )}
         </button>

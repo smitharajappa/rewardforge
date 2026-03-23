@@ -1,5 +1,5 @@
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { LayoutGrid, MessageSquare, Cpu, RefreshCw, BarChart2, Sparkles, Settings, Home, BookOpen, CreditCard, LogOut } from 'lucide-react';
+import { LayoutGrid, MessageSquare, Cpu, RefreshCw, BarChart2, Sparkles, Settings, Home, BookOpen, CreditCard, LogOut, FileText } from 'lucide-react';
 import { LogoMark, Wordmark } from './Logo';
 import { useApp } from '@/context/AppContext';
 import { useState, useRef, useEffect } from 'react';
@@ -119,13 +119,24 @@ export function Sidebar() {
         <div className="p-3" style={{ borderTop: '1px solid #1a1a1a' }}>
           {/* Home link */}
           <Link to="/"
-            className="flex items-center gap-2 px-2.5 py-1.5 rounded-md mb-2 transition-colors text-[11px] font-mono cursor-pointer"
+            className="flex items-center gap-2 px-2.5 py-1.5 rounded-md mb-1 transition-colors text-[11px] font-mono cursor-pointer"
             style={{ color: '#333', textDecoration: 'none' }}
             onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#525252'}
             onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#333'}
           >
             <Home size={11} />
             ← Home
+          </Link>
+
+          {/* Blog link */}
+          <Link to="/blog"
+            className="flex items-center gap-2 px-2.5 py-1.5 rounded-md mb-2 transition-colors text-[11px] font-mono cursor-pointer"
+            style={{ color: '#333', textDecoration: 'none' }}
+            onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#525252'}
+            onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#333'}
+          >
+            <FileText size={11} />
+            📝 Blog
           </Link>
 
           {/* User profile with dropdown */}
