@@ -4,6 +4,7 @@ import { LayoutGrid, MessageSquare, Cpu, RefreshCw, CheckCircle2, Clock, BarChar
 import { useNavigate } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useApp } from '@/context/AppContext';
+import { clearPipelineData } from '@/lib/clearPipelineData';
 
 const USE_CASE_META: Record<string, { emoji: string; label: string }> = {
   legal: { emoji: '⚖️', label: 'Legal Services' },
