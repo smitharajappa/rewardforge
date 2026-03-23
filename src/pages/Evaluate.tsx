@@ -424,7 +424,7 @@ export function Evaluate() {
               <div>
                 <p className="font-mono text-[9px] uppercase tracking-widest mb-1" style={{ color: '#525252' }}>CERTIFICATE ID</p>
                 <p className="font-mono text-[13px]" style={{ color: '#38bdf8' }}>
-                  {(() => { const k = 'rf_cert_id'; let id = localStorage.getItem(k); if (!id) { id = `RF-2026-${String(Math.floor(10000 + Math.random() * 90000))`; localStorage.setItem(k, id); } return id; })()}
+                  {(() => { const k = 'rf_cert_id'; let id = localStorage.getItem(k); if (!id) { id = 'RF-2026-' + String(Math.floor(10000 + Math.random() * 90000)); localStorage.setItem(k, id); } return id; })()}
                 </p>
               </div>
             </div>
