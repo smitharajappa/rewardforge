@@ -158,7 +158,7 @@ export default function HomePage() {
               )}
             </AnimatePresence>
           </div>
-          <button onClick={() => navigate('/dashboard')}
+          <button onClick={handleGetStarted}
             className="px-4 py-1.5 rounded-full text-xs font-bold transition-opacity hover:opacity-88 flex items-center gap-1.5 cursor-pointer"
             style={{ background: '#fafafa', color: '#000' }}>
             Get started <ArrowRight size={12} />
