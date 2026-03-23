@@ -371,7 +371,7 @@ function GeneratingScreen({
     return (
       <div className="max-w-[480px] mx-auto text-center py-16">
         <div className="font-syne font-bold text-[22px] mb-4" style={{ color: '#34d399' }}>
-          ✅ {generatedPrompts.length} prompts generated!
+          {wasInstant ? '✅ 10 prompts loaded instantly!' : `✅ ${generatedPrompts.length} prompts generated from your document!`}
         </div>
         <div className="space-y-2 mb-6 text-left">
           {generatedPrompts.slice(0, 3).map((p, i) => (
