@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/context/AppContext';
 import { callGroq, getGroqKey } from '@/lib/groq';
 import { FAQ_BY_USE_CASE, FAQ_LABEL, FAQ_SUBTITLE } from '@/data/faqStrings';
+import { PAIRS_BY_USE_CASE } from '@/data/prompts';
 
 // ── Types ─────────────────────────────────────────────────────
 interface GeneratedPrompt {
@@ -129,6 +130,7 @@ function UploadScreen({ onGenerate }: { onGenerate: (text: string) => void }) {
   };
 
   const handleExampleFAQ = () => {
+    localStorage.setItem('rf_using_example_faq', 'true');
     const faq = FAQ_BY_USE_CASE[useCase] || FAQ_BY_USE_CASE['developer'];
     tryGenerate(faq);
   };
@@ -241,6 +243,7 @@ function GeneratingScreen({
   const [questions, setQuestions] = useState<string[]>([]);
   const [showSuccess, setShowSuccess] = useState(false);
   const [generatedPrompts, setGeneratedPrompts] = useState<GeneratedPrompt[]>([]);
+  const [wasInstant, setWasInstant] = useState(false);
   const ran = useRef(false);
 
   const getFallbackQuestions = (): string[] => {
@@ -265,6 +268,27 @@ function GeneratingScreen({
     ran.current = true;
 
     const run = async () => {
+      // FIX 1: Skip Groq for example FAQs — instant load
+      const isHardcodedFAQ = localStorage.getItem('rf_using_example_faq') === 'true';
+      if (isHardcodedFAQ) {
+        localStorage.removeItem('rf_using_example_faq');
+        const pairs = (PAIRS_BY_USE_CASE[useCase] || PAIRS_BY_USE_CASE['developer']).map(p => ({
+          prompt: p.text,
+          responseA: p.responseA,
+          responseB: p.responseB,
+        }));
+        localStorage.setItem('rf_generated_prompts', JSON.stringify(pairs));
+        setStep1Done(true);
+        setStep2Done(true);
+        setStep3Done(true);
+        setProgress(100);
+        setGeneratedPrompts(pairs);
+        setWasInstant(true);
+        setShowSuccess(true);
+        setTimeout(() => onDone(pairs), 1000);
+        return;
+      }
+
       const groqKey = getGroqKey();
       setStep1Done(true);
       setProgress(10);
@@ -347,7 +371,7 @@ function GeneratingScreen({
     return (
       <div className="max-w-[480px] mx-auto text-center py-16">
         <div className="font-syne font-bold text-[22px] mb-4" style={{ color: '#34d399' }}>
-          ✅ {generatedPrompts.length} prompts generated!
+          {wasInstant ? '✅ 10 prompts loaded instantly!' : `✅ ${generatedPrompts.length} prompts generated from your document!`}
         </div>
         <div className="space-y-2 mb-6 text-left">
           {generatedPrompts.slice(0, 3).map((p, i) => (

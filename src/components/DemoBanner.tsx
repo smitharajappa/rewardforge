@@ -17,6 +17,7 @@ export function DemoBanner() {
   const exitDemo = () => {
     localStorage.removeItem('rf_demo_mode');
     localStorage.removeItem('rf_generated_prompts');
+    localStorage.removeItem('rf_using_example_faq');
     localStorage.removeItem('rf_banner_team');
     localStorage.removeItem('rf_banner_audit');
     localStorage.removeItem('rf_banner_drift');
