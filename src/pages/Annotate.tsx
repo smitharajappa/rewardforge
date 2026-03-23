@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/context/AppContext';
 import { callGroq, getGroqKey } from '@/lib/groq';
 import { FAQ_BY_USE_CASE, FAQ_LABEL, FAQ_SUBTITLE } from '@/data/faqStrings';
+import { PAIRS_BY_USE_CASE } from '@/data/prompts';
 
 // ── Types ─────────────────────────────────────────────────────
 interface GeneratedPrompt {
