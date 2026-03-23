@@ -90,11 +90,8 @@ function PipelineProgress({ activeStep }: { activeStep: number }) {
 // ── Upload Screen ─────────────────────────────────────────────
 function UploadScreen({ onGenerate }: { onGenerate: (text: string) => void }) {
   const { addToast } = useApp();
-  const navigate = useNavigate();
   const [documentText, setDocumentText] = useState('');
   const [fileName, setFileName] = useState('');
-  const [groqModalOpen, setGroqModalOpen] = useState(false);
-  const [pendingText, setPendingText] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isDemoMode = localStorage.getItem('rf_demo_mode') === 'marcus';
