@@ -90,15 +90,23 @@ function PipelineProgress({ activeStep }: { activeStep: number }) {
 // ── Upload Screen ─────────────────────────────────────────────
 function UploadScreen({ onGenerate }: { onGenerate: (text: string) => void }) {
   const { addToast } = useApp();
+  const navigate = useNavigate();
   const [documentText, setDocumentText] = useState('');
   const [fileName, setFileName] = useState('');
   const [groqModalOpen, setGroqModalOpen] = useState(false);
   const [pendingText, setPendingText] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const isDemoMode = localStorage.getItem('rf_demo_mode') === 'marcus';
   const useCase = localStorage.getItem('rf_use_case') || 'developer';
-  const faqLabel = FAQ_LABEL[useCase] || 'Use example FAQ →';
-  const faqSubtitle = FAQ_SUBTITLE[useCase] || '';
+
+  const faqLabel = isDemoMode
+    ? "Use Marcus's Law Firm FAQ →"
+    : (FAQ_LABEL[useCase] || 'Use example FAQ →');
+
+  const faqSubtitle = isDemoMode
+    ? "47 questions from a California law firm"
+    : (FAQ_SUBTITLE[useCase] || '');
 
   const tryGenerate = (text: string) => {
     const key = getGroqKey();
