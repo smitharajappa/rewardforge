@@ -221,14 +221,6 @@ function UploadScreen({ onGenerate }: { onGenerate: (text: string) => void }) {
           )}
         </div>
       </div>
-
-      <GroqKeyModal
-        open={groqModalOpen}
-        onClose={() => { setGroqModalOpen(false); setPendingText(null); }}
-        onSaved={() => {
-          if (pendingText) onGenerate(pendingText);
-        }}
-      />
     </>
   );
 }
