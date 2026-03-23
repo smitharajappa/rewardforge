@@ -30,6 +30,13 @@ export default function HomePage() {
   const [productOpen, setProductOpen] = useState(false);
   const [signInOpen, setSignInOpen] = useState(false);
   const [demoModalOpen, setDemoModalOpen] = useState(false);
+
+  const handleGetStarted = () => {
+    const useCase = localStorage.getItem('rf_use_case');
+    const isDemoMode = localStorage.getItem('rf_demo_mode') === 'marcus';
+    if (isDemoMode) { navigate('/dashboard'); return; }
+    navigate(useCase ? '/dashboard' : '/onboarding');
+  };
   const productRef = useRef<HTMLDivElement>(null);
   const signInRef = useRef<HTMLDivElement>(null);
 
@@ -151,7 +158,7 @@ export default function HomePage() {
               )}
             </AnimatePresence>
           </div>
-          <button onClick={() => navigate('/dashboard')}
+          <button onClick={handleGetStarted}
             className="px-4 py-1.5 rounded-full text-xs font-bold transition-opacity hover:opacity-88 flex items-center gap-1.5 cursor-pointer"
             style={{ background: '#fafafa', color: '#000' }}>
             Get started <ArrowRight size={12} />
@@ -193,10 +200,7 @@ export default function HomePage() {
           {/* CTA buttons */}
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.18 }}
             className="flex items-center justify-center gap-2.5">
-          <button onClick={() => {
-              const hasUseCase = localStorage.getItem('rf_use_case');
-              navigate(hasUseCase ? '/dashboard' : '/onboarding');
-            }}
+          <button onClick={handleGetStarted}
             className="px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-opacity hover:opacity-88 cursor-pointer"
             style={{ background: '#fafafa', color: '#000', borderRadius: '9999px' }}>
             <LogoMark size={16} /> Start for free →
@@ -295,7 +299,7 @@ export default function HomePage() {
           <div className="relative z-10">
             <h2 className="font-syne font-extrabold text-[22px] text-[#fafafa] mb-2">Start forging aligned models today.</h2>
             <p className="text-sm mb-6" style={{ color: '#525252' }}>Free plan. 1,000 comparisons. 3 training runs. No CC.</p>
-            <button onClick={() => navigate('/dashboard')}
+            <button onClick={handleGetStarted}
               className="px-5 py-2.5 text-sm font-bold transition-opacity hover:opacity-88 cursor-pointer"
               style={{ background: '#fafafa', color: '#000', borderRadius: '9999px' }}>
               Get started →

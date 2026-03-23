@@ -16,15 +16,15 @@ export function DemoBanner() {
 
   const exitDemo = () => {
     localStorage.removeItem('rf_demo_mode');
+    localStorage.removeItem('rf_generated_prompts');
+    localStorage.removeItem('rf_banner_team');
+    localStorage.removeItem('rf_banner_audit');
+    localStorage.removeItem('rf_banner_drift');
     localStorage.removeItem('rf_comparisons');
     localStorage.removeItem('rf_ratings');
     localStorage.removeItem('rf_models');
     localStorage.removeItem('rf_runs');
     localStorage.removeItem('rf_activity');
-    localStorage.removeItem('rf_generated_prompts');
-    localStorage.removeItem('rf_banner_team');
-    localStorage.removeItem('rf_banner_audit');
-    localStorage.removeItem('rf_banner_drift');
     setActive(false);
     navigate('/');
   };

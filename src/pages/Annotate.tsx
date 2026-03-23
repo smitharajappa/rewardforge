@@ -4,7 +4,6 @@ import { CheckCircle2, ChevronRight, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/context/AppContext';
 import { callGroq, getGroqKey } from '@/lib/groq';
-import { GroqKeyModal } from '@/components/GroqKeyModal';
 import { FAQ_BY_USE_CASE, FAQ_LABEL, FAQ_SUBTITLE } from '@/data/faqStrings';
 
 // ── Types ─────────────────────────────────────────────────────
@@ -92,22 +91,21 @@ function UploadScreen({ onGenerate }: { onGenerate: (text: string) => void }) {
   const { addToast } = useApp();
   const [documentText, setDocumentText] = useState('');
   const [fileName, setFileName] = useState('');
-  const [groqModalOpen, setGroqModalOpen] = useState(false);
-  const [pendingText, setPendingText] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const isDemoMode = localStorage.getItem('rf_demo_mode') === 'marcus';
   const useCase = localStorage.getItem('rf_use_case') || 'developer';
-  const faqLabel = FAQ_LABEL[useCase] || 'Use example FAQ →';
-  const faqSubtitle = FAQ_SUBTITLE[useCase] || '';
+
+  const faqLabel = isDemoMode
+    ? "Use Marcus's Law Firm FAQ →"
+    : (FAQ_LABEL[useCase] || 'Use example FAQ →');
+
+  const faqSubtitle = isDemoMode
+    ? "47 questions from a California law firm"
+    : (FAQ_SUBTITLE[useCase] || '');
 
   const tryGenerate = (text: string) => {
-    const key = getGroqKey();
-    if (!key) {
-      setPendingText(text);
-      setGroqModalOpen(true);
-    } else {
-      onGenerate(text);
-    }
+    onGenerate(text);
   };
 
   const handleFileSelect = (file: File) => {
@@ -222,14 +220,6 @@ function UploadScreen({ onGenerate }: { onGenerate: (text: string) => void }) {
           )}
         </div>
       </div>
-
-      <GroqKeyModal
-        open={groqModalOpen}
-        onClose={() => { setGroqModalOpen(false); setPendingText(null); }}
-        onSaved={() => {
-          if (pendingText) onGenerate(pendingText);
-        }}
-      />
     </>
   );
 }
@@ -275,7 +265,7 @@ function GeneratingScreen({
     ran.current = true;
 
     const run = async () => {
-      const groqKey = getGroqKey()!;
+      const groqKey = getGroqKey();
       setStep1Done(true);
       setProgress(10);
 
@@ -768,7 +758,18 @@ function RateTab({ prompts }: { prompts: GeneratedPrompt[] }) {
 
 // ── Main Annotate Page ────────────────────────────────────────
 export function Annotate() {
+  const navigate = useNavigate();
   const useCase = localStorage.getItem('rf_use_case') || 'developer';
+
+  // Fix 3: redirect to onboarding if no use case and not in demo mode
+  useEffect(() => {
+    const uc = localStorage.getItem('rf_use_case');
+    const isDemo = localStorage.getItem('rf_demo_mode') === 'marcus';
+    if (!isDemo && !uc) {
+      localStorage.setItem('rf_return_path', '/annotate');
+      navigate('/onboarding');
+    }
+  }, []);
 
   // Determine initial step: if prompts already exist skip to annotate
   const [annotateStep, setAnnotateStep] = useState<'upload' | 'generating' | 'annotate'>(() => {
