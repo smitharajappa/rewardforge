@@ -268,6 +268,27 @@ function GeneratingScreen({
     ran.current = true;
 
     const run = async () => {
+      // FIX 1: Skip Groq for example FAQs — instant load
+      const isHardcodedFAQ = localStorage.getItem('rf_using_example_faq') === 'true';
+      if (isHardcodedFAQ) {
+        localStorage.removeItem('rf_using_example_faq');
+        const pairs = (PAIRS_BY_USE_CASE[useCase] || PAIRS_BY_USE_CASE['developer']).map(p => ({
+          prompt: p.text,
+          responseA: p.responseA,
+          responseB: p.responseB,
+        }));
+        localStorage.setItem('rf_generated_prompts', JSON.stringify(pairs));
+        setStep1Done(true);
+        setStep2Done(true);
+        setStep3Done(true);
+        setProgress(100);
+        setGeneratedPrompts(pairs);
+        setWasInstant(true);
+        setShowSuccess(true);
+        setTimeout(() => onDone(pairs), 1000);
+        return;
+      }
+
       const groqKey = getGroqKey();
       setStep1Done(true);
       setProgress(10);
