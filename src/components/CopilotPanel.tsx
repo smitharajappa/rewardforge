@@ -9,7 +9,7 @@ import { USE_CASE_LABEL } from '@/data/faqStrings';
 const SUGGESTION_GROUPS = [
   [
     "Why is my KL divergence at 0.038?",
-    "Is {n} comparisons enough to start?",
+    "Is {n} comparison{plural} enough to start?",
     "PPO or DPO — which should I use?",
     "What does my reward score mean?",
   ],
