@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { clearPipelineData } from '@/lib/clearPipelineData';
+import { useApp } from '@/context/AppContext';
 
 export function DemoBanner() {
   const navigate = useNavigate();
+  const { setComparisons, setRatings, setRewardModels, setRlRuns } = useApp();
   const [active, setActive] = useState(false);
 
   useEffect(() => {
@@ -15,17 +18,12 @@ export function DemoBanner() {
   if (!active) return null;
 
   const exitDemo = () => {
+    clearPipelineData();
     localStorage.removeItem('rf_demo_mode');
-    localStorage.removeItem('rf_generated_prompts');
-    localStorage.removeItem('rf_using_example_faq');
-    localStorage.removeItem('rf_banner_team');
-    localStorage.removeItem('rf_banner_audit');
-    localStorage.removeItem('rf_banner_drift');
-    localStorage.removeItem('rf_comparisons');
-    localStorage.removeItem('rf_ratings');
-    localStorage.removeItem('rf_models');
-    localStorage.removeItem('rf_runs');
-    localStorage.removeItem('rf_activity');
+    setComparisons([]);
+    setRatings([]);
+    setRewardModels([]);
+    setRlRuns([]);
     setActive(false);
     navigate('/');
   };

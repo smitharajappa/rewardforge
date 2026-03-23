@@ -1,6 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { clearPipelineData } from '@/lib/clearPipelineData';
+import { useApp } from '@/context/AppContext';
 
 interface Props {
   open: boolean;
@@ -11,16 +13,16 @@ const STEPS = ['Upload', 'Annotate', 'Train RM', 'RL Loop', 'Evaluate'];
 
 export function MarcusDemoModal({ open, onClose }: Props) {
   const navigate = useNavigate();
+  const { setComparisons, setRatings, setRewardModels, setRlRuns } = useApp();
 
   const startDemo = () => {
+    clearPipelineData();
     localStorage.setItem('rf_demo_mode', 'marcus');
     localStorage.setItem('rf_use_case', 'legal');
-    localStorage.removeItem('rf_generated_prompts');
-    localStorage.removeItem('rf_using_example_faq');
-    localStorage.removeItem('rf_comparisons');
-    localStorage.removeItem('rf_ratings');
-    localStorage.removeItem('rf_models');
-    localStorage.removeItem('rf_runs');
+    setComparisons([]);
+    setRatings([]);
+    setRewardModels([]);
+    setRlRuns([]);
     onClose();
     navigate('/annotate');
   };
