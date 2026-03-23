@@ -4,7 +4,6 @@ import { CheckCircle2, ChevronRight, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/context/AppContext';
 import { callGroq, getGroqKey } from '@/lib/groq';
-import { GroqKeyModal } from '@/components/GroqKeyModal';
 import { FAQ_BY_USE_CASE, FAQ_LABEL, FAQ_SUBTITLE } from '@/data/faqStrings';
 
 // ── Types ─────────────────────────────────────────────────────
