@@ -193,11 +193,14 @@ export default function HomePage() {
           {/* CTA buttons */}
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.18 }}
             className="flex items-center justify-center gap-2.5">
-            <button onClick={() => navigate('/dashboard')}
-              className="px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-opacity hover:opacity-88 cursor-pointer"
-              style={{ background: '#fafafa', color: '#000', borderRadius: '9999px' }}>
-              <LogoMark size={16} /> Start for free →
-            </button>
+          <button onClick={() => {
+              const hasUseCase = localStorage.getItem('rf_use_case');
+              navigate(hasUseCase ? '/dashboard' : '/onboarding');
+            }}
+            className="px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-opacity hover:opacity-88 cursor-pointer"
+            style={{ background: '#fafafa', color: '#000', borderRadius: '9999px' }}>
+            <LogoMark size={16} /> Start for free →
+          </button>
             <button onClick={() => setDemoModalOpen(true)}
               className="px-5 py-2.5 text-sm font-bold transition-all cursor-pointer"
               style={{ border: '1px solid #1a1a1a', color: '#fafafa', background: 'transparent', borderRadius: '9999px' }}>

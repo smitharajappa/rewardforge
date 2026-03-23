@@ -10,6 +10,7 @@ import HomePage from "./pages/Index";
 import BlogPage from "./pages/Blog";
 import DocsPage from "./pages/Docs";
 import PricingPage from "./pages/Pricing";
+import OnboardingPage from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
