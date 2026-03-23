@@ -281,6 +281,9 @@ export function Dashboard() {
     { title: 'View Evaluate', desc: 'Compare all runs and export your best model', path: '/evaluate', color: '#f59e0b' },
   ];
 
+  const currentUseCase = localStorage.getItem('rf_use_case');
+  const ucMeta = currentUseCase ? USE_CASE_META[currentUseCase] : null;
+
   return (
     <div className="space-y-7">
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex justify-between items-end">
@@ -300,6 +303,26 @@ export function Dashboard() {
           </button>
         </div>
       </motion.div>
+
+      {/* Use case switcher bar */}
+      {currentUseCase && ucMeta && (
+        <div className="flex items-center justify-between" style={{ borderBottom: '1px solid #111', paddingBottom: 8, marginBottom: -12 }}>
+          <span className="font-mono text-[11px]" style={{ color: '#525252' }}>
+            {ucMeta.emoji} {ucMeta.label} workspace
+          </span>
+          <button
+            onClick={() => {
+              localStorage.removeItem('rf_use_case');
+              localStorage.removeItem('rf_generated_prompts');
+              navigate('/onboarding');
+            }}
+            className="font-mono text-[11px] transition-opacity hover:opacity-80"
+            style={{ color: '#38bdf8', background: 'none', border: 'none', cursor: 'pointer' }}
+          >
+            Switch use case →
+          </button>
+        </div>
+      )}
 
       {/* Stat cards */}
       <div className="grid grid-cols-4 gap-4">
