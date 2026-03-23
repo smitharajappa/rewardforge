@@ -109,13 +109,7 @@ function UploadScreen({ onGenerate }: { onGenerate: (text: string) => void }) {
     : (FAQ_SUBTITLE[useCase] || '');
 
   const tryGenerate = (text: string) => {
-    const key = getGroqKey();
-    if (!key) {
-      setPendingText(text);
-      setGroqModalOpen(true);
-    } else {
-      onGenerate(text);
-    }
+    onGenerate(text);
   };
 
   const handleFileSelect = (file: File) => {
