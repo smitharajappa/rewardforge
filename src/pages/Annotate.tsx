@@ -243,6 +243,7 @@ function GeneratingScreen({
   const [questions, setQuestions] = useState<string[]>([]);
   const [showSuccess, setShowSuccess] = useState(false);
   const [generatedPrompts, setGeneratedPrompts] = useState<GeneratedPrompt[]>([]);
+  const [wasInstant, setWasInstant] = useState(false);
   const ran = useRef(false);
 
   const getFallbackQuestions = (): string[] => {
