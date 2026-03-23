@@ -140,7 +140,7 @@ export const FAQ_BY_USE_CASE: Record<string, string> = {
 };
 
 export const FAQ_LABEL: Record<string, string> = {
-  legal: "Use Marcus's Law Firm FAQ →",
+  legal: "Use example Law Firm FAQ →",
   medical: "Use example Medical FAQ →",
   financial: "Use example Financial FAQ →",
   customer_service: "Use example Support FAQ →",
