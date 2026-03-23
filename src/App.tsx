@@ -27,6 +27,7 @@ const App = () => (
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/docs" element={<DocsPage />} />
           <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/onboarding" element={<OnboardingPage />} />
 
           {/* Single AppShell instance handles all app routes via nested Routes */}
           <Route path="/*" element={<AppShell />} />
