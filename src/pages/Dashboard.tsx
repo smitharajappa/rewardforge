@@ -359,8 +359,8 @@ export function Dashboard() {
         <div className="flex items-center justify-between mb-5">
           <h3 className="font-syne font-bold text-sm text-[#fafafa]">RLHF Pipeline</h3>
           <span className="font-mono text-[9px] px-2 py-0.5 rounded-full"
-            style={{ background: pipelineStep === 4 ? 'rgba(52,211,153,0.1)' : 'rgba(245,158,11,0.1)', border: `1px solid ${pipelineStep === 4 ? '#34d39930' : '#f59e0b30'}`, color: pipelineStep === 4 ? '#34d399' : '#f59e0b' }}>
-            {pipelineStep === 4 ? '✓ Pipeline complete' : `Step ${pipelineStep} of 4`}
+            style={{ background: pipelineStep === 5 ? 'rgba(52,211,153,0.1)' : 'rgba(245,158,11,0.1)', border: `1px solid ${pipelineStep === 5 ? '#34d39930' : '#f59e0b30'}`, color: pipelineStep === 5 ? '#34d399' : '#f59e0b' }}>
+            {pipelineStep === 5 ? '✓ Pipeline complete' : `Step ${pipelineStep} of 5`}
           </span>
         </div>
         <div className="flex items-center gap-0">
@@ -373,7 +373,7 @@ export function Dashboard() {
                 </div>
                 <span className="font-mono text-[9px] uppercase tracking-widest" style={{ color: s.done ? '#34d399' : i === pipelineStep - 1 ? '#38bdf8' : '#333' }}>{s.label}</span>
               </div>
-              {i < 3 && <div className="flex-1 h-[2px] mx-2 mb-5" style={{ background: s.done ? '#34d399' : '#1a1a1a' }} />}
+              {i < 4 && <div className="flex-1 h-[2px] mx-2 mb-5" style={{ background: s.done ? '#34d399' : '#1a1a1a' }} />}
             </div>
           ))}
         </div>

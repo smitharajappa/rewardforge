@@ -38,10 +38,36 @@ export default function DocsPage() {
   };
 
   const steps = [
-    { label: 'Go to Annotate — collect 5 pairwise comparisons', path: '/annotate' },
-    { label: 'Go to Train RM — click Start Training', path: '/train-rm' },
-    { label: 'Go to RL Loop — launch PPO or DPO run', path: '/rl-loop' },
-    { label: 'Go to Evaluate — compare results and export model', path: '/evaluate' },
+    {
+      label: 'Select your use case',
+      desc: "Tell RewardForge what you're building — legal, medical, financial, or other. We personalize your prompts and Copilot for your specific domain automatically.",
+      path: '/onboarding',
+    },
+    {
+      label: 'Upload your practice documents',
+      desc: "Upload your firm's FAQ, intake forms, or client emails. We extract your real client questions and generate AI response pairs from YOUR actual practice. Your data never leaves your browser.",
+      path: '/annotate',
+    },
+    {
+      label: 'Annotate AI responses',
+      desc: 'Compare two AI responses and pick which one better serves your clients. No ML knowledge needed — just your professional judgment. 10 comparisons takes 15 minutes.',
+      path: '/annotate',
+    },
+    {
+      label: 'Train your reward model',
+      desc: 'One button trains your AI on your preferences. RewardForge automatically selects the right model and settings. Takes about 2 minutes.',
+      path: '/train-rm',
+    },
+    {
+      label: 'Launch RL fine-tuning',
+      desc: 'Run PPO, GRPO, or DPO to align your AI to your professional standards. Watch the reward score climb in real time.',
+      path: '/rl-loop',
+    },
+    {
+      label: 'Export your alignment certificate',
+      desc: "Get your official compliance certificate with your experts' credentials, quality score, and complete audit trail. Share with regulators, insurers, and clients.",
+      path: '/evaluate',
+    },
   ];
 
   const concepts = [
