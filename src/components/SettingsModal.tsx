@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Eye, EyeOff, Copy } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { useNavigate } from 'react-router-dom';
+import { getGroqKey, saveGroqKey } from '@/lib/groq';
 
 interface SettingsModalProps {
   open: boolean;
@@ -17,6 +18,9 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
   const apiKey = 'rf-sk-••••••••4f9a';
   const realApiKey = 'rf-sk-a9b2c3d4e5f64f9a';
 
+  const [groqKey, setGroqKey] = useState(() => getGroqKey() || '');
+  const [groqVisible, setGroqVisible] = useState(false);
+
   const handleCopy = () => {
     navigator.clipboard.writeText(realApiKey);
     addToast({ type: 'success', message: 'Copied!' });
@@ -26,6 +30,11 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
     resetDemoData();
     addToast({ type: 'success', message: 'Demo data cleared — fresh start! ✓' });
     onClose();
+  };
+
+  const handleGroqChange = (val: string) => {
+    setGroqKey(val);
+    saveGroqKey(val);
   };
 
   return (
@@ -46,14 +55,8 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
             transition={{ duration: 0.18 }}
             onClick={e => e.stopPropagation()}
             style={{
-              position: 'relative',
-              zIndex: 50,
-              width: '100%',
-              maxWidth: 480,
-              background: '#0a0a0a',
-              border: '1px solid #1a1a1a',
-              borderRadius: 12,
-              padding: 24,
+              position: 'relative', zIndex: 50, width: '100%', maxWidth: 480,
+              background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 12, padding: 24,
             }}
           >
             {/* Header */}
@@ -68,17 +71,39 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
               {/* Project Name */}
               <div>
                 <label className="font-mono text-[10px] uppercase tracking-widest text-[#525252] block mb-2">Project Name</label>
-                <input
-                  value={projectName}
-                  onChange={e => setProjectName(e.target.value)}
+                <input value={projectName} onChange={e => setProjectName(e.target.value)}
                   className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
                   style={{ background: '#000', border: '1px solid #1a1a1a', color: '#fafafa' }}
                   onFocus={e => e.currentTarget.style.borderColor = '#38bdf8'}
-                  onBlur={e => e.currentTarget.style.borderColor = '#1a1a1a'}
-                />
+                  onBlur={e => e.currentTarget.style.borderColor = '#1a1a1a'} />
               </div>
 
-              {/* API Key */}
+              {/* Groq API Key */}
+              <div>
+                <label className="font-mono text-[10px] uppercase tracking-widest text-[#525252] block mb-1">Groq API Key (free)</label>
+                <p className="font-mono text-[9px] mb-2" style={{ color: '#525252' }}>
+                  Free at console.groq.com · No credit card
+                </p>
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg"
+                  style={{ background: '#000', border: '1px solid #1a1a1a' }}>
+                  <input
+                    type={groqVisible ? 'text' : 'password'}
+                    value={groqKey}
+                    onChange={e => handleGroqChange(e.target.value)}
+                    placeholder="gsk_xxxxxxxxxxxx"
+                    className="flex-1 bg-transparent text-sm outline-none font-mono"
+                    style={{ color: '#fafafa' }}
+                  />
+                  <button onClick={() => setGroqVisible(v => !v)} className="text-[#525252] hover:text-[#a3a3a3] transition-colors">
+                    {groqVisible ? <EyeOff size={13} /> : <Eye size={13} />}
+                  </button>
+                </div>
+                {groqKey && (
+                  <p className="font-mono text-[9px] mt-1" style={{ color: '#34d399' }}>✓ Key saved</p>
+                )}
+              </div>
+
+              {/* RewardForge API Key */}
               <div>
                 <label className="font-mono text-[10px] uppercase tracking-widest text-[#525252] block mb-1">API Key</label>
                 <p className="font-mono text-[9px] mb-2" style={{ color: '#525252' }}>
@@ -110,7 +135,7 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
                     </span>
                   </div>
                   <div className="space-y-2">
-                    {['1,000 comparisons / month', '3 training runs', 'PPO + GRPO + DPO', 'AI Copilot (limited)'].map(f => (
+                    {['1,000 comparisons / month', '1 training run', 'PPO + GRPO + DPO', 'AI Copilot (10 messages/day)'].map(f => (
                       <div key={f} className="flex items-center gap-2 text-xs" style={{ color: '#a3a3a3' }}>
                         <span style={{ color: '#34d399' }}>✓</span> {f}
                       </div>
@@ -124,8 +149,7 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
                 </div>
               </div>
 
-              <button
-                onClick={() => { onClose(); navigate('/pricing'); }}
+              <button onClick={() => { onClose(); navigate('/pricing'); }}
                 className="w-full py-2.5 rounded-full font-syne font-bold text-sm transition-opacity hover:opacity-90"
                 style={{ background: '#fafafa', color: '#000' }}>
                 Upgrade Plan →
@@ -133,8 +157,7 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
 
               {/* Reset demo data */}
               <div style={{ borderTop: '1px solid #1a1a1a', paddingTop: 16 }}>
-                <button
-                  onClick={handleReset}
+                <button onClick={handleReset}
                   className="w-full py-2.5 rounded-full font-syne font-bold text-sm transition-all hover:opacity-80"
                   style={{ border: '1px solid rgba(244,63,94,0.4)', color: '#f43f5e', background: 'rgba(244,63,94,0.06)' }}>
                   Reset demo data

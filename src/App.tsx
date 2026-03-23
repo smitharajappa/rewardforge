@@ -10,6 +10,7 @@ import HomePage from "./pages/Index";
 import BlogPage from "./pages/Blog";
 import DocsPage from "./pages/Docs";
 import PricingPage from "./pages/Pricing";
+import OnboardingPage from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/docs" element={<DocsPage />} />
           <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/onboarding" element={<OnboardingPage />} />
 
           {/* Single AppShell instance handles all app routes via nested Routes */}
           <Route path="/*" element={<AppShell />} />

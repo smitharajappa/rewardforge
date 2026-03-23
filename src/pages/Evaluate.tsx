@@ -387,6 +387,73 @@ export function Evaluate() {
         </motion.div>
       )}
 
+      {/* Alignment Certificate */}
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-syne font-bold text-lg text-[#fafafa]">Alignment Certificate</h3>
+          <span className="font-mono text-[11px]" style={{ color: '#525252' }}>🛡 RewardForge Certified</span>
+        </div>
+        <div className="rounded-xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #0a0f1a, #0a0a0a)', border: '1px solid #1e3a5f' }}>
+          <div className="px-6 pt-5 pb-4" style={{ borderBottom: '1px solid #1e3a5f' }}>
+            <p className="font-mono text-[11px] text-center tracking-[0.1em]" style={{ color: '#38bdf8' }}>REWARDFORGE ALIGNMENT CERTIFICATE</p>
+          </div>
+          <div className="grid grid-cols-2 gap-6 p-6">
+            <div className="space-y-4">
+              {[
+                { label: 'ORGANIZATION', value: 'Your Organization' },
+                { label: 'CERTIFIED BY', value: localStorage.getItem('rf_demo_mode') === 'marcus' ? 'Marcus Chen · Managing Partner' : 'Your Name · Your Role' },
+                { label: 'PROFESSIONAL STANDARDS', value: localStorage.getItem('rf_demo_mode') === 'marcus' ? 'California Bar Association Guidelines' : `${(localStorage.getItem('rf_use_case') || 'general')} professional standards` },
+              ].map(({ label, value }) => (
+                <div key={label}>
+                  <p className="font-mono text-[9px] uppercase tracking-widest mb-1" style={{ color: '#525252' }}>{label}</p>
+                  <p className="text-[13px] text-[#fafafa]">{value}</p>
+                </div>
+              ))}
+            </div>
+            <div className="space-y-4">
+              <div>
+                <p className="font-mono text-[9px] uppercase tracking-widest mb-1" style={{ color: '#525252' }}>QUALITY SCORE</p>
+                <p className="font-syne font-extrabold text-[28px]" style={{ color: '#34d399' }}>
+                  {rewardModels[0] ? `${(rewardModels[0].accuracy * 100).toFixed(1)}%` : '—'}
+                </p>
+              </div>
+              <div>
+                <p className="font-mono text-[9px] uppercase tracking-widest mb-1" style={{ color: '#525252' }}>TRAINING DATE</p>
+                <p className="text-[13px] text-[#fafafa]">{new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+              </div>
+              <div>
+                <p className="font-mono text-[9px] uppercase tracking-widest mb-1" style={{ color: '#525252' }}>CERTIFICATE ID</p>
+                <p className="font-mono text-[13px]" style={{ color: '#38bdf8' }}>
+                  {(() => { const k = 'rf_cert_id'; let id = localStorage.getItem(k); if (!id) { id = 'RF-2026-' + String(Math.floor(10000 + Math.random() * 90000)); localStorage.setItem(k, id); } return id; })()}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-center gap-3 px-6 pb-4">
+            {['🔒 Private', '✓ Credentialed', '📋 Auditable'].map(b => (
+              <span key={b} className="font-mono text-[11px] px-3 py-1 rounded-full" style={{ background: '#111', border: '1px solid #1a1a1a', color: '#525252' }}>{b}</span>
+            ))}
+          </div>
+          <div className="flex items-center justify-between px-6 py-3 rounded-b-xl"
+            style={rlRuns.length === 0
+              ? { background: '#1a1200', borderTop: '1px solid rgba(245,158,11,0.2)' }
+              : { background: '#0a1a0a', borderTop: '1px solid rgba(56,189,248,0.2)' }}>
+            <span className="text-[13px]" style={{ color: rlRuns.length === 0 ? '#f59e0b' : '#38bdf8' }}>
+              {rlRuns.length === 0
+                ? '⚡ Complete the full pipeline to generate your official certificate'
+                : '✓ Pipeline complete · Upgrade to issue official certificate with your credentials'}
+            </span>
+            {rlRuns.length > 0 && (
+              <button onClick={() => navigate('/pricing')}
+                className="font-mono text-[11px] px-3 py-1.5 rounded-full font-semibold ml-4"
+                style={{ background: '#38bdf8', color: '#000' }}>
+                Get Starter Plan →
+              </button>
+            )}
+          </div>
+        </div>
+      </motion.div>
+
       {/* Export panel */}
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
         className="relative p-5 rounded-xl space-y-4 overflow-hidden" style={{ background: '#0a0a0a', border: '1px solid #1a1a1a' }}>

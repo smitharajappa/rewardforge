@@ -15,6 +15,7 @@ const FREE_FEATURES = [
   { text: 'AI Copilot (10 messages/day)', ok: true },
   { text: 'API access', ok: false },
   { text: 'Priority GPU compute', ok: false },
+  { text: 'Official certificate (watermarked on free)', ok: false },
 ];
 
 const STARTER_FEATURES = [
