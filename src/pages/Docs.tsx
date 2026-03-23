@@ -172,7 +172,7 @@ export default function DocsPage() {
             >
               <span style={{ color: '#34d399' }}>✓</span>
               <span className="text-sm" style={{ color: '#a3a3a3' }}>
-                We'll email you at <span style={{ color: '#fafafa' }}>{savedEmail}</span> when API docs launch in Q2 2026.
+                You're on the list! We'll reach out when API docs launch in Q2 2026. ✓
               </span>
             </div>
           ) : (
