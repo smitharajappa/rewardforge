@@ -3,11 +3,24 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Eye, EyeOff, Copy } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 import { useNavigate } from 'react-router-dom';
-import { getGroqKey, saveGroqKey } from '@/lib/groq';
 
 interface SettingsModalProps {
   open: boolean;
   onClose: () => void;
+}
+
+const USE_CASE_MAP: Record<string, { emoji: string; label: string }> = {
+  legal: { emoji: '⚖️', label: 'Legal Services' },
+  medical: { emoji: '🏥', label: 'Medical & Health' },
+  financial: { emoji: '💰', label: 'Financial Services' },
+  customer_service: { emoji: '🎧', label: 'Customer Service' },
+  education: { emoji: '📚', label: 'Education' },
+  developer: { emoji: '⚙️', label: 'Developer / Other' },
+};
+
+function planHasApiAccess(): boolean {
+  const plan = localStorage.getItem('rf_plan') || 'free';
+  return ['growth', 'pro', 'enterprise'].includes(plan);
 }
 
 export function SettingsModal({ open, onClose }: SettingsModalProps) {
@@ -18,8 +31,8 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
   const apiKey = 'rf-sk-••••••••4f9a';
   const realApiKey = 'rf-sk-a9b2c3d4e5f64f9a';
 
-  const [groqKey, setGroqKey] = useState(() => getGroqKey() || '');
-  const [groqVisible, setGroqVisible] = useState(false);
+  const useCase = localStorage.getItem('rf_use_case') || '';
+  const useCaseInfo = USE_CASE_MAP[useCase];
 
   const handleCopy = () => {
     navigator.clipboard.writeText(realApiKey);
@@ -32,9 +45,11 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
     onClose();
   };
 
-  const handleGroqChange = (val: string) => {
-    setGroqKey(val);
-    saveGroqKey(val);
+  const handleSwitchUseCase = () => {
+    localStorage.removeItem('rf_use_case');
+    localStorage.removeItem('rf_generated_prompts');
+    onClose();
+    navigate('/onboarding');
   };
 
   return (
@@ -78,50 +93,68 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
                   onBlur={e => e.currentTarget.style.borderColor = '#1a1a1a'} />
               </div>
 
-              {/* Groq API Key */}
+              {/* Use Case */}
               <div>
-                <label className="font-mono text-[10px] uppercase tracking-widest text-[#525252] block mb-1">Groq API Key (free)</label>
-                <p className="font-mono text-[9px] mb-2" style={{ color: '#525252' }}>
-                  Free at console.groq.com · No credit card
-                </p>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg"
-                  style={{ background: '#000', border: '1px solid #1a1a1a' }}>
-                  <input
-                    type={groqVisible ? 'text' : 'password'}
-                    value={groqKey}
-                    onChange={e => handleGroqChange(e.target.value)}
-                    placeholder="gsk_xxxxxxxxxxxx"
-                    className="flex-1 bg-transparent text-sm outline-none font-mono"
-                    style={{ color: '#fafafa' }}
-                  />
-                  <button onClick={() => setGroqVisible(v => !v)} className="text-[#525252] hover:text-[#a3a3a3] transition-colors">
-                    {groqVisible ? <EyeOff size={13} /> : <Eye size={13} />}
+                <label className="font-mono text-[10px] uppercase tracking-widest text-[#525252] block mb-2">Use Case</label>
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[11px] px-3 py-1 rounded-full"
+                    style={{ background: 'rgba(56,189,248,0.1)', border: '1px solid rgba(56,189,248,0.2)', color: '#38bdf8' }}>
+                    {useCaseInfo ? `${useCaseInfo.emoji} ${useCaseInfo.label}` : '○ not selected'}
+                  </span>
+                  <button
+                    onClick={handleSwitchUseCase}
+                    className="font-mono text-[11px] transition-colors"
+                    style={{ color: '#525252', background: 'none', border: 'none', cursor: 'pointer' }}
+                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#a3a3a3'}
+                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#525252'}
+                  >
+                    Switch →
                   </button>
                 </div>
-                {groqKey && (
-                  <p className="font-mono text-[9px] mt-1" style={{ color: '#34d399' }}>✓ Key saved</p>
-                )}
               </div>
 
-              {/* RewardForge API Key */}
-              <div>
-                <label className="font-mono text-[10px] uppercase tracking-widest text-[#525252] block mb-1">API Key</label>
-                <p className="font-mono text-[9px] mb-2" style={{ color: '#525252' }}>
-                  Use this to access RewardForge programmatically. Never share or commit to code.
-                </p>
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg"
-                  style={{ background: '#000', border: '1px solid #1a1a1a' }}>
-                  <span className="flex-1 font-mono text-xs text-[#a3a3a3]">
-                    {apiKeyVisible ? realApiKey : apiKey}
-                  </span>
-                  <button onClick={() => setApiKeyVisible(v => !v)} className="text-[#525252] hover:text-[#a3a3a3] transition-colors">
-                    {apiKeyVisible ? <EyeOff size={13} /> : <Eye size={13} />}
-                  </button>
-                  <button onClick={handleCopy} className="text-[#525252] hover:text-[#a3a3a3] transition-colors">
-                    <Copy size={13} />
-                  </button>
+              {/* API Access */}
+              {planHasApiAccess() ? (
+                <div>
+                  <label className="font-mono text-[10px] uppercase tracking-widest text-[#525252] block mb-1">API Key</label>
+                  <p className="font-mono text-[9px] mb-2" style={{ color: '#525252' }}>
+                    Use this to access RewardForge programmatically. Never share or commit to code.
+                  </p>
+                  <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg"
+                    style={{ background: '#000', border: '1px solid #1a1a1a' }}>
+                    <span className="flex-1 font-mono text-xs text-[#a3a3a3]">
+                      {apiKeyVisible ? realApiKey : apiKey}
+                    </span>
+                    <button onClick={() => setApiKeyVisible(v => !v)} className="text-[#525252] hover:text-[#a3a3a3] transition-colors">
+                      {apiKeyVisible ? <EyeOff size={13} /> : <Eye size={13} />}
+                    </button>
+                    <button onClick={handleCopy} className="text-[#525252] hover:text-[#a3a3a3] transition-colors">
+                      <Copy size={13} />
+                    </button>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div>
+                  <label className="font-mono text-[10px] uppercase tracking-widest text-[#525252] block mb-2">API Access</label>
+                  <div className="px-4 py-3.5 rounded-lg" style={{ background: '#0a0a0a', border: '1px solid #1a1a1a', borderRadius: 8 }}>
+                    <p className="font-syne text-[13px] mb-2" style={{ color: '#525252' }}>🔒 Available on Growth plan and above</p>
+                    <ul className="space-y-1">
+                      {['Submit annotations via API', 'Trigger training automatically', 'Pull trained models programmatically'].map(b => (
+                        <li key={b} className="font-mono text-[11px]" style={{ color: '#333' }}>• {b}</li>
+                      ))}
+                    </ul>
+                    <button
+                      onClick={() => { onClose(); navigate('/pricing'); }}
+                      className="w-full mt-3 py-2 rounded-md font-syne text-[12px] transition-colors"
+                      style={{ border: '1px solid #1a1a1a', color: '#525252', background: 'transparent', cursor: 'pointer' }}
+                      onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#a3a3a3'}
+                      onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#525252'}
+                    >
+                      Upgrade to Growth →
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Plan */}
               <div>

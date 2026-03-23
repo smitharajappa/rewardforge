@@ -14,7 +14,10 @@ const USE_CASES = [
 
 export default function OnboardingPage() {
   const navigate = useNavigate();
-  const [selected, setSelected] = useState<string | null>(null);
+  const existingUseCase = localStorage.getItem('rf_use_case');
+  const isReturning = !!existingUseCase;
+
+  const [selected, setSelected] = useState<string | null>(existingUseCase);
 
   const handleContinue = () => {
     if (!selected) return;
@@ -52,7 +55,7 @@ export default function OnboardingPage() {
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
             className="text-center mb-8">
             <h1 className="font-syne font-extrabold text-[32px] tracking-tight text-[#fafafa] mb-3">
-              What are you aligning AI for?
+              {isReturning ? 'Switch your use case' : 'What are you aligning AI for?'}
             </h1>
             <p className="font-mono text-[15px] leading-relaxed" style={{ color: '#525252' }}>
               We'll personalize your prompts and Copilot for your specific use case.
@@ -103,17 +106,19 @@ export default function OnboardingPage() {
                 cursor: selected ? 'pointer' : 'not-allowed',
               }}
             >
-              Continue →
+              {isReturning ? 'Update use case →' : 'Continue →'}
             </button>
-            <button
-              onClick={handleSkip}
-              className="font-mono text-[12px] transition-colors"
-              style={{ color: '#333' }}
-              onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#525252'}
-              onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#333'}
-            >
-              Skip for now →
-            </button>
+            {!isReturning && (
+              <button
+                onClick={handleSkip}
+                className="font-mono text-[12px] transition-colors"
+                style={{ color: '#333' }}
+                onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#525252'}
+                onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#333'}
+              >
+                Skip for now →
+              </button>
+            )}
           </motion.div>
         </div>
       </div>

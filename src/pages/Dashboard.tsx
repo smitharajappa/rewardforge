@@ -5,6 +5,15 @@ import { useNavigate } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useApp } from '@/context/AppContext';
 
+const USE_CASE_META: Record<string, { emoji: string; label: string }> = {
+  legal: { emoji: '⚖️', label: 'Legal Services' },
+  medical: { emoji: '🏥', label: 'Medical & Health' },
+  financial: { emoji: '💰', label: 'Financial Services' },
+  customer_service: { emoji: '🎧', label: 'Customer Service' },
+  education: { emoji: '📚', label: 'Education' },
+  developer: { emoji: '⚙️', label: 'Developer / Other' },
+};
+
 function useCountUp(target: number, duration = 800) {
   const [value, setValue] = useState(0);
   useEffect(() => {
@@ -70,10 +79,9 @@ function relativeTime(date: Date) {
 // ── Behavioral Standards Card ─────────────────────────────────
 function BehavioralStandardsCard() {
   const { addToast } = useApp();
-  const isDemoMode = localStorage.getItem('rf_demo_mode') === 'marcus';
-  const useCase = localStorage.getItem('rf_use_case') || 'developer';
+  const useCase = localStorage.getItem('rf_use_case') || 'legal';
 
-  const standards: Record<string, string[]> = {
+  const STANDARDS_BY_USE_CASE: Record<string, string[]> = {
     legal: [
       'Always recommend consulting a local attorney for jurisdiction-specific questions',
       'Keep responses under 100 words unless client requests detail',
@@ -89,11 +97,24 @@ function BehavioralStandardsCard() {
       'Never recommend specific securities without suitability assessment',
       'Always recommend consulting a licensed financial advisor for major decisions',
     ],
+    customer_service: [
+      "Always acknowledge the customer's frustration before providing a solution",
+      'Never promise a specific resolution timeframe without checking availability',
+      'Always offer a follow-up contact method at the end of each response',
+    ],
+    education: [
+      'Always encourage students to attempt the problem before providing the answer',
+      'Never make a student feel bad for not understanding a concept',
+      'Always connect new concepts to something the student already knows',
+    ],
+    developer: [
+      'Always include working code examples for technical explanations',
+      'Never suggest deprecated libraries or outdated approaches',
+      'Always mention potential edge cases and error handling',
+    ],
   };
 
-  const items = isDemoMode
-    ? standards.legal
-    : standards[useCase] ?? standards.legal;
+  const items = STANDARDS_BY_USE_CASE[useCase] ?? STANDARDS_BY_USE_CASE['legal'];
 
   return (
     <motion.div
@@ -260,6 +281,9 @@ export function Dashboard() {
     { title: 'View Evaluate', desc: 'Compare all runs and export your best model', path: '/evaluate', color: '#f59e0b' },
   ];
 
+  const currentUseCase = localStorage.getItem('rf_use_case');
+  const ucMeta = currentUseCase ? USE_CASE_META[currentUseCase] : null;
+
   return (
     <div className="space-y-7">
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex justify-between items-end">
@@ -279,6 +303,26 @@ export function Dashboard() {
           </button>
         </div>
       </motion.div>
+
+      {/* Use case switcher bar */}
+      {currentUseCase && ucMeta && (
+        <div className="flex items-center justify-between" style={{ borderBottom: '1px solid #111', paddingBottom: 8, marginBottom: -12 }}>
+          <span className="font-mono text-[11px]" style={{ color: '#525252' }}>
+            {ucMeta.emoji} {ucMeta.label} workspace
+          </span>
+          <button
+            onClick={() => {
+              localStorage.removeItem('rf_use_case');
+              localStorage.removeItem('rf_generated_prompts');
+              navigate('/onboarding');
+            }}
+            className="font-mono text-[11px] transition-opacity hover:opacity-80"
+            style={{ color: '#38bdf8', background: 'none', border: 'none', cursor: 'pointer' }}
+          >
+            Switch use case →
+          </button>
+        </div>
+      )}
 
       {/* Stat cards */}
       <div className="grid grid-cols-4 gap-4">
