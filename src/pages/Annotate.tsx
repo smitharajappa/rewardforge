@@ -130,6 +130,7 @@ function UploadScreen({ onGenerate }: { onGenerate: (text: string) => void }) {
   };
 
   const handleExampleFAQ = () => {
+    localStorage.setItem('rf_using_example_faq', 'true');
     const faq = FAQ_BY_USE_CASE[useCase] || FAQ_BY_USE_CASE['developer'];
     tryGenerate(faq);
   };
