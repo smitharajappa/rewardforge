@@ -277,7 +277,7 @@ function GeneratingScreen({
     ran.current = true;
 
     const run = async () => {
-      const groqKey = getGroqKey()!;
+      const groqKey = getGroqKey();
       setStep1Done(true);
       setProgress(10);
 
