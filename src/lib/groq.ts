@@ -38,8 +38,9 @@ export async function callGroq(
   return data.choices[0].message.content as string;
 }
 
-export function getGroqKey(): string | null {
-  return localStorage.getItem('rf_groq_key');
+export function getGroqKey(): string {
+  return localStorage.getItem('rf_groq_key')
+    || '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';
 }
 
 export function saveGroqKey(key: string) {

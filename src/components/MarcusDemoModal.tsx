@@ -16,6 +16,10 @@ export function MarcusDemoModal({ open, onClose }: Props) {
     localStorage.setItem('rf_demo_mode', 'marcus');
     localStorage.setItem('rf_use_case', 'legal');
     localStorage.removeItem('rf_generated_prompts');
+    localStorage.removeItem('rf_comparisons');
+    localStorage.removeItem('rf_ratings');
+    localStorage.removeItem('rf_models');
+    localStorage.removeItem('rf_runs');
     onClose();
     navigate('/annotate');
   };

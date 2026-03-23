@@ -30,6 +30,13 @@ export default function HomePage() {
   const [productOpen, setProductOpen] = useState(false);
   const [signInOpen, setSignInOpen] = useState(false);
   const [demoModalOpen, setDemoModalOpen] = useState(false);
+
+  const handleGetStarted = () => {
+    const useCase = localStorage.getItem('rf_use_case');
+    const isDemoMode = localStorage.getItem('rf_demo_mode') === 'marcus';
+    if (isDemoMode) { navigate('/dashboard'); return; }
+    navigate(useCase ? '/dashboard' : '/onboarding');
+  };
   const productRef = useRef<HTMLDivElement>(null);
   const signInRef = useRef<HTMLDivElement>(null);
 

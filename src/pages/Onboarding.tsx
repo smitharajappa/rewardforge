@@ -16,18 +16,19 @@ export default function OnboardingPage() {
   const navigate = useNavigate();
   const [selected, setSelected] = useState<string | null>(null);
 
-  const proceed = (id: string) => {
-    localStorage.setItem('rf_use_case', id);
-    navigate('/dashboard');
-  };
-
   const handleContinue = () => {
     if (!selected) return;
-    proceed(selected);
+    localStorage.setItem('rf_use_case', selected);
+    const returnPath = localStorage.getItem('rf_return_path') || '/dashboard';
+    localStorage.removeItem('rf_return_path');
+    navigate(returnPath);
   };
 
   const handleSkip = () => {
-    proceed('developer');
+    localStorage.setItem('rf_use_case', 'developer');
+    const returnPath = localStorage.getItem('rf_return_path') || '/dashboard';
+    localStorage.removeItem('rf_return_path');
+    navigate(returnPath);
   };
 
   return (
