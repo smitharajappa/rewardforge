@@ -265,10 +265,12 @@ export function Dashboard() {
   const avgRating = ratings.length ? ratings.reduce((a, r) => a + r.overall, 0) / ratings.length : 0;
   const bestRM = rewardModels[0];
   const lastRun = rlRuns[0];
-  const pipelineStep = comparisons.length >= 5 ? (rewardModels.length > 0 ? (rlRuns.length > 0 ? 4 : 3) : 2) : 1;
+  // 5-step pipeline: Upload(1), Annotate(2), Train RM(3), RL Loop(4), Evaluate(5)
+  const pipelineStep = rlRuns.length > 0 ? 5 : rewardModels.length > 0 ? 4 : comparisons.length >= 5 ? 3 : comparisons.length > 0 ? 2 : 1;
 
   const pipelineSteps = [
-    { label: 'Annotate', done: comparisons.length > 0 },
+    { label: 'Upload', done: comparisons.length > 0 },
+    { label: 'Annotate', done: comparisons.length >= 5 },
     { label: 'Train RM', done: rewardModels.length > 0 },
     { label: 'RL Loop', done: rlRuns.length > 0 },
     { label: 'Evaluate', done: rlRuns.length > 1 },
