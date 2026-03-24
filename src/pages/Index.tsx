@@ -12,7 +12,7 @@ const FEATURES = [
   { icon: RefreshCw, color: '#34d399', title: 'PPO · GRPO · DPO', desc: 'Launch RL fine-tuning with any algorithm. Compare runs side by side in a GitHub-style diff view.' },
   { icon: Sparkles, color: '#a78bfa', title: 'AI Copilot', desc: 'Ask anything about your training run in plain English. Streamed responses, Perplexity-style, with context.' },
   { icon: Package, color: '#38bdf8', title: 'Model Registry', desc: 'Every reward model versioned and stored. Export to HuggingFace Hub in one click.' },
-  { icon: Bot, color: '#f472b6', title: 'AI-Generated Pairs', desc: 'Auto-generate response pairs via Claude API. First comparison in under 60 seconds from signup.' },
+  { icon: Bot, color: '#f472b6', title: 'AI-Generated Pairs', desc: 'Auto-generate response pairs via Groq AI. First comparison in under 60 seconds from signup.' },
 ];
 
 const MODELS = ['LLaMA 3', 'Mistral 7B', 'Gemma', 'Falcon', 'Qwen'];
