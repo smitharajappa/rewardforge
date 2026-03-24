@@ -394,21 +394,60 @@ export function TrainRM() {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            {[{ label: 'Learning Rate', val: lr, set: setLr, help: 'Range: 1e-5 to 5e-5' }, { label: 'Batch Size', val: batchSize, set: setBatchSize, help: 'Larger = faster but more GPU memory' }].map(f => (
-              <div key={f.label}>
-                <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>{f.label}</label>
-                <input value={f.val} onChange={e => f.set(e.target.value)} className="w-full px-3 py-2.5 rounded-lg text-sm outline-none" style={{ background: '#000', border: '1px solid #1a1a1a', color: '#fafafa' }}
-                  onFocus={e => e.currentTarget.style.borderColor = '#38bdf8'} onBlur={e => e.currentTarget.style.borderColor = '#1a1a1a'} />
-                <p className="font-mono text-[10px] mt-1" style={{ color: '#525252' }}>{f.help}</p>
-              </div>
-            ))}
+            {/* Learning Rate */}
+            <div>
+              <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>Learning Rate</label>
+              <input
+                type="number" value={lr} min={0.00001} max={0.0001} step={0.00001}
+                maxLength={10}
+                onChange={e => setLr(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
+                style={{ background: '#000', border: `1px solid ${Number(lr) < 0.00001 || Number(lr) > 0.0001 ? '#f43f5e' : '#1a1a1a'}`, color: '#fafafa' }}
+                onFocus={e => e.currentTarget.style.borderColor = '#38bdf8'}
+                onBlur={e => e.currentTarget.style.borderColor = Number(lr) < 0.00001 || Number(lr) > 0.0001 ? '#f43f5e' : '#1a1a1a'}
+              />
+              {(Number(lr) < 0.00001 || Number(lr) > 0.0001) && (
+                <p className="font-mono text-[10px] mt-1" style={{ color: '#f43f5e' }}>Must be between 1e-5 and 1e-4</p>
+              )}
+              {!(Number(lr) < 0.00001 || Number(lr) > 0.0001) && (
+                <p className="font-mono text-[10px] mt-1" style={{ color: '#525252' }}>Range: 1e-5 to 1e-4</p>
+              )}
+            </div>
+            {/* Batch Size */}
+            <div>
+              <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>Batch Size</label>
+              <input
+                type="number" value={batchSize} min={1} max={64} step={1}
+                onChange={e => setBatchSize(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
+                style={{ background: '#000', border: `1px solid ${(Number(batchSize) < 1 || Number(batchSize) > 64 || !Number.isInteger(Number(batchSize))) ? '#f43f5e' : '#1a1a1a'}`, color: '#fafafa' }}
+                onFocus={e => e.currentTarget.style.borderColor = '#38bdf8'}
+                onBlur={e => e.currentTarget.style.borderColor = (Number(batchSize) < 1 || Number(batchSize) > 64 || !Number.isInteger(Number(batchSize))) ? '#f43f5e' : '#1a1a1a'}
+              />
+              {(Number(batchSize) < 1 || Number(batchSize) > 64 || !Number.isInteger(Number(batchSize))) && (
+                <p className="font-mono text-[10px] mt-1" style={{ color: '#f43f5e' }}>Must be between 1 and 64</p>
+              )}
+              {!(Number(batchSize) < 1 || Number(batchSize) > 64 || !Number.isInteger(Number(batchSize))) && (
+                <p className="font-mono text-[10px] mt-1" style={{ color: '#525252' }}>Larger = faster but more GPU memory</p>
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
+            {/* Epochs */}
             <div>
               <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>Epochs</label>
-              <input value={epochs} onChange={e => setEpochs(e.target.value)} className="w-full px-3 py-2.5 rounded-lg text-sm outline-none" style={{ background: '#000', border: '1px solid #1a1a1a', color: '#fafafa' }}
-                onFocus={e => e.currentTarget.style.borderColor = '#38bdf8'} onBlur={e => e.currentTarget.style.borderColor = '#1a1a1a'} />
+              <input
+                type="number" value={epochs} min={1} max={10} step={1}
+                onChange={e => setEpochs(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
+                style={{ background: '#000', border: `1px solid ${(Number(epochs) < 1 || Number(epochs) > 10 || !Number.isInteger(Number(epochs))) ? '#f43f5e' : '#1a1a1a'}`, color: '#fafafa' }}
+                onFocus={e => e.currentTarget.style.borderColor = '#38bdf8'}
+                onBlur={e => e.currentTarget.style.borderColor = (Number(epochs) < 1 || Number(epochs) > 10 || !Number.isInteger(Number(epochs))) ? '#f43f5e' : '#1a1a1a'}
+              />
+              {(Number(epochs) < 1 || Number(epochs) > 10 || !Number.isInteger(Number(epochs))) && (
+                <p className="font-mono text-[10px] mt-1" style={{ color: '#f43f5e' }}>Must be between 1 and 10</p>
+              )}
             </div>
             <div>
               <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>
@@ -427,12 +466,44 @@ export function TrainRM() {
             {advancedOpen && (
               <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
                 <div className="grid grid-cols-3 gap-4 pt-2">
-                  {[{ label: 'Warmup Steps', val: warmup, set: setWarmup }, { label: 'Weight Decay', val: weightDecay, set: setWeightDecay }, { label: 'Max Seq Length', val: maxSeqLen, set: setMaxSeqLen }].map(f => (
-                    <div key={f.label}>
-                      <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>{f.label}</label>
-                      <input value={f.val} onChange={e => f.set(e.target.value)} className="w-full px-3 py-2.5 rounded-lg text-sm outline-none" style={{ background: '#000', border: '1px solid #1a1a1a', color: '#fafafa' }} />
-                    </div>
-                  ))}
+                  {/* Warmup Steps */}
+                  <div>
+                    <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>Warmup Steps</label>
+                    <input
+                      type="number" value={warmup} min={0} max={1000} step={1}
+                      onChange={e => setWarmup(e.target.value)}
+                      className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
+                      style={{ background: '#000', border: `1px solid ${(Number(warmup) < 0 || Number(warmup) > 1000) ? '#f43f5e' : '#1a1a1a'}`, color: '#fafafa' }}
+                    />
+                    {(Number(warmup) < 0 || Number(warmup) > 1000) && (
+                      <p className="font-mono text-[9px] mt-1" style={{ color: '#f43f5e' }}>0–1000</p>
+                    )}
+                  </div>
+                  {/* Weight Decay */}
+                  <div>
+                    <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>Weight Decay</label>
+                    <input
+                      type="number" value={weightDecay} min={0} max={0.1} step={0.001}
+                      onChange={e => setWeightDecay(e.target.value)}
+                      className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
+                      style={{ background: '#000', border: `1px solid ${(Number(weightDecay) < 0 || Number(weightDecay) > 0.1) ? '#f43f5e' : '#1a1a1a'}`, color: '#fafafa' }}
+                    />
+                    {(Number(weightDecay) < 0 || Number(weightDecay) > 0.1) && (
+                      <p className="font-mono text-[9px] mt-1" style={{ color: '#f43f5e' }}>0–0.1</p>
+                    )}
+                  </div>
+                  {/* Max Seq Length */}
+                  <div>
+                    <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>Max Seq Length</label>
+                    <select
+                      value={maxSeqLen}
+                      onChange={e => setMaxSeqLen(e.target.value)}
+                      className="w-full px-3 py-2.5 rounded-lg text-sm outline-none appearance-none"
+                      style={{ background: '#000', border: '1px solid #1a1a1a', color: '#fafafa' }}
+                    >
+                      {['128', '256', '512', '1024', '2048'].map(v => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                  </div>
                 </div>
               </motion.div>
             )}

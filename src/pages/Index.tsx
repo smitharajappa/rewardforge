@@ -195,7 +195,7 @@ export default function HomePage() {
 
           <motion.p initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
             className="text-[14px] leading-relaxed mb-7 mx-auto max-w-[480px]" style={{ color: '#525252' }}>
-            The end-to-end RLHF platform that takes your raw model to production-ready in hours — not months. Annotation, reward model training, and RL fine-tuning. One workspace.
+            The self-serve AI alignment platform for professional service firms. Let your licensed experts train your AI — privately, in hours, with a compliance certificate.
           </motion.p>
 
           {/* CTA buttons */}

@@ -223,18 +223,48 @@ export function RLLoop() {
             </div>
             <div>
               <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>Rollouts</label>
-              <input value={rollouts} onChange={e => setRollouts(e.target.value)} className="w-full px-3 py-2.5 rounded-lg text-sm outline-none" style={{ background: '#000', border: '1px solid #1a1a1a', color: '#fafafa' }} />
+              <input
+                type="number" value={rollouts} min={4} max={256} step={1}
+                onChange={e => setRollouts(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
+                style={{ background: '#000', border: `1px solid ${(Number(rollouts) < 4 || Number(rollouts) > 256 || !Number.isInteger(Number(rollouts))) ? '#f43f5e' : '#1a1a1a'}`, color: '#fafafa' }}
+                onFocus={e => e.currentTarget.style.borderColor = '#38bdf8'}
+                onBlur={e => e.currentTarget.style.borderColor = (Number(rollouts) < 4 || Number(rollouts) > 256 || !Number.isInteger(Number(rollouts))) ? '#f43f5e' : '#1a1a1a'}
+              />
+              {(Number(rollouts) < 4 || Number(rollouts) > 256 || !Number.isInteger(Number(rollouts))) && (
+                <p className="font-mono text-[10px] mt-1" style={{ color: '#f43f5e' }}>Must be between 4 and 256</p>
+              )}
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>Max Steps</label>
-              <input value={maxSteps} onChange={e => setMaxSteps(e.target.value)} className="w-full px-3 py-2.5 rounded-lg text-sm outline-none" style={{ background: '#000', border: '1px solid #1a1a1a', color: '#fafafa' }} />
+              <input
+                type="number" value={maxSteps} min={100} max={10000} step={1}
+                onChange={e => setMaxSteps(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
+                style={{ background: '#000', border: `1px solid ${(Number(maxSteps) < 100 || Number(maxSteps) > 10000 || !Number.isInteger(Number(maxSteps))) ? '#f43f5e' : '#1a1a1a'}`, color: '#fafafa' }}
+                onFocus={e => e.currentTarget.style.borderColor = '#38bdf8'}
+                onBlur={e => e.currentTarget.style.borderColor = (Number(maxSteps) < 100 || Number(maxSteps) > 10000 || !Number.isInteger(Number(maxSteps))) ? '#f43f5e' : '#1a1a1a'}
+              />
+              {(Number(maxSteps) < 100 || Number(maxSteps) > 10000 || !Number.isInteger(Number(maxSteps))) && (
+                <p className="font-mono text-[10px] mt-1" style={{ color: '#f43f5e' }}>Must be between 100 and 10,000</p>
+              )}
             </div>
             <div>
               <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>Random Seed</label>
-              <input value={seed} onChange={e => setSeed(e.target.value)} className="w-full px-3 py-2.5 rounded-lg text-sm outline-none" style={{ background: '#000', border: '1px solid #1a1a1a', color: '#fafafa' }} />
+              <input
+                type="number" value={seed} min={0} max={99999} step={1}
+                onChange={e => setSeed(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
+                style={{ background: '#000', border: `1px solid ${(Number(seed) < 0 || Number(seed) > 99999 || !Number.isInteger(Number(seed))) ? '#f43f5e' : '#1a1a1a'}`, color: '#fafafa' }}
+                onFocus={e => e.currentTarget.style.borderColor = '#38bdf8'}
+                onBlur={e => e.currentTarget.style.borderColor = (Number(seed) < 0 || Number(seed) > 99999 || !Number.isInteger(Number(seed))) ? '#f43f5e' : '#1a1a1a'}
+              />
+              {(Number(seed) < 0 || Number(seed) > 99999 || !Number.isInteger(Number(seed))) && (
+                <p className="font-mono text-[10px] mt-1" style={{ color: '#f43f5e' }}>Must be between 0 and 99,999</p>
+              )}
             </div>
           </div>
 
