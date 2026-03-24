@@ -100,8 +100,21 @@ function ModelDetailsModal({ model, onClose, onHFHub }: { model: RewardModel; on
 function HFHubModal({ onClose, modelName, onToast }: { onClose: () => void; modelName: string; onToast: (msg: string, type: 'info' | 'success') => void }) {
   const [token, setToken] = useState('');
   const [repo, setRepo] = useState(`rewardforge-demo/${modelName.toLowerCase()}`);
+  const [tokenError, setTokenError] = useState('');
+
+  const isTokenValid = token.startsWith('hf_') && token.length > 4;
+
+  const handleTokenChange = (val: string) => {
+    setToken(val);
+    if (val.length > 0 && !val.startsWith('hf_')) {
+      setTokenError('Token must start with hf_');
+    } else {
+      setTokenError('');
+    }
+  };
 
   const handlePush = () => {
+    if (!isTokenValid) return;
     onClose();
     onToast('Pushing to huggingface.co...', 'info');
     setTimeout(() => onToast(`✓ Model pushed to huggingface.co/${repo}`, 'success'), 2000);
@@ -133,16 +146,20 @@ function HFHubModal({ onClose, modelName, onToast }: { onClose: () => void; mode
         <div className="space-y-4">
           <div>
             <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>HuggingFace Token</label>
-            <input type="password" value={token} onChange={e => setToken(e.target.value)}
+            <input type="password" value={token} onChange={e => handleTokenChange(e.target.value)}
               placeholder="hf_xxxxxxxxxxxx"
               className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
-              style={{ background: '#000', border: '1px solid #1a1a1a', color: '#fafafa' }}
-              onFocus={e => e.currentTarget.style.borderColor = '#38bdf8'}
-              onBlur={e => e.currentTarget.style.borderColor = '#1a1a1a'}
+              style={{ background: '#000', border: `1px solid ${tokenError ? '#f43f5e' : '#1a1a1a'}`, color: '#fafafa' }}
+              onFocus={e => e.currentTarget.style.borderColor = tokenError ? '#f43f5e' : '#38bdf8'}
+              onBlur={e => e.currentTarget.style.borderColor = tokenError ? '#f43f5e' : '#1a1a1a'}
             />
-            <p className="font-mono text-[9px] mt-1" style={{ color: '#525252' }}>
-              Get yours at huggingface.co/settings/tokens
-            </p>
+            {tokenError ? (
+              <p className="font-mono text-[10px] mt-1" style={{ color: '#f43f5e' }}>{tokenError}</p>
+            ) : (
+              <p className="font-mono text-[9px] mt-1" style={{ color: '#525252' }}>
+                Get yours at huggingface.co/settings/tokens
+              </p>
+            )}
           </div>
           <div>
             <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>Destination repository</label>
@@ -154,8 +171,14 @@ function HFHubModal({ onClose, modelName, onToast }: { onClose: () => void; mode
             />
           </div>
           <button onClick={handlePush}
-            className="w-full py-3 rounded-full font-syne font-bold text-sm transition-opacity hover:opacity-90"
-            style={{ background: '#fafafa', color: '#000' }}>
+            disabled={!isTokenValid}
+            className="w-full py-3 rounded-full font-syne font-bold text-sm transition-opacity"
+            style={{
+              background: isTokenValid ? '#fafafa' : '#1a1a1a',
+              color: isTokenValid ? '#000' : '#525252',
+              cursor: isTokenValid ? 'pointer' : 'not-allowed',
+              opacity: isTokenValid ? 1 : 0.5,
+            }}>
             Push model →
           </button>
         </div>
