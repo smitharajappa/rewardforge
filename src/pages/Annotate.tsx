@@ -704,7 +704,8 @@ function PairwiseTab({ prompts, isGenerated }: { prompts: GeneratedPrompt[]; isG
 
 // ── Rate Tab ──────────────────────────────────────────────────
 function RateTab({ prompts }: { prompts: GeneratedPrompt[] }) {
-  const { addRating, ratings, addToast } = useApp();
+  const { addRating, ratings, comparisons, addToast } = useApp();
+  const navigate = useNavigate();
   const TOTAL = prompts.length;
   const MAX_RATINGS = 10;
   const [promptIdx, setPromptIdx] = useState(0);
@@ -712,6 +713,7 @@ function RateTab({ prompts }: { prompts: GeneratedPrompt[] }) {
 
   const overall = DIMENSIONS.reduce((sum, d) => sum + scores[d.key] * d.weight, 0);
   const ratingsMaxReached = ratings.length >= MAX_RATINGS;
+  const canTrainRM = comparisons.length >= 5;
 
   const handleSubmit = () => {
     if (TOTAL === 0 || ratingsMaxReached) return;
@@ -801,6 +803,22 @@ function RateTab({ prompts }: { prompts: GeneratedPrompt[] }) {
           </table>
         </div>
       )}
+
+      {/* Train RM CTA — shown when 5+ comparisons collected */}
+      {canTrainRM && (
+        <div className="pt-4 text-center space-y-3">
+          <p className="font-mono text-[11px]" style={{ color: '#525252' }}>
+            You have enough data to train. Rate & Score adds optional quality signal — you can proceed anytime.
+          </p>
+          <button
+            onClick={() => navigate('/train-rm')}
+            className="px-6 py-2.5 rounded-full font-syne font-bold text-sm transition-opacity hover:opacity-88"
+            style={{ background: '#fafafa', color: '#000' }}
+          >
+            Train Reward Model →
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -808,9 +826,9 @@ function RateTab({ prompts }: { prompts: GeneratedPrompt[] }) {
 // ── Main Annotate Page ────────────────────────────────────────
 export function Annotate() {
   const navigate = useNavigate();
-  const useCase = localStorage.getItem('rf_use_case') || 'developer';
+  const { comparisons } = useApp();
 
-  // Fix 3: redirect to onboarding if no use case and not in demo mode
+  // Redirect to onboarding if no use case and not in demo mode
   useEffect(() => {
     const uc = localStorage.getItem('rf_use_case');
     const isDemo = localStorage.getItem('rf_demo_mode') === 'marcus';
@@ -862,6 +880,21 @@ export function Annotate() {
     setBannerTeamDismissed(true);
   };
 
+  // Free plan cap logic
+  const FREE_CAP = 10;
+  const plan = localStorage.getItem('rf_plan') || 'free';
+  const isPaidPlan = ['starter', 'growth', 'pro', 'enterprise'].includes(plan);
+  const isCapReached = !isPaidPlan && comparisons.length >= FREE_CAP;
+
+  const handleRestart = () => {
+    localStorage.removeItem('rf_comparisons');
+    localStorage.removeItem('rf_ratings');
+    localStorage.removeItem('rf_generated_prompts');
+    localStorage.removeItem('rf_using_example_faq');
+    setAnnotateStep('upload');
+    setPrompts([]);
+  };
+
   return (
     <div className="space-y-6">
       {/* Demo insight banner 1 */}
@@ -896,40 +929,73 @@ export function Annotate() {
       {/* Annotate state */}
       {annotateStep === 'annotate' && (
         <>
-          {/* Re-generate button */}
-          <div className="flex items-center justify-between">
-            <div className="flex gap-0" style={{ borderBottom: '1px solid #1a1a1a' }}>
-              {[{ id: 'pairwise', label: 'Pairwise Comparison', subtitle: null }, { id: 'rate', label: 'Rate & Score', subtitle: '(Optional)' }].map(t => (
-                <button key={t.id} onClick={() => setTab(t.id as 'pairwise' | 'rate')}
-                  className="px-5 py-3 font-syne font-bold text-sm transition-all flex flex-col items-start"
-                  style={{ color: tab === t.id ? '#fafafa' : '#525252', borderBottom: `2px solid ${tab === t.id ? '#38bdf8' : 'transparent'}`, marginBottom: -1 }}>
-                  <span>{t.label}</span>
-                  {t.subtitle && <span className="font-mono text-[9px] font-normal mt-0.5" style={{ color: '#525252' }}>(Optional — adds quality signal to your reward model)</span>}
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => { localStorage.removeItem('rf_generated_prompts'); setAnnotateStep('upload'); setPrompts([]); }}
-              className="font-mono text-[11px] transition-colors"
-              style={{ color: '#333' }}
-              onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#525252'}
-              onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#333'}
+          {/* Cap reached → show "All done!" state */}
+          {isCapReached ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.4 }} className="flex flex-col items-center justify-center py-20 gap-6"
             >
-              <Upload size={11} className="inline mr-1" />
-              Upload new doc
-            </button>
-          </div>
+              <div className="font-syne font-extrabold text-[28px] text-[#fafafa] text-center">All done!</div>
+              <p className="text-sm" style={{ color: '#525252' }}>
+                {comparisons.length} comparisons collected — free plan limit reached
+              </p>
+              <div className="flex gap-3">
+                <button onClick={() => navigate('/train-rm')}
+                  className="px-5 py-2.5 rounded-full font-syne font-bold text-sm transition-opacity hover:opacity-88"
+                  style={{ background: '#fafafa', color: '#000' }}>
+                  Train Reward Model →
+                </button>
+                <button onClick={handleRestart}
+                  className="px-5 py-2.5 rounded-full font-syne font-bold text-sm transition-all"
+                  style={{ border: '1px solid #1a1a1a', color: '#fafafa' }}>
+                  Restart
+                </button>
+              </div>
+              <p className="font-mono text-[10px] text-center" style={{ color: '#333' }}>
+                Upgrade to Starter or above for unlimited comparisons
+              </p>
+            </motion.div>
+          ) : (
+            <>
+              {/* Tab bar + Upload new doc button */}
+              <div className="flex items-center justify-between">
+                <div className="flex gap-0" style={{ borderBottom: '1px solid #1a1a1a' }}>
+                  {[{ id: 'pairwise', label: 'Pairwise Comparison', subtitle: null }, { id: 'rate', label: 'Rate & Score', subtitle: '(Optional)' }].map(t => (
+                    <button key={t.id} onClick={() => setTab(t.id as 'pairwise' | 'rate')}
+                      className="px-5 py-3 font-syne font-bold text-sm transition-all flex flex-col items-start"
+                      style={{ color: tab === t.id ? '#fafafa' : '#525252', borderBottom: `2px solid ${tab === t.id ? '#38bdf8' : 'transparent'}`, marginBottom: -1 }}>
+                      <span>{t.label}</span>
+                      {t.subtitle && <span className="font-mono text-[9px] font-normal mt-0.5" style={{ color: '#525252' }}>(Optional — adds quality signal to your reward model)</span>}
+                    </button>
+                  ))}
+                </div>
+                {/* Hide "Upload new doc" if cap is reached */}
+                {!isCapReached && (
+                  <button
+                    onClick={() => { localStorage.removeItem('rf_generated_prompts'); setAnnotateStep('upload'); setPrompts([]); }}
+                    className="font-mono text-[11px] transition-colors"
+                    style={{ color: '#333' }}
+                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#525252'}
+                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#333'}
+                  >
+                    <Upload size={11} className="inline mr-1" />
+                    Upload new doc
+                  </button>
+                )}
+              </div>
 
-          <AnimatePresence mode="wait">
-            {tab === 'pairwise'
-              ? <motion.div key="pairwise" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                  <PairwiseTab prompts={prompts} isGenerated={isGenerated} />
-                </motion.div>
-              : <motion.div key="rate" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                  <RateTab prompts={prompts} />
-                </motion.div>
-            }
-          </AnimatePresence>
+              <AnimatePresence mode="wait">
+                {tab === 'pairwise'
+                  ? <motion.div key="pairwise" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                      <PairwiseTab prompts={prompts} isGenerated={isGenerated} />
+                    </motion.div>
+                  : <motion.div key="rate" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                      <RateTab prompts={prompts} />
+                    </motion.div>
+                }
+              </AnimatePresence>
+            </>
+          )}
         </>
       )}
     </div>
