@@ -100,8 +100,21 @@ function ModelDetailsModal({ model, onClose, onHFHub }: { model: RewardModel; on
 function HFHubModal({ onClose, modelName, onToast }: { onClose: () => void; modelName: string; onToast: (msg: string, type: 'info' | 'success') => void }) {
   const [token, setToken] = useState('');
   const [repo, setRepo] = useState(`rewardforge-demo/${modelName.toLowerCase()}`);
+  const [tokenError, setTokenError] = useState('');
+
+  const isTokenValid = token.startsWith('hf_') && token.length > 4;
+
+  const handleTokenChange = (val: string) => {
+    setToken(val);
+    if (val.length > 0 && !val.startsWith('hf_')) {
+      setTokenError('Token must start with hf_');
+    } else {
+      setTokenError('');
+    }
+  };
 
   const handlePush = () => {
+    if (!isTokenValid) return;
     onClose();
     onToast('Pushing to huggingface.co...', 'info');
     setTimeout(() => onToast(`✓ Model pushed to huggingface.co/${repo}`, 'success'), 2000);
@@ -133,16 +146,20 @@ function HFHubModal({ onClose, modelName, onToast }: { onClose: () => void; mode
         <div className="space-y-4">
           <div>
             <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>HuggingFace Token</label>
-            <input type="password" value={token} onChange={e => setToken(e.target.value)}
+            <input type="password" value={token} onChange={e => handleTokenChange(e.target.value)}
               placeholder="hf_xxxxxxxxxxxx"
               className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
-              style={{ background: '#000', border: '1px solid #1a1a1a', color: '#fafafa' }}
-              onFocus={e => e.currentTarget.style.borderColor = '#38bdf8'}
-              onBlur={e => e.currentTarget.style.borderColor = '#1a1a1a'}
+              style={{ background: '#000', border: `1px solid ${tokenError ? '#f43f5e' : '#1a1a1a'}`, color: '#fafafa' }}
+              onFocus={e => e.currentTarget.style.borderColor = tokenError ? '#f43f5e' : '#38bdf8'}
+              onBlur={e => e.currentTarget.style.borderColor = tokenError ? '#f43f5e' : '#1a1a1a'}
             />
-            <p className="font-mono text-[9px] mt-1" style={{ color: '#525252' }}>
-              Get yours at huggingface.co/settings/tokens
-            </p>
+            {tokenError ? (
+              <p className="font-mono text-[10px] mt-1" style={{ color: '#f43f5e' }}>{tokenError}</p>
+            ) : (
+              <p className="font-mono text-[9px] mt-1" style={{ color: '#525252' }}>
+                Get yours at huggingface.co/settings/tokens
+              </p>
+            )}
           </div>
           <div>
             <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>Destination repository</label>
@@ -154,8 +171,14 @@ function HFHubModal({ onClose, modelName, onToast }: { onClose: () => void; mode
             />
           </div>
           <button onClick={handlePush}
-            className="w-full py-3 rounded-full font-syne font-bold text-sm transition-opacity hover:opacity-90"
-            style={{ background: '#fafafa', color: '#000' }}>
+            disabled={!isTokenValid}
+            className="w-full py-3 rounded-full font-syne font-bold text-sm transition-opacity"
+            style={{
+              background: isTokenValid ? '#fafafa' : '#1a1a1a',
+              color: isTokenValid ? '#000' : '#525252',
+              cursor: isTokenValid ? 'pointer' : 'not-allowed',
+              opacity: isTokenValid ? 1 : 0.5,
+            }}>
             Push model →
           </button>
         </div>
@@ -371,21 +394,60 @@ export function TrainRM() {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            {[{ label: 'Learning Rate', val: lr, set: setLr, help: 'Range: 1e-5 to 5e-5' }, { label: 'Batch Size', val: batchSize, set: setBatchSize, help: 'Larger = faster but more GPU memory' }].map(f => (
-              <div key={f.label}>
-                <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>{f.label}</label>
-                <input value={f.val} onChange={e => f.set(e.target.value)} className="w-full px-3 py-2.5 rounded-lg text-sm outline-none" style={{ background: '#000', border: '1px solid #1a1a1a', color: '#fafafa' }}
-                  onFocus={e => e.currentTarget.style.borderColor = '#38bdf8'} onBlur={e => e.currentTarget.style.borderColor = '#1a1a1a'} />
-                <p className="font-mono text-[10px] mt-1" style={{ color: '#525252' }}>{f.help}</p>
-              </div>
-            ))}
+            {/* Learning Rate */}
+            <div>
+              <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>Learning Rate</label>
+              <input
+                type="number" value={lr} min={0.00001} max={0.0001} step={0.00001}
+                maxLength={10}
+                onChange={e => setLr(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
+                style={{ background: '#000', border: `1px solid ${Number(lr) < 0.00001 || Number(lr) > 0.0001 ? '#f43f5e' : '#1a1a1a'}`, color: '#fafafa' }}
+                onFocus={e => e.currentTarget.style.borderColor = '#38bdf8'}
+                onBlur={e => e.currentTarget.style.borderColor = Number(lr) < 0.00001 || Number(lr) > 0.0001 ? '#f43f5e' : '#1a1a1a'}
+              />
+              {(Number(lr) < 0.00001 || Number(lr) > 0.0001) && (
+                <p className="font-mono text-[10px] mt-1" style={{ color: '#f43f5e' }}>Must be between 1e-5 and 1e-4</p>
+              )}
+              {!(Number(lr) < 0.00001 || Number(lr) > 0.0001) && (
+                <p className="font-mono text-[10px] mt-1" style={{ color: '#525252' }}>Range: 1e-5 to 1e-4</p>
+              )}
+            </div>
+            {/* Batch Size */}
+            <div>
+              <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>Batch Size</label>
+              <input
+                type="number" value={batchSize} min={1} max={64} step={1}
+                onChange={e => setBatchSize(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
+                style={{ background: '#000', border: `1px solid ${(Number(batchSize) < 1 || Number(batchSize) > 64 || !Number.isInteger(Number(batchSize))) ? '#f43f5e' : '#1a1a1a'}`, color: '#fafafa' }}
+                onFocus={e => e.currentTarget.style.borderColor = '#38bdf8'}
+                onBlur={e => e.currentTarget.style.borderColor = (Number(batchSize) < 1 || Number(batchSize) > 64 || !Number.isInteger(Number(batchSize))) ? '#f43f5e' : '#1a1a1a'}
+              />
+              {(Number(batchSize) < 1 || Number(batchSize) > 64 || !Number.isInteger(Number(batchSize))) && (
+                <p className="font-mono text-[10px] mt-1" style={{ color: '#f43f5e' }}>Must be between 1 and 64</p>
+              )}
+              {!(Number(batchSize) < 1 || Number(batchSize) > 64 || !Number.isInteger(Number(batchSize))) && (
+                <p className="font-mono text-[10px] mt-1" style={{ color: '#525252' }}>Larger = faster but more GPU memory</p>
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
+            {/* Epochs */}
             <div>
               <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>Epochs</label>
-              <input value={epochs} onChange={e => setEpochs(e.target.value)} className="w-full px-3 py-2.5 rounded-lg text-sm outline-none" style={{ background: '#000', border: '1px solid #1a1a1a', color: '#fafafa' }}
-                onFocus={e => e.currentTarget.style.borderColor = '#38bdf8'} onBlur={e => e.currentTarget.style.borderColor = '#1a1a1a'} />
+              <input
+                type="number" value={epochs} min={1} max={10} step={1}
+                onChange={e => setEpochs(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
+                style={{ background: '#000', border: `1px solid ${(Number(epochs) < 1 || Number(epochs) > 10 || !Number.isInteger(Number(epochs))) ? '#f43f5e' : '#1a1a1a'}`, color: '#fafafa' }}
+                onFocus={e => e.currentTarget.style.borderColor = '#38bdf8'}
+                onBlur={e => e.currentTarget.style.borderColor = (Number(epochs) < 1 || Number(epochs) > 10 || !Number.isInteger(Number(epochs))) ? '#f43f5e' : '#1a1a1a'}
+              />
+              {(Number(epochs) < 1 || Number(epochs) > 10 || !Number.isInteger(Number(epochs))) && (
+                <p className="font-mono text-[10px] mt-1" style={{ color: '#f43f5e' }}>Must be between 1 and 10</p>
+              )}
             </div>
             <div>
               <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>
@@ -404,12 +466,44 @@ export function TrainRM() {
             {advancedOpen && (
               <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
                 <div className="grid grid-cols-3 gap-4 pt-2">
-                  {[{ label: 'Warmup Steps', val: warmup, set: setWarmup }, { label: 'Weight Decay', val: weightDecay, set: setWeightDecay }, { label: 'Max Seq Length', val: maxSeqLen, set: setMaxSeqLen }].map(f => (
-                    <div key={f.label}>
-                      <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>{f.label}</label>
-                      <input value={f.val} onChange={e => f.set(e.target.value)} className="w-full px-3 py-2.5 rounded-lg text-sm outline-none" style={{ background: '#000', border: '1px solid #1a1a1a', color: '#fafafa' }} />
-                    </div>
-                  ))}
+                  {/* Warmup Steps */}
+                  <div>
+                    <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>Warmup Steps</label>
+                    <input
+                      type="number" value={warmup} min={0} max={1000} step={1}
+                      onChange={e => setWarmup(e.target.value)}
+                      className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
+                      style={{ background: '#000', border: `1px solid ${(Number(warmup) < 0 || Number(warmup) > 1000) ? '#f43f5e' : '#1a1a1a'}`, color: '#fafafa' }}
+                    />
+                    {(Number(warmup) < 0 || Number(warmup) > 1000) && (
+                      <p className="font-mono text-[9px] mt-1" style={{ color: '#f43f5e' }}>0–1000</p>
+                    )}
+                  </div>
+                  {/* Weight Decay */}
+                  <div>
+                    <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>Weight Decay</label>
+                    <input
+                      type="number" value={weightDecay} min={0} max={0.1} step={0.001}
+                      onChange={e => setWeightDecay(e.target.value)}
+                      className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
+                      style={{ background: '#000', border: `1px solid ${(Number(weightDecay) < 0 || Number(weightDecay) > 0.1) ? '#f43f5e' : '#1a1a1a'}`, color: '#fafafa' }}
+                    />
+                    {(Number(weightDecay) < 0 || Number(weightDecay) > 0.1) && (
+                      <p className="font-mono text-[9px] mt-1" style={{ color: '#f43f5e' }}>0–0.1</p>
+                    )}
+                  </div>
+                  {/* Max Seq Length */}
+                  <div>
+                    <label className="font-mono text-[10px] uppercase tracking-widest mb-1.5 block" style={{ color: '#525252' }}>Max Seq Length</label>
+                    <select
+                      value={maxSeqLen}
+                      onChange={e => setMaxSeqLen(e.target.value)}
+                      className="w-full px-3 py-2.5 rounded-lg text-sm outline-none appearance-none"
+                      style={{ background: '#000', border: '1px solid #1a1a1a', color: '#fafafa' }}
+                    >
+                      {['128', '256', '512', '1024', '2048'].map(v => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                  </div>
                 </div>
               </motion.div>
             )}

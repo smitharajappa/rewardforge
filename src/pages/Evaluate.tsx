@@ -423,11 +423,11 @@ export function Evaluate() {
                 };
                 const STANDARDS_MAP: Record<string, string> = {
                   legal: 'California Bar Association Guidelines',
-                  medical: 'Clinical practice & patient care standards',
-                  financial: 'FINRA suitability & disclosure guidelines',
-                  customer_service: 'Customer experience best practices',
-                  education: 'Academic integrity & pedagogy standards',
-                  developer: 'Software engineering best practices',
+                  medical: 'AMA Clinical Documentation Standards',
+                  financial: 'CFA Institute Code of Ethics',
+                  customer_service: 'Customer Experience Professional Standards',
+                  education: 'ISTE Educator Standards',
+                  developer: 'IEEE Software Engineering Standards',
                 };
 
                 const org = isDemoMode
@@ -440,10 +440,10 @@ export function Evaluate() {
                   ? 'Marcus Chen · Managing Partner'
                   : !isDefaultName
                     ? `${projectName} · Administrator`
-                    : (CERTIFIED_BY_USE_CASE[useCase] || 'Administrator · Your Organization');
+                    : (CERTIFIED_BY_USE_CASE[useCase] || 'Licensed Expert · Your Organization');
 
                 const standards = isDemoMode
-                  ? 'California Bar Association Guidelines'
+                  ? 'California Bar Association Guidelines · Rule 1.1 Competence'
                   : (STANDARDS_MAP[useCase] || 'Professional industry standards');
 
                 return [
