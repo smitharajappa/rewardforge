@@ -760,9 +760,19 @@ function RateTab({ prompts }: { prompts: GeneratedPrompt[] }) {
         <div className="font-syne font-extrabold text-[52px] leading-none" style={{ color: '#38bdf8' }}>{overall.toFixed(1)}</div>
         <div className="font-syne font-bold text-sm mt-2" style={{ color: qualifier.color }}>{qualifier.label}</div>
       </div>
-      <button onClick={handleSubmit}
-        className="w-full py-3.5 rounded-full font-syne font-bold text-sm transition-opacity hover:opacity-90"
-        style={{ background: '#fafafa', color: '#000' }}>Submit Rating</button>
+      <button
+        onClick={handleSubmit}
+        disabled={ratingsMaxReached}
+        className="w-full py-3.5 rounded-full font-syne font-bold text-sm transition-opacity"
+        style={{
+          background: ratingsMaxReached ? '#1a1a1a' : '#fafafa',
+          color: ratingsMaxReached ? '#525252' : '#000',
+          cursor: ratingsMaxReached ? 'not-allowed' : 'pointer',
+          opacity: ratingsMaxReached ? 0.5 : 1,
+        }}
+      >
+        {ratingsMaxReached ? `Maximum ratings reached (${MAX_RATINGS}/${MAX_RATINGS})` : 'Submit Rating'}
+      </button>
       {ratings.length > 0 && (
         <div className="rounded-xl overflow-hidden" style={{ border: '1px solid #1a1a1a' }}>
           <table className="w-full">
