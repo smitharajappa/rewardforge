@@ -706,13 +706,15 @@ function PairwiseTab({ prompts, isGenerated }: { prompts: GeneratedPrompt[]; isG
 function RateTab({ prompts }: { prompts: GeneratedPrompt[] }) {
   const { addRating, ratings, addToast } = useApp();
   const TOTAL = prompts.length;
+  const MAX_RATINGS = 10;
   const [promptIdx, setPromptIdx] = useState(0);
   const [scores, setScores] = useState<Record<string, number>>({ helpfulness: 5, accuracy: 5, safety: 5, coherence: 5, creativity: 5 });
 
   const overall = DIMENSIONS.reduce((sum, d) => sum + scores[d.key] * d.weight, 0);
+  const ratingsMaxReached = ratings.length >= MAX_RATINGS;
 
   const handleSubmit = () => {
-    if (TOTAL === 0) return;
+    if (TOTAL === 0 || ratingsMaxReached) return;
     addRating({
       id: crypto.randomUUID(),
       prompt: prompts[promptIdx].prompt,
@@ -758,9 +760,19 @@ function RateTab({ prompts }: { prompts: GeneratedPrompt[] }) {
         <div className="font-syne font-extrabold text-[52px] leading-none" style={{ color: '#38bdf8' }}>{overall.toFixed(1)}</div>
         <div className="font-syne font-bold text-sm mt-2" style={{ color: qualifier.color }}>{qualifier.label}</div>
       </div>
-      <button onClick={handleSubmit}
-        className="w-full py-3.5 rounded-full font-syne font-bold text-sm transition-opacity hover:opacity-90"
-        style={{ background: '#fafafa', color: '#000' }}>Submit Rating</button>
+      <button
+        onClick={handleSubmit}
+        disabled={ratingsMaxReached}
+        className="w-full py-3.5 rounded-full font-syne font-bold text-sm transition-opacity"
+        style={{
+          background: ratingsMaxReached ? '#1a1a1a' : '#fafafa',
+          color: ratingsMaxReached ? '#525252' : '#000',
+          cursor: ratingsMaxReached ? 'not-allowed' : 'pointer',
+          opacity: ratingsMaxReached ? 0.5 : 1,
+        }}
+      >
+        {ratingsMaxReached ? `Maximum ratings reached (${MAX_RATINGS}/${MAX_RATINGS})` : 'Submit Rating'}
+      </button>
       {ratings.length > 0 && (
         <div className="rounded-xl overflow-hidden" style={{ border: '1px solid #1a1a1a' }}>
           <table className="w-full">
@@ -887,11 +899,12 @@ export function Annotate() {
           {/* Re-generate button */}
           <div className="flex items-center justify-between">
             <div className="flex gap-0" style={{ borderBottom: '1px solid #1a1a1a' }}>
-              {[{ id: 'pairwise', label: 'Pairwise Comparison' }, { id: 'rate', label: 'Rate & Score' }].map(t => (
+              {[{ id: 'pairwise', label: 'Pairwise Comparison', subtitle: null }, { id: 'rate', label: 'Rate & Score', subtitle: '(Optional)' }].map(t => (
                 <button key={t.id} onClick={() => setTab(t.id as 'pairwise' | 'rate')}
-                  className="px-5 py-3 font-syne font-bold text-sm transition-all"
+                  className="px-5 py-3 font-syne font-bold text-sm transition-all flex flex-col items-start"
                   style={{ color: tab === t.id ? '#fafafa' : '#525252', borderBottom: `2px solid ${tab === t.id ? '#38bdf8' : 'transparent'}`, marginBottom: -1 }}>
-                  {t.label}
+                  <span>{t.label}</span>
+                  {t.subtitle && <span className="font-mono text-[9px] font-normal mt-0.5" style={{ color: '#525252' }}>(Optional — adds quality signal to your reward model)</span>}
                 </button>
               ))}
             </div>

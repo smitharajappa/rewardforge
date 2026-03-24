@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Bell, X } from 'lucide-react';
+import { Bell, X, Menu } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useApp } from '@/context/AppContext';
@@ -73,7 +73,12 @@ function saveNotifs(notifs: AppNotification[]) {
   try { localStorage.setItem(LS_NOTIFS_KEY, JSON.stringify(notifs)); } catch { /* ignore */ }
 }
 
-export function TopBar() {
+interface TopBarProps {
+  mobileSidebarToggle?: () => void;
+  mobileSidebarOpen?: boolean;
+}
+
+export function TopBar({ mobileSidebarToggle, mobileSidebarOpen }: TopBarProps = {}) {
   const location = useLocation();
   const title = PAGE_TITLES[location.pathname] ?? 'RewardForge';
   const { comparisons, rewardModels, rlRuns } = useApp();
@@ -203,10 +208,21 @@ export function TopBar() {
 
   return (
     <div
-      className="sticky top-0 z-30 flex items-center justify-between px-6"
+      className="sticky top-0 z-30 flex items-center justify-between px-4 md:px-6"
       style={{ height: 48, background: 'rgba(0,0,0,0.92)', borderBottom: '1px solid #1a1a1a', backdropFilter: 'blur(8px)', flexShrink: 0 }}
     >
       <div className="flex items-center gap-2">
+        {/* Mobile hamburger */}
+        {mobileSidebarToggle && (
+          <button
+            onClick={mobileSidebarToggle}
+            className="mr-1 p-1.5 rounded-lg transition-colors"
+            style={{ color: '#525252' }}
+            aria-label="Toggle sidebar"
+          >
+            <Menu size={18} />
+          </button>
+        )}
         <span className="font-syne font-extrabold text-base text-[#fafafa]">{title}</span>
         <span className="text-[#333] text-sm">/</span>
         <a

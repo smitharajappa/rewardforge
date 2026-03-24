@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Menu, X } from 'lucide-react';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { DemoBanner } from './DemoBanner';
@@ -9,6 +10,7 @@ import { Annotate } from '@/pages/Annotate';
 import { TrainRM } from '@/pages/TrainRM';
 import { RLLoop } from '@/pages/RLLoop';
 import { Evaluate } from '@/pages/Evaluate';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 function SkeletonShimmer() {
   return (
@@ -35,6 +37,13 @@ export function AppShell() {
   const mainRef = useRef<HTMLDivElement>(null);
   const [showSkeleton, setShowSkeleton] = useState(true);
   const prevPathRef = useRef(location.pathname);
+  const isMobile = useIsMobile();
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+  // Close mobile sidebar on route change
+  useEffect(() => {
+    setMobileSidebarOpen(false);
+  }, [location.pathname]);
 
   // Scroll to top on navigation
   useEffect(() => {
@@ -59,9 +68,46 @@ export function AppShell() {
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: '#000' }}>
-      <Sidebar />
+      {/* Desktop sidebar — always visible */}
+      {!isMobile && <Sidebar />}
+
+      {/* Mobile sidebar — slide-in overlay */}
+      {isMobile && (
+        <AnimatePresence>
+          {mobileSidebarOpen && (
+            <>
+              {/* Backdrop */}
+              <motion.div
+                key="backdrop"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 z-40"
+                style={{ background: 'rgba(0,0,0,0.7)' }}
+                onClick={() => setMobileSidebarOpen(false)}
+              />
+              {/* Sidebar panel */}
+              <motion.div
+                key="mobile-sidebar"
+                initial={{ x: -240 }}
+                animate={{ x: 0 }}
+                exit={{ x: -240 }}
+                transition={{ type: 'tween', duration: 0.22, ease: 'easeOut' }}
+                className="fixed top-0 left-0 h-full z-50"
+              >
+                <Sidebar />
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+      )}
+
       <div className="flex-1 flex flex-col overflow-hidden">
-        <TopBar />
+        <TopBar
+          mobileSidebarToggle={isMobile ? () => setMobileSidebarOpen(v => !v) : undefined}
+          mobileSidebarOpen={mobileSidebarOpen}
+        />
         <DemoBanner />
         <main ref={mainRef} className="flex-1 overflow-y-auto bg-grid-main relative">
           {/* Radial glows */}
@@ -72,7 +118,7 @@ export function AppShell() {
           <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-[350px] h-[300px] pointer-events-none z-0"
             style={{ background: 'radial-gradient(ellipse, rgba(52,211,153,0.05) 0%, transparent 70%)' }} />
 
-          <div className="relative z-10 p-7 max-w-[1300px] mx-auto w-full">
+          <div className="relative z-10 p-4 md:p-7 max-w-[1300px] mx-auto w-full">
             <AnimatePresence mode="wait" initial={false}>
               {showSkeleton ? (
                 <motion.div
