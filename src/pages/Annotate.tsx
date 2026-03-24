@@ -706,13 +706,15 @@ function PairwiseTab({ prompts, isGenerated }: { prompts: GeneratedPrompt[]; isG
 function RateTab({ prompts }: { prompts: GeneratedPrompt[] }) {
   const { addRating, ratings, addToast } = useApp();
   const TOTAL = prompts.length;
+  const MAX_RATINGS = 10;
   const [promptIdx, setPromptIdx] = useState(0);
   const [scores, setScores] = useState<Record<string, number>>({ helpfulness: 5, accuracy: 5, safety: 5, coherence: 5, creativity: 5 });
 
   const overall = DIMENSIONS.reduce((sum, d) => sum + scores[d.key] * d.weight, 0);
+  const ratingsMaxReached = ratings.length >= MAX_RATINGS;
 
   const handleSubmit = () => {
-    if (TOTAL === 0) return;
+    if (TOTAL === 0 || ratingsMaxReached) return;
     addRating({
       id: crypto.randomUUID(),
       prompt: prompts[promptIdx].prompt,
