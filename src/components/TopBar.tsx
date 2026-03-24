@@ -73,7 +73,14 @@ function saveNotifs(notifs: AppNotification[]) {
   try { localStorage.setItem(LS_NOTIFS_KEY, JSON.stringify(notifs)); } catch { /* ignore */ }
 }
 
-export function TopBar() {
+import { Menu } from 'lucide-react';
+
+interface TopBarProps {
+  mobileSidebarToggle?: () => void;
+  mobileSidebarOpen?: boolean;
+}
+
+export function TopBar({ mobileSidebarToggle, mobileSidebarOpen }: TopBarProps = {}) {
   const location = useLocation();
   const title = PAGE_TITLES[location.pathname] ?? 'RewardForge';
   const { comparisons, rewardModels, rlRuns } = useApp();
