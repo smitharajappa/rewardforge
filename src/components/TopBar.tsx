@@ -210,10 +210,21 @@ export function TopBar({ mobileSidebarToggle, mobileSidebarOpen }: TopBarProps =
 
   return (
     <div
-      className="sticky top-0 z-30 flex items-center justify-between px-6"
+      className="sticky top-0 z-30 flex items-center justify-between px-4 md:px-6"
       style={{ height: 48, background: 'rgba(0,0,0,0.92)', borderBottom: '1px solid #1a1a1a', backdropFilter: 'blur(8px)', flexShrink: 0 }}
     >
       <div className="flex items-center gap-2">
+        {/* Mobile hamburger */}
+        {mobileSidebarToggle && (
+          <button
+            onClick={mobileSidebarToggle}
+            className="mr-1 p-1.5 rounded-lg transition-colors"
+            style={{ color: '#525252' }}
+            aria-label="Toggle sidebar"
+          >
+            <Menu size={18} />
+          </button>
+        )}
         <span className="font-syne font-extrabold text-base text-[#fafafa]">{title}</span>
         <span className="text-[#333] text-sm">/</span>
         <a
