@@ -118,6 +118,7 @@ export function TopBar() {
   }, []);
 
   // ── Watch comparisons for milestone ──────────────────────
+  const prevComparisonsLen = useRef(comparisons.length);
   useEffect(() => {
     const prev = prevComparisonsLen.current;
     prevComparisonsLen.current = comparisons.length;
