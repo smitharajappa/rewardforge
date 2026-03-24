@@ -73,8 +73,6 @@ function saveNotifs(notifs: AppNotification[]) {
   try { localStorage.setItem(LS_NOTIFS_KEY, JSON.stringify(notifs)); } catch { /* ignore */ }
 }
 
-import { Menu } from 'lucide-react';
-
 interface TopBarProps {
   mobileSidebarToggle?: () => void;
   mobileSidebarOpen?: boolean;
