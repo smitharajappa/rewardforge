@@ -367,7 +367,7 @@ export function RLLoop() {
                           ✓ Completed
                         </span>
                       </td>
-                      <td className="px-3 py-2.5 font-mono text-[9px]" style={{ color: '#333' }}>{r.timestamp.toLocaleDateString()}</td>
+                      <td className="px-3 py-2.5 font-mono text-[9px]" style={{ color: '#333' }}>{new Date(r.timestamp).toLocaleDateString('en-GB')}</td>
                     </tr>
                   );
                 })}

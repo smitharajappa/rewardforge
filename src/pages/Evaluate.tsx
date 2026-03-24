@@ -403,14 +403,23 @@ export function Evaluate() {
                 const isDemoMode = localStorage.getItem('rf_demo_mode') === 'marcus';
                 const useCase = localStorage.getItem('rf_use_case') || 'developer';
                 const projectName = localStorage.getItem('rf_project_name') || '';
+                const isDefaultName = !projectName || projectName === 'My RLHF Project';
 
-                const ORG_FALLBACK: Record<string, string> = {
-                  legal: 'Chen & Associates Legal Group',
+                const ORG_BY_USE_CASE: Record<string, string> = {
+                  legal: 'Your Law Firm',
                   medical: 'Your Medical Practice',
                   financial: 'Your Financial Advisory',
-                  customer_service: 'Your Support Team',
-                  education: 'Your Educational Institution',
+                  customer_service: 'Your Organization',
+                  education: 'Your Institution',
                   developer: 'Your Organization',
+                };
+                const CERTIFIED_BY_USE_CASE: Record<string, string> = {
+                  legal: 'Licensed Attorney · Your Firm',
+                  medical: 'Licensed Physician · Your Practice',
+                  financial: 'Licensed Advisor · Your Firm',
+                  customer_service: 'Team Lead · Your Organization',
+                  education: 'Lead Educator · Your Institution',
+                  developer: 'Administrator · Your Organization',
                 };
                 const STANDARDS_MAP: Record<string, string> = {
                   legal: 'California Bar Association Guidelines',
@@ -421,10 +430,18 @@ export function Evaluate() {
                   developer: 'Software engineering best practices',
                 };
 
-                const org = projectName || ORG_FALLBACK[useCase] || 'Your Organization';
+                const org = isDemoMode
+                  ? 'Chen & Associates Legal Group'
+                  : !isDefaultName
+                    ? projectName
+                    : (ORG_BY_USE_CASE[useCase] || 'Your Organization');
+
                 const certifiedBy = isDemoMode
                   ? 'Marcus Chen · Managing Partner'
-                  : projectName ? `${projectName} · Administrator` : 'Your Name · Your Role';
+                  : !isDefaultName
+                    ? `${projectName} · Administrator`
+                    : (CERTIFIED_BY_USE_CASE[useCase] || 'Administrator · Your Organization');
+
                 const standards = isDemoMode
                   ? 'California Bar Association Guidelines'
                   : (STANDARDS_MAP[useCase] || 'Professional industry standards');
