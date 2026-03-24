@@ -10,9 +10,10 @@ const FEATURES = [
   { icon: MessageSquare, color: '#38bdf8', title: 'Pairwise Annotation', desc: 'Compare AI response pairs with keyboard shortcuts. Collect human preference data in under 60 seconds.' },
   { icon: Cpu, color: '#f472b6', title: 'No-Code RM Training', desc: 'Train reward models on GPT-2, LLaMA, or Mistral. Watch live W&B-style loss curves animate in real time.' },
   { icon: RefreshCw, color: '#34d399', title: 'PPO · GRPO · DPO', desc: 'Launch RL fine-tuning with any algorithm. Compare runs side by side in a GitHub-style diff view.' },
-  { icon: Sparkles, color: '#a78bfa', title: 'AI Copilot', desc: 'Ask anything about your training run in plain English. Streamed responses, Perplexity-style, with context.' },
+  { icon: Sparkles, color: '#a78bfa', title: 'AI Copilot', desc: 'Ask anything about your training run in plain English. Powered by Groq AI — instant answers about RM accuracy, algorithm choice, and pipeline optimization.' },
   { icon: Package, color: '#38bdf8', title: 'Model Registry', desc: 'Every reward model versioned and stored. Export to HuggingFace Hub in one click.' },
   { icon: Bot, color: '#f472b6', title: 'AI-Generated Pairs', desc: 'Auto-generate response pairs via Groq AI. First comparison in under 60 seconds from signup.' },
+  { icon: ArrowRight, color: '#34d399', title: 'Alignment Certificate', desc: 'Auto-generate a compliance-ready certificate with your licensed expert\'s name, quality score, and professional standards. Auditable. Private. Yours.' },
 ];
 
 const MODELS = ['LLaMA 3', 'Mistral 7B', 'Gemma', 'Falcon', 'Qwen'];
