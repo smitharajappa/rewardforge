@@ -16,8 +16,13 @@ export const PIPELINE_KEYS = [
   'rf_banner_drift',
   'rf_cert_id',
   'rf_return_path',
+  'rf_notifications',
 ] as const;
 
 export function clearPipelineData() {
   PIPELINE_KEYS.forEach(k => localStorage.removeItem(k));
+  // Signal TopBar to reset notifications — works cross-tab via storage event
+  localStorage.setItem('rf_notifications_reset', String(Date.now()));
+  // Same-tab dispatch since storage events don't fire in the originating tab
+  window.dispatchEvent(new Event('rf_notifications_reset'));
 }

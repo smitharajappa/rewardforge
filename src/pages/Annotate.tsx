@@ -638,6 +638,19 @@ function PairwiseTab({ prompts, isGenerated }: { prompts: GeneratedPrompt[]; isG
         })}
       </div>
 
+      {/* Helper text when nothing selected */}
+      {!isSelected && (
+        <p style={{
+          textAlign: 'center',
+          color: '#525252',
+          fontFamily: 'Space Mono, monospace',
+          fontSize: '12px',
+          marginTop: '4px',
+        }}>
+          Click a response card or press A / B to select
+        </p>
+      )}
+
       {/* Control row */}
       <div className="flex justify-center gap-3">
         {['Tie', 'Skip'].map(action => (

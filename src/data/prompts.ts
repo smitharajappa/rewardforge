@@ -291,7 +291,7 @@ export const DEVELOPER_PROMPTS: Prompt[] = [
   },
   {
     text: "How do I prevent reward hacking during RL fine-tuning?",
-    responseA: `Reward hacking mitigation strategies include implementation of KL divergence penalty terms in the PPO objective function to constrain policy drift, ensemble reward model approaches to reduce individual model bias exploitation, periodic reward model updates using newly collected preference data, output length normalization to prevent verbosity exploitation, and diverse prompt sampling during training.
+    responseA: `Reward hacking mitigation strategies include implementation of KL divergence penalty terms in the PPO objective function to constrain policy drift, ensemble reward model approaches to reduce individual model bias exploitation, periodic reward model updates using newly collected preference data, output length normalization to prevent verbosity exploitation, and diverse prompt sampling during training.`,
     responseB: `The main protection is the KL penalty β — keep it around 0.1 as a starting point. Watch for signs of hacking: responses getting unusually long, becoming overly sycophantic, or very repetitive. If reward climbs fast but real quality isn't improving, your model is gaming the signal. Practical fix: add length normalization and check your reward model accuracy — below 80% means retrain with more data.`,
   },
   {

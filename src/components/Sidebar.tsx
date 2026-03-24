@@ -94,8 +94,7 @@ export function Sidebar() {
                     <span className="text-sm font-medium">{item.label}</span>
                   </div>
                   {badge !== undefined && badge > 0 && (
-                    <span className="font-mono text-[9px] px-1.5 py-0.5 rounded-full"
-                      style={{ background: 'rgba(56,189,248,0.1)', color: '#38bdf8', border: '1px solid rgba(56,189,248,0.25)' }}>
+                    <span className="font-mono text-[10px]" style={{ color: '#525252' }}>
                       {badge}
                     </span>
                   )}

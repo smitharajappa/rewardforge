@@ -593,7 +593,7 @@ export function TrainRM() {
                       </div>
                     </td>
                     <td className="px-4 py-3 font-mono text-[10px]" style={{ color: '#f472b6' }}>{m.loss.toFixed(4)}</td>
-                    <td className="px-4 py-3 font-mono text-[9px]" style={{ color: '#333' }}>{m.timestamp.toLocaleDateString()}</td>
+                    <td className="px-4 py-3 font-mono text-[9px]" style={{ color: '#333' }}>{new Date(m.timestamp).toLocaleDateString('en-GB')}</td>
                     <td className="px-4 py-3">
                       <div className="flex gap-2">
                         <button onClick={() => setSelectedModel(m)} className="px-2.5 py-1 rounded font-mono text-[10px] transition-all" style={{ border: '1px solid #1a1a1a', color: '#a3a3a3' }}>Details</button>

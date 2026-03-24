@@ -12,7 +12,7 @@ const FEATURES = [
   { icon: RefreshCw, color: '#34d399', title: 'PPO · GRPO · DPO', desc: 'Launch RL fine-tuning with any algorithm. Compare runs side by side in a GitHub-style diff view.' },
   { icon: Sparkles, color: '#a78bfa', title: 'AI Copilot', desc: 'Ask anything about your training run in plain English. Streamed responses, Perplexity-style, with context.' },
   { icon: Package, color: '#38bdf8', title: 'Model Registry', desc: 'Every reward model versioned and stored. Export to HuggingFace Hub in one click.' },
-  { icon: Bot, color: '#f472b6', title: 'AI-Generated Pairs', desc: 'Auto-generate response pairs via Claude API. First comparison in under 60 seconds from signup.' },
+  { icon: Bot, color: '#f472b6', title: 'AI-Generated Pairs', desc: 'Auto-generate response pairs via Groq AI. First comparison in under 60 seconds from signup.' },
 ];
 
 const MODELS = ['LLaMA 3', 'Mistral 7B', 'Gemma', 'Falcon', 'Qwen'];
@@ -298,7 +298,7 @@ export default function HomePage() {
           <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(56,189,248,0.07) 0%, transparent 65%)' }} />
           <div className="relative z-10">
             <h2 className="font-syne font-extrabold text-[22px] text-[#fafafa] mb-2">Start forging aligned models today.</h2>
-            <p className="text-sm mb-6" style={{ color: '#525252' }}>Free plan. 1,000 comparisons. 3 training runs. No CC.</p>
+            <p className="text-sm mb-6" style={{ color: '#525252' }}>Free plan. 1,000 comparisons. 1 training run. No CC.</p>
             <button onClick={handleGetStarted}
               className="px-5 py-2.5 text-sm font-bold transition-opacity hover:opacity-88 cursor-pointer"
               style={{ background: '#fafafa', color: '#000', borderRadius: '9999px' }}>

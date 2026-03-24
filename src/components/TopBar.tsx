@@ -97,6 +97,26 @@ export function TopBar() {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  // ── Reset notifications when pipeline data is cleared ─────
+  useEffect(() => {
+    const handler = (e: StorageEvent) => {
+      if (e.key === 'rf_notifications_reset') {
+        setNotifs(WELCOME_NOTIFS);
+        localStorage.removeItem('rf_notifications_reset');
+      }
+    };
+    window.addEventListener('storage', handler);
+    // Also handle same-tab resets via custom event
+    const localHandler = () => {
+      setNotifs(WELCOME_NOTIFS);
+    };
+    window.addEventListener('rf_notifications_reset', localHandler);
+    return () => {
+      window.removeEventListener('storage', handler);
+      window.removeEventListener('rf_notifications_reset', localHandler);
+    };
+  }, []);
+
   // ── Watch comparisons for milestone ──────────────────────
   const prevComparisonsLen = useRef(comparisons.length);
   useEffect(() => {
