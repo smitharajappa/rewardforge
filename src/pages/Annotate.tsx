@@ -899,11 +899,12 @@ export function Annotate() {
           {/* Re-generate button */}
           <div className="flex items-center justify-between">
             <div className="flex gap-0" style={{ borderBottom: '1px solid #1a1a1a' }}>
-              {[{ id: 'pairwise', label: 'Pairwise Comparison' }, { id: 'rate', label: 'Rate & Score' }].map(t => (
+              {[{ id: 'pairwise', label: 'Pairwise Comparison', subtitle: null }, { id: 'rate', label: 'Rate & Score', subtitle: '(Optional)' }].map(t => (
                 <button key={t.id} onClick={() => setTab(t.id as 'pairwise' | 'rate')}
-                  className="px-5 py-3 font-syne font-bold text-sm transition-all"
+                  className="px-5 py-3 font-syne font-bold text-sm transition-all flex flex-col items-start"
                   style={{ color: tab === t.id ? '#fafafa' : '#525252', borderBottom: `2px solid ${tab === t.id ? '#38bdf8' : 'transparent'}`, marginBottom: -1 }}>
-                  {t.label}
+                  <span>{t.label}</span>
+                  {t.subtitle && <span className="font-mono text-[9px] font-normal mt-0.5" style={{ color: '#525252' }}>(Optional — adds quality signal to your reward model)</span>}
                 </button>
               ))}
             </div>
