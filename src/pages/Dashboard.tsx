@@ -317,8 +317,8 @@ export function Dashboard() {
         </div>
       </motion.div>
 
-      {/* Use case switcher bar */}
-      {currentUseCase && ucMeta && (
+      {/* Use case switcher bar — hidden in demo mode */}
+      {currentUseCase && ucMeta && localStorage.getItem('rf_demo_mode') !== 'marcus' && (
         <div className="flex items-center justify-between" style={{ borderBottom: '1px solid #111', paddingBottom: 8, marginBottom: -12 }}>
           <span className="font-mono text-[11px]" style={{ color: '#525252' }}>
             {ucMeta.emoji} {ucMeta.label} workspace
