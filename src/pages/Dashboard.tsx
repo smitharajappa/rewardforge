@@ -305,10 +305,19 @@ export function Dashboard() {
           <p className="text-sm mt-1" style={{ color: '#525252' }}>Overview of your alignment pipeline.</p>
         </div>
         <div className="flex gap-2.5">
-          <button className="px-4 py-2 rounded-full text-sm font-bold transition-all"
-            style={{ border: '1px solid #1a1a1a', color: '#fafafa', background: 'transparent' }}>
-            Export Data
-          </button>
+          <div className="relative group">
+            <button
+              className="px-4 py-2 rounded-full text-sm font-bold transition-all"
+              style={{ border: '1px solid #1a1a1a', color: '#fafafa', background: 'transparent' }}
+              onClick={() => addToast({ type: 'info', message: 'Export coming soon — available on Starter plan and above' })}
+            >
+              Export Data
+            </button>
+            <div className="absolute -top-9 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded font-mono text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10"
+              style={{ background: '#111', border: '1px solid #1a1a1a', color: '#a3a3a3' }}>
+              Export your comparisons and ratings as JSON
+            </div>
+          </div>
           <button onClick={() => navigate('/annotate')}
             className="px-4 py-2 rounded-full text-sm font-bold transition-opacity hover:opacity-88"
             style={{ background: '#fafafa', color: '#000' }}>

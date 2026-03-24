@@ -108,25 +108,27 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
                 />
               </div>
 
-              {/* Use Case */}
-              <div>
-                <label className="font-mono text-[10px] uppercase tracking-widest text-[#525252] block mb-2">Use Case</label>
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-[11px] px-3 py-1 rounded-full"
-                    style={{ background: 'rgba(56,189,248,0.1)', border: '1px solid rgba(56,189,248,0.2)', color: '#38bdf8' }}>
-                    {useCaseInfo ? `${useCaseInfo.emoji} ${useCaseInfo.label}` : '○ not selected'}
-                  </span>
-                  <button
-                    onClick={handleSwitchUseCase}
-                    className="font-mono text-[11px] transition-colors"
-                    style={{ color: '#525252', background: 'none', border: 'none', cursor: 'pointer' }}
-                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#a3a3a3'}
-                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#525252'}
-                  >
-                    Switch →
-                  </button>
+              {/* Use Case — hidden in demo mode */}
+              {localStorage.getItem('rf_demo_mode') !== 'marcus' && (
+                <div>
+                  <label className="font-mono text-[10px] uppercase tracking-widest text-[#525252] block mb-2">Use Case</label>
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[11px] px-3 py-1 rounded-full"
+                      style={{ background: 'rgba(56,189,248,0.1)', border: '1px solid rgba(56,189,248,0.2)', color: '#38bdf8' }}>
+                      {useCaseInfo ? `${useCaseInfo.emoji} ${useCaseInfo.label}` : '○ not selected'}
+                    </span>
+                    <button
+                      onClick={handleSwitchUseCase}
+                      className="font-mono text-[11px] transition-colors"
+                      style={{ color: '#525252', background: 'none', border: 'none', cursor: 'pointer' }}
+                      onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#a3a3a3'}
+                      onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#525252'}
+                    >
+                      Switch →
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* API Access */}
               {planHasApiAccess() ? (
