@@ -16,8 +16,11 @@ export const PIPELINE_KEYS = [
   'rf_banner_drift',
   'rf_cert_id',
   'rf_return_path',
+  'rf_notifications',
 ] as const;
 
 export function clearPipelineData() {
   PIPELINE_KEYS.forEach(k => localStorage.removeItem(k));
+  // Signal TopBar to reset notifications to defaults
+  localStorage.setItem('rf_notifications_reset', String(Date.now()));
 }
