@@ -148,7 +148,7 @@ function UploadScreen({ onGenerate }: { onGenerate: (text: string) => void }) {
       <div className="max-w-[640px] mx-auto">
         <div className="rounded-xl p-8" style={{ background: '#0a0a0a', border: '1px solid #1a1a1a' }}>
           <div className="text-center mb-6">
-            <span className="font-mono text-[11px]" style={{ color: '#38bdf8' }}>Step 1 of 5 · Upload Documents</span>
+            <span className="font-mono text-[11px]" style={{ color: '#38bdf8' }}>Step 1 of {localStorage.getItem('rf_demo_mode') === 'marcus' ? '3' : '5'} · Upload Documents</span>
             <h2 className="font-syne font-bold text-[24px] text-[#fafafa] mt-3 mb-2">Upload your practice documents</h2>
             <p className="font-mono text-[13px] leading-relaxed" style={{ color: '#525252' }}>
               We'll extract your real client questions and generate AI response pairs. Your data never leaves your browser.

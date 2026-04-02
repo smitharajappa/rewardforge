@@ -73,7 +73,7 @@ export function Sidebar() {
             Workspace
           </div>
           <div className="space-y-0.5">
-            {navItems.map((item) => {
+            {navItems.filter(item => !(item.hideInMarcus && localStorage.getItem('rf_demo_mode') === 'marcus')).map((item) => {
               const isActive = location.pathname === item.path;
               const badge = badges[item.path];
               return (

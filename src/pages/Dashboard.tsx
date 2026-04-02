@@ -297,6 +297,65 @@ export function Dashboard() {
     navigate('/onboarding');
   };
 
+  const isDemoMode = localStorage.getItem('rf_demo_mode') === 'marcus';
+  const [trainingComplete, setTrainingComplete] = useState(() => localStorage.getItem('rf_training_complete') === 'true');
+  const estimatedTime = new Date(Date.now() + 35 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  // Marcus demo mode dashboard
+  if (isDemoMode) {
+    return (
+      <div className="space-y-7">
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex justify-between items-end">
+          <div>
+            <h1 className="font-syne font-extrabold text-3xl tracking-tight text-[#fafafa]">Dashboard</h1>
+            <p className="text-sm mt-1" style={{ color: '#525252' }}>LexAI · Chen & Associates Legal Group</p>
+          </div>
+        </motion.div>
+
+        {/* Status card */}
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+          className="p-8 rounded-xl"
+          style={{ background: '#0a0a0a', border: `1px solid ${trainingComplete ? 'rgba(52,211,153,0.3)' : 'rgba(245,158,11,0.3)'}` }}>
+          {trainingComplete ? (
+            <div className="text-center space-y-4">
+              <div className="text-[48px]">✅</div>
+              <div className="font-syne font-extrabold text-[24px] text-[#fafafa]">LexAI Training Complete</div>
+              <p className="font-mono text-[13px]" style={{ color: '#34d399' }}>
+                Quality score: 94/100 — Ready for verification
+              </p>
+              <button onClick={() => navigate('/evaluate')}
+                className="mt-4 px-8 py-3 rounded-full font-syne font-bold text-sm transition-opacity hover:opacity-88"
+                style={{ background: '#38bdf8', color: '#000' }}>
+                Verify My AI →
+              </button>
+            </div>
+          ) : (
+            <div className="text-center space-y-4">
+              <div className="text-[48px]">🔄</div>
+              <div className="font-syne font-extrabold text-[24px] text-[#fafafa]">LexAI Training Run #1</div>
+              <p className="font-mono text-[13px]" style={{ color: '#f59e0b' }}>
+                In progress — Estimated completion: {estimatedTime}
+              </p>
+            </div>
+          )}
+        </motion.div>
+
+        {/* Skip link for demo */}
+        <div className="text-center">
+          <button
+            onClick={() => { localStorage.setItem('rf_training_complete', 'true'); setTrainingComplete(true); }}
+            className="font-mono text-[9px] transition-colors"
+            style={{ color: '#1a1a1a', background: 'none', border: 'none', cursor: 'pointer' }}
+            onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#333'}
+            onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#1a1a1a'}
+          >
+            Skip to completed state →
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-7">
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex justify-between items-end">
