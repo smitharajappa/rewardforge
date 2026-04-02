@@ -32,6 +32,14 @@ export default function HomePage() {
   const [signInOpen, setSignInOpen] = useState(false);
   const [demoModalOpen, setDemoModalOpen] = useState(false);
 
+  // Clear demo mode when navigating to homepage
+  useEffect(() => {
+    if (localStorage.getItem('rf_demo_mode') === 'marcus') {
+      localStorage.removeItem('rf_demo_mode');
+      localStorage.removeItem('rf_training_complete');
+    }
+  }, []);
+
   const handleGetStarted = () => {
     const useCase = localStorage.getItem('rf_use_case');
     const isDemoMode = localStorage.getItem('rf_demo_mode') === 'marcus';
