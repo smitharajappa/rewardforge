@@ -298,11 +298,6 @@ export function CopilotPanel() {
 
             {/* Input */}
             <div className="p-4 space-y-2" style={{ borderTop: '1px solid #1a1a1a' }}>
-              {!getGroqKey() && (
-                <p className="font-mono text-[10px] text-center" style={{ color: '#f59e0b' }}>
-                  Add a Groq API key in Settings for live AI responses
-                </p>
-              )}
               <div className="flex gap-2">
                 <input
                   value={input}
