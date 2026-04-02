@@ -672,6 +672,20 @@ function PairwiseTab({ prompts, isGenerated, onImproveMyAI }: { prompts: Generat
         })}
       </div>
 
+      {/* Marcus mode: "Improve My AI" CTA after 5 comparisons */}
+      {marcusReady && (
+        <div className="text-center space-y-3 py-4">
+          <button onClick={() => onImproveMyAI?.()}
+            className="w-full py-4 rounded-full font-syne font-bold text-sm transition-opacity hover:opacity-88"
+            style={{ background: '#38bdf8', color: '#000' }}>
+            Improve My AI →
+          </button>
+          <p className="font-mono text-[11px]" style={{ color: '#525252' }}>
+            We'll train your AI on your feedback.
+          </p>
+        </div>
+      )}
+
       {/* Helper text when nothing selected */}
       {!isSelected && (
         <p style={{
