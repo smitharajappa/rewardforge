@@ -308,6 +308,12 @@ export function Dashboard() {
   if (isDemoMode) {
     return (
       <div className="space-y-7">
+        <AnimatePresence>
+          {showVerification && (
+            <MarcusVerificationFlow onClose={() => setShowVerification(false)} />
+          )}
+        </AnimatePresence>
+
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex justify-between items-end">
           <div>
             <h1 className="font-syne font-extrabold text-3xl tracking-tight text-[#fafafa]">Dashboard</h1>
@@ -326,7 +332,7 @@ export function Dashboard() {
               <p className="font-mono text-[13px]" style={{ color: '#34d399' }}>
                 Quality score: 94/100 — Ready for verification
               </p>
-              <button onClick={() => navigate('/evaluate')}
+              <button onClick={() => setShowVerification(true)}
                 className="mt-4 px-8 py-3 rounded-full font-syne font-bold text-sm transition-opacity hover:opacity-88"
                 style={{ background: '#38bdf8', color: '#000' }}>
                 Verify My AI →
