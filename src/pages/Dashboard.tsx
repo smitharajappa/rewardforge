@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useApp } from '@/context/AppContext';
 import { clearPipelineData } from '@/lib/clearPipelineData';
+import { MarcusVerificationFlow } from '@/components/MarcusVerificationFlow';
+import { AnimatePresence } from 'framer-motion';
 
 const USE_CASE_META: Record<string, { emoji: string; label: string }> = {
   legal: { emoji: '⚖️', label: 'Legal Services' },
