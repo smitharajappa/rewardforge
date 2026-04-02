@@ -54,7 +54,7 @@ function ModelDetailsModal({ model, onClose, onHFHub }: { model: RewardModel; on
             { label: 'Base Model', value: <span className="font-mono text-[10px] px-2 py-0.5 rounded" style={{ background: 'rgba(56,189,248,0.08)', border: '1px solid rgba(56,189,248,0.2)', color: '#38bdf8' }}>{model.baseModel}</span> },
             { label: 'Accuracy', value: <span style={{ color: '#34d399' }} className="font-mono text-sm font-bold">{(model.accuracy * 100).toFixed(1)}%</span> },
             { label: 'Loss', value: <span style={{ color: '#f472b6' }} className="font-mono text-sm">{model.loss.toFixed(4)}</span> },
-            { label: 'Trained', value: <span style={{ color: '#a3a3a3' }} className="font-mono text-xs">{model.timestamp.toLocaleDateString()}</span> },
+            { label: 'Trained', value: <span style={{ color: '#a3a3a3' }} className="font-mono text-xs">{new Date(model.timestamp).toLocaleDateString('en-GB')}</span> },
             { label: 'Duration', value: <span style={{ color: '#525252' }} className="font-mono text-xs">~14 seconds (GPU simulated)</span> },
           ].map(row => (
             <div key={row.label} className="flex items-center justify-between py-2" style={{ borderBottom: '1px solid #0f0f0f' }}>
