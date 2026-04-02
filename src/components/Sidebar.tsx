@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid, path: '/dashboard' },
-  { id: 'annotate', label: 'Annotate', icon: MessageSquare, path: '/annotate' },
+  { id: 'annotate', label: 'Annotate', icon: MessageSquare, path: '/annotate', hideInMarcus: true },
   { id: 'train-rm', label: 'Train RM', icon: Cpu, path: '/train-rm', hideInMarcus: true },
   { id: 'rl-loop', label: 'RL Loop', icon: RefreshCw, path: '/rl-loop', hideInMarcus: true },
   { id: 'evaluate', label: 'Evaluate', icon: BarChart2, path: '/evaluate', hideInMarcus: true },

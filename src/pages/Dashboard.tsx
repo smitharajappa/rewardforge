@@ -317,50 +317,57 @@ export function Dashboard() {
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex justify-between items-end">
           <div>
             <h1 className="font-syne font-extrabold text-3xl tracking-tight text-[#fafafa]">Dashboard</h1>
-            <p className="text-sm mt-1" style={{ color: '#525252' }}>LexAI · Chen & Associates Legal Group</p>
+            <p className="text-sm mt-1" style={{ color: '#94a3b8' }}>LexAI · Chen & Associates Legal Group</p>
           </div>
         </motion.div>
 
-        {/* Status card */}
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-          className="p-8 rounded-xl"
-          style={{ background: '#0a0a0a', border: `1px solid ${trainingComplete ? 'rgba(52,211,153,0.3)' : 'rgba(245,158,11,0.3)'}` }}>
-          {trainingComplete ? (
+        {trainingComplete ? (
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+            className="rounded-xl"
+            style={{ background: '#0a0a0a', border: '2px solid #34d399', borderRadius: 12, padding: 40 }}>
             <div className="text-center space-y-4">
-              <div className="text-[48px]">✅</div>
-              <div className="font-syne font-extrabold text-[24px] text-[#fafafa]">LexAI Training Complete</div>
-              <p className="font-mono text-[13px]" style={{ color: '#34d399' }}>
-                Quality score: 94/100 — Ready for verification
+              <div style={{ fontSize: 48 }}>✅</div>
+              <div className="font-syne font-extrabold" style={{ fontSize: 24, color: '#fafafa' }}>LexAI Training Complete</div>
+              <p className="font-mono" style={{ fontSize: 14, color: '#34d399' }}>
+                Quality score: 94/100 — Ready for your review
               </p>
+              <div style={{ height: 24 }} />
               <button onClick={() => setShowVerification(true)}
-                className="mt-4 px-8 py-3 rounded-full font-syne font-bold text-sm transition-opacity hover:opacity-88"
-                style={{ background: '#38bdf8', color: '#000' }}>
+                className="font-syne font-bold transition-opacity hover:opacity-90"
+                style={{ background: '#38bdf8', color: '#fff', fontSize: 18, width: '100%', height: 56, borderRadius: 10, border: 'none', cursor: 'pointer' }}>
                 Verify My AI →
               </button>
             </div>
-          ) : (
-            <div className="text-center space-y-4">
-              <div className="text-[48px]">🔄</div>
-              <div className="font-syne font-extrabold text-[24px] text-[#fafafa]">LexAI Training Run #1</div>
-              <p className="font-mono text-[13px]" style={{ color: '#f59e0b' }}>
-                In progress — Estimated completion: {estimatedTime}
-              </p>
-            </div>
-          )}
-        </motion.div>
+          </motion.div>
+        ) : (
+          <>
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+              className="p-8 rounded-xl"
+              style={{ background: '#0a0a0a', border: '1px solid rgba(245,158,11,0.3)' }}>
+              <div className="text-center space-y-4">
+                <div style={{ fontSize: 48 }}>🔄</div>
+                <div className="font-syne font-extrabold" style={{ fontSize: 24, color: '#fafafa' }}>LexAI Training Run #1</div>
+                <p className="font-mono" style={{ fontSize: 13, color: '#f59e0b' }}>
+                  In progress — Estimated completion: {estimatedTime}
+                </p>
+              </div>
+            </motion.div>
 
-        {/* Skip link for demo */}
-        <div className="text-center">
-          <button
-            onClick={() => { localStorage.setItem('rf_training_complete', 'true'); setTrainingComplete(true); }}
-            className="font-mono text-[9px] transition-colors"
-            style={{ color: '#1a1a1a', background: 'none', border: 'none', cursor: 'pointer' }}
-            onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#333'}
-            onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#1a1a1a'}
-          >
-            Skip to completed state →
-          </button>
-        </div>
+            {/* Demo skip banner */}
+            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+              style={{ background: '#0a0a0a', border: '1px solid #1a2540', borderRadius: 10, padding: '12px 20px' }}>
+              <p className="font-mono" style={{ color: '#94a3b8', fontSize: 13, marginBottom: 10 }}>
+                Demo mode — click below to jump to completed state
+              </p>
+              <button
+                onClick={() => { localStorage.setItem('rf_training_complete', 'true'); window.location.reload(); }}
+                className="font-syne font-bold transition-opacity hover:opacity-90"
+                style={{ background: '#38bdf8', color: '#fff', fontSize: 14, padding: '8px 20px', borderRadius: 8, border: 'none', cursor: 'pointer' }}>
+                Skip to verification →
+              </button>
+            </motion.div>
+          </>
+        )}
       </div>
     );
   }
