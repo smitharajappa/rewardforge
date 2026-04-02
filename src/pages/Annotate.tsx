@@ -52,11 +52,14 @@ function Confetti() {
 
 // ── Pipeline Progress Indicator ───────────────────────────────
 const PIPELINE_STEPS = ['Upload', 'Annotate', 'Train RM', 'RL Loop', 'Evaluate'];
+const MARCUS_PIPELINE_STEPS = ['Upload Documents', 'Review Responses', 'Improve My AI'];
 
 function PipelineProgress({ activeStep }: { activeStep: number }) {
+  const isMarcus = localStorage.getItem('rf_demo_mode') === 'marcus';
+  const steps = isMarcus ? MARCUS_PIPELINE_STEPS : PIPELINE_STEPS;
   return (
     <div className="flex items-center justify-center gap-0 mb-6">
-      {PIPELINE_STEPS.map((step, i) => {
+      {steps.map((step, i) => {
         const stepNum = i + 1;
         const isActive = stepNum === activeStep;
         const isDone = stepNum < activeStep;
@@ -77,7 +80,7 @@ function PipelineProgress({ activeStep }: { activeStep: number }) {
                 {step}
               </span>
             </div>
-            {i < PIPELINE_STEPS.length - 1 && (
+            {i < steps.length - 1 && (
               <div className="w-8 h-[1px] mb-4 mx-1" style={{ background: isDone ? '#34d399' : '#1a1a1a' }} />
             )}
           </div>
