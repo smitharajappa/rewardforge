@@ -521,10 +521,41 @@ function PairwiseTab({ prompts, isGenerated, onImproveMyAI }: { prompts: Generat
     );
   }
 
+  // Marcus mode: show "Improve My AI" after 5 comparisons
+  const isMarcus = localStorage.getItem('rf_demo_mode') === 'marcus';
+  const marcusReady = isMarcus && comparisons.length >= 5 && !done;
+
   if (done) {
     const countA = comparisons.filter(c => c.preferred === 'A').length;
     const countB = comparisons.filter(c => c.preferred === 'B').length;
     const countTie = comparisons.filter(c => c.preferred === 'Tie').length;
+
+    // Marcus mode done screen
+    if (isMarcus) {
+      return (
+        <>
+          {showConfetti && <Confetti />}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.4 }} className="flex flex-col items-center justify-center py-20 gap-6"
+          >
+            <div className="font-syne font-extrabold text-[28px] text-[#fafafa] text-center">All done!</div>
+            <p className="text-sm" style={{ color: '#525252' }}>{comparisons.length} comparisons collected</p>
+            <div className="space-y-3 text-center">
+              <button onClick={() => onImproveMyAI?.()}
+                className="w-full px-8 py-4 rounded-full font-syne font-bold text-sm transition-opacity hover:opacity-88"
+                style={{ background: '#38bdf8', color: '#000' }}>
+                Improve My AI →
+              </button>
+              <p className="font-mono text-[11px]" style={{ color: '#525252' }}>
+                We'll train your AI on your feedback.
+              </p>
+            </div>
+          </motion.div>
+        </>
+      );
+    }
+
     return (
       <>
         {showConfetti && <Confetti />}
