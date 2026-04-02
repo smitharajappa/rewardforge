@@ -113,39 +113,6 @@ export function CopilotPanel() {
     setCopilotHistory(updatedHistory);
     setIsThinking(true);
 
-    const groqKey = getGroqKey();
-
-    if (!groqKey) {
-      // Fallback responses when no API key
-      await new Promise(r => setTimeout(r, 900));
-      setIsThinking(false);
-      const fallbackResponses: Record<string, string> = {
-        "Why is my KL divergence at 0.038?": `A KL of 0.038 is healthy — it means your policy is improving without drifting too far from the base model. The sweet spot is 0.02–0.08. If it climbs above 0.1, increase your β penalty in RL Loop settings.`,
-        "PPO or DPO — which should I use?": `Start with PPO — it's stable and well-understood${lastRM ? `, and your ${lastRM.name} reward model is a solid foundation` : ""}. Use DPO to skip reward model training entirely. Next step: launch a PPO run in the RL Loop tab.`,
-        "What does my reward score mean?": `Your reward score measures how well the policy produces responses preferred by your reward model. Higher is better, but watch for reward hacking — unusually long responses may inflate scores artificially. Check the Evaluate tab for side-by-side diffs.`,
-      };
-
-      const fallback = isDemoMode
-        ? `For LexAI's legal AI alignment, the key signal is plain English vs citation-heavy answers. ${comparisons.length === 0 ? 'Start by annotating 5 legal prompt pairs.' : rewardModels.length === 0 ? `You have ${comparisons.length} annotations — head to Train RM.` : 'Your reward model is ready. Launch a PPO run in RL Loop.'}`
-        : `You have ${comparisons.length} comparisons. ${comparisons.length < 5 ? `Collect ${5 - comparisons.length} more then train in Train RM.` : rewardModels.length === 0 ? 'Head to Train RM to train your first reward model.' : 'Check the Evaluate tab to compare your runs.'}`;
-
-      const content = fallbackResponses[msg] ?? fallback;
-
-      setIsStreaming(true);
-      const words = content.split(' ');
-      let built = '';
-      for (let i = 0; i < words.length; i++) {
-        built += (i === 0 ? '' : ' ') + words[i];
-        setStreamedText(built);
-        await new Promise(r => setTimeout(r, 35));
-      }
-      setIsStreaming(false);
-      setStreamedText('');
-      setCopilotHistory([...updatedHistory, { role: 'assistant', content, timestamp: new Date() }]);
-      return;
-    }
-
-    // Real Groq call
     try {
       const systemPrompt = buildSystemPrompt(
         comparisons.length, ratings.length, rewardModels.length, rlRuns.length,
@@ -154,7 +121,7 @@ export function CopilotPanel() {
       await new Promise(r => setTimeout(r, 600));
       setIsThinking(false);
 
-      const content = await callGroq(systemPrompt, msg, groqKey);
+      const content = await callGroq(systemPrompt, msg, '');
 
       setIsStreaming(true);
       const words = content.split(' ');
@@ -174,7 +141,7 @@ export function CopilotPanel() {
       const errMsg = err instanceof Error ? err.message : 'Unknown error';
       setCopilotHistory([...updatedHistory, {
         role: 'assistant',
-        content: errMsg.includes('Daily AI limit') ? '⚠️ Daily AI limit reached (30 calls). Resets tomorrow.' : `⚠️ AI error: ${errMsg}. Check your Groq key in Settings.`,
+        content: `⚠️ Something went wrong: ${errMsg}`,
         timestamp: new Date(),
       }]);
     }
