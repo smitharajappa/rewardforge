@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useApp } from '@/context/AppContext';
 import { clearPipelineData } from '@/lib/clearPipelineData';
+import { MarcusVerificationFlow } from '@/components/MarcusVerificationFlow';
+import { AnimatePresence } from 'framer-motion';
 
 const USE_CASE_META: Record<string, { emoji: string; label: string }> = {
   legal: { emoji: '⚖️', label: 'Legal Services' },
@@ -299,12 +301,19 @@ export function Dashboard() {
 
   const isDemoMode = localStorage.getItem('rf_demo_mode') === 'marcus';
   const [trainingComplete, setTrainingComplete] = useState(() => localStorage.getItem('rf_training_complete') === 'true');
+  const [showVerification, setShowVerification] = useState(false);
   const estimatedTime = new Date(Date.now() + 35 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   // Marcus demo mode dashboard
   if (isDemoMode) {
     return (
       <div className="space-y-7">
+        <AnimatePresence>
+          {showVerification && (
+            <MarcusVerificationFlow onClose={() => setShowVerification(false)} />
+          )}
+        </AnimatePresence>
+
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex justify-between items-end">
           <div>
             <h1 className="font-syne font-extrabold text-3xl tracking-tight text-[#fafafa]">Dashboard</h1>
@@ -323,7 +332,7 @@ export function Dashboard() {
               <p className="font-mono text-[13px]" style={{ color: '#34d399' }}>
                 Quality score: 94/100 — Ready for verification
               </p>
-              <button onClick={() => navigate('/evaluate')}
+              <button onClick={() => setShowVerification(true)}
                 className="mt-4 px-8 py-3 rounded-full font-syne font-bold text-sm transition-opacity hover:opacity-88"
                 style={{ background: '#38bdf8', color: '#000' }}>
                 Verify My AI →
