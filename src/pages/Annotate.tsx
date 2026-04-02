@@ -858,7 +858,13 @@ export function Annotate() {
   const [tab, setTab] = useState<'pairwise' | 'rate'>('pairwise');
 
   // Pipeline step for progress indicator
-  const activePipelineStep = annotateStep === 'annotate' ? 2 : 1;
+  const isMarcusMode = localStorage.getItem('rf_demo_mode') === 'marcus';
+  const activePipelineStep = isMarcusMode
+    ? (annotateStep === 'annotate' ? 2 : 1)
+    : (annotateStep === 'annotate' ? 2 : 1);
+
+  // Marcus mode: "Improve My AI" submitted state
+  const [marcusSubmitted, setMarcusSubmitted] = useState(false);
 
   const isGenerated = localStorage.getItem('rf_generated_prompts') !== null;
 
