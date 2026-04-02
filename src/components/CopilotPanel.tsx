@@ -226,7 +226,6 @@ export function CopilotPanel() {
               {lastRM && ` · ${(lastRM.accuracy * 100).toFixed(1)}% acc`}
               {lastRun && ` · ${lastRun.finalReward.toFixed(3)} reward`}
               {isDemoMode && <span style={{ color: '#38bdf8' }}> · Marcus / LexAI</span>}
-              {!getGroqKey() && <span style={{ color: '#f59e0b' }}> · No API key</span>}
             </div>
 
             {/* Messages */}
