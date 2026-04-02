@@ -301,6 +301,7 @@ export function Dashboard() {
 
   const isDemoMode = localStorage.getItem('rf_demo_mode') === 'marcus';
   const [trainingComplete, setTrainingComplete] = useState(() => localStorage.getItem('rf_training_complete') === 'true');
+  const [showVerification, setShowVerification] = useState(false);
   const estimatedTime = new Date(Date.now() + 35 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   // Marcus demo mode dashboard
