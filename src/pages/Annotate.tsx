@@ -453,7 +453,7 @@ const DIMENSIONS = [
   { key: 'creativity', label: 'Creativity', weight: 0.10 },
 ] as const;
 
-function PairwiseTab({ prompts, isGenerated }: { prompts: GeneratedPrompt[]; isGenerated: boolean }) {
+function PairwiseTab({ prompts, isGenerated, onImproveMyAI }: { prompts: GeneratedPrompt[]; isGenerated: boolean; onImproveMyAI?: () => void }) {
   const { addComparison, comparisons, addToast } = useApp();
   const navigate = useNavigate();
   const TOTAL = prompts.length;
