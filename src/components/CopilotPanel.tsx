@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, X, RotateCcw } from 'lucide-react';
 import { LogoMark } from './Logo';
 import { useApp } from '@/context/AppContext';
-import { callGroq, getGroqKey } from '@/lib/groq';
+import { callGroq } from '@/lib/groq';
 import { USE_CASE_LABEL } from '@/data/faqStrings';
 
 const SUGGESTION_GROUPS = [
