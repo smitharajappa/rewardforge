@@ -938,8 +938,30 @@ export function Annotate() {
       {/* Annotate state */}
       {annotateStep === 'annotate' && (
         <>
-          {/* Cap reached → show "All done!" state */}
-          {isCapReached ? (
+          {/* Marcus submitted confirmation */}
+          {isMarcusMode && marcusSubmitted ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.4 }} className="flex flex-col items-center justify-center py-24 gap-5"
+            >
+              <div className="text-[64px]">✅</div>
+              <div className="font-syne font-extrabold text-[28px] text-[#fafafa] text-center">Submitted for training</div>
+              <p className="text-sm text-center" style={{ color: '#a3a3a3' }}>
+                Your AI is being trained on Marcus Chen's preferences.
+              </p>
+              <p className="font-mono text-[12px] text-center" style={{ color: '#525252' }}>
+                Estimated time: 20–45 minutes
+              </p>
+              <p className="font-mono text-[11px] text-center" style={{ color: '#333' }}>
+                We'll notify you at marcus@chenassociates.com when ready.
+              </p>
+              <button onClick={() => navigate('/dashboard')}
+                className="mt-4 px-6 py-3 rounded-full font-syne font-bold text-sm transition-opacity hover:opacity-88"
+                style={{ background: '#fafafa', color: '#000' }}>
+                View Dashboard →
+              </button>
+            </motion.div>
+          ) : isCapReached ? (
             <motion.div
               initial={{ opacity: 0, scale: 0.96, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: 0.4 }} className="flex flex-col items-center justify-center py-20 gap-6"
@@ -969,7 +991,10 @@ export function Annotate() {
               {/* Tab bar + Upload new doc button */}
               <div className="flex items-center justify-between">
                 <div className="flex gap-0" style={{ borderBottom: '1px solid #1a1a1a' }}>
-                  {[{ id: 'pairwise', label: 'Pairwise Comparison', subtitle: null }, { id: 'rate', label: 'Rate & Score', subtitle: '(Optional)' }].map(t => (
+                  {(isMarcusMode
+                    ? [{ id: 'pairwise', label: 'Pairwise Comparison', subtitle: null }]
+                    : [{ id: 'pairwise', label: 'Pairwise Comparison', subtitle: null }, { id: 'rate', label: 'Rate & Score', subtitle: '(Optional)' }]
+                  ).map(t => (
                     <button key={t.id} onClick={() => setTab(t.id as 'pairwise' | 'rate')}
                       className="px-5 py-3 font-syne font-bold text-sm transition-all flex flex-col items-start"
                       style={{ color: tab === t.id ? '#fafafa' : '#525252', borderBottom: `2px solid ${tab === t.id ? '#38bdf8' : 'transparent'}`, marginBottom: -1 }}>
@@ -978,7 +1003,6 @@ export function Annotate() {
                     </button>
                   ))}
                 </div>
-                {/* Hide "Upload new doc" if cap is reached */}
                 {!isCapReached && (
                   <button
                     onClick={() => { localStorage.removeItem('rf_generated_prompts'); setAnnotateStep('upload'); setPrompts([]); }}
@@ -996,7 +1020,10 @@ export function Annotate() {
               <AnimatePresence mode="wait">
                 {tab === 'pairwise'
                   ? <motion.div key="pairwise" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                      <PairwiseTab prompts={prompts} isGenerated={isGenerated} />
+                      <PairwiseTab prompts={prompts} isGenerated={isGenerated} onImproveMyAI={isMarcusMode ? () => {
+                        localStorage.setItem('rf_training_complete', 'false');
+                        setMarcusSubmitted(true);
+                      } : undefined} />
                     </motion.div>
                   : <motion.div key="rate" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                       <RateTab prompts={prompts} />
