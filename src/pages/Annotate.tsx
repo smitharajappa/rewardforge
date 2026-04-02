@@ -52,11 +52,14 @@ function Confetti() {
 
 // ── Pipeline Progress Indicator ───────────────────────────────
 const PIPELINE_STEPS = ['Upload', 'Annotate', 'Train RM', 'RL Loop', 'Evaluate'];
+const MARCUS_PIPELINE_STEPS = ['Upload Documents', 'Review Responses', 'Improve My AI'];
 
 function PipelineProgress({ activeStep }: { activeStep: number }) {
+  const isMarcus = localStorage.getItem('rf_demo_mode') === 'marcus';
+  const steps = isMarcus ? MARCUS_PIPELINE_STEPS : PIPELINE_STEPS;
   return (
     <div className="flex items-center justify-center gap-0 mb-6">
-      {PIPELINE_STEPS.map((step, i) => {
+      {steps.map((step, i) => {
         const stepNum = i + 1;
         const isActive = stepNum === activeStep;
         const isDone = stepNum < activeStep;
@@ -77,7 +80,7 @@ function PipelineProgress({ activeStep }: { activeStep: number }) {
                 {step}
               </span>
             </div>
-            {i < PIPELINE_STEPS.length - 1 && (
+            {i < steps.length - 1 && (
               <div className="w-8 h-[1px] mb-4 mx-1" style={{ background: isDone ? '#34d399' : '#1a1a1a' }} />
             )}
           </div>
@@ -145,7 +148,7 @@ function UploadScreen({ onGenerate }: { onGenerate: (text: string) => void }) {
       <div className="max-w-[640px] mx-auto">
         <div className="rounded-xl p-8" style={{ background: '#0a0a0a', border: '1px solid #1a1a1a' }}>
           <div className="text-center mb-6">
-            <span className="font-mono text-[11px]" style={{ color: '#38bdf8' }}>Step 1 of 5 · Upload Documents</span>
+            <span className="font-mono text-[11px]" style={{ color: '#38bdf8' }}>Step 1 of {localStorage.getItem('rf_demo_mode') === 'marcus' ? '3' : '5'} · Upload Documents</span>
             <h2 className="font-syne font-bold text-[24px] text-[#fafafa] mt-3 mb-2">Upload your practice documents</h2>
             <p className="font-mono text-[13px] leading-relaxed" style={{ color: '#525252' }}>
               We'll extract your real client questions and generate AI response pairs. Your data never leaves your browser.
@@ -450,7 +453,7 @@ const DIMENSIONS = [
   { key: 'creativity', label: 'Creativity', weight: 0.10 },
 ] as const;
 
-function PairwiseTab({ prompts, isGenerated }: { prompts: GeneratedPrompt[]; isGenerated: boolean }) {
+function PairwiseTab({ prompts, isGenerated, onImproveMyAI }: { prompts: GeneratedPrompt[]; isGenerated: boolean; onImproveMyAI?: () => void }) {
   const { addComparison, comparisons, addToast } = useApp();
   const navigate = useNavigate();
   const TOTAL = prompts.length;
@@ -518,10 +521,41 @@ function PairwiseTab({ prompts, isGenerated }: { prompts: GeneratedPrompt[]; isG
     );
   }
 
+  // Marcus mode: show "Improve My AI" after 5 comparisons
+  const isMarcus = localStorage.getItem('rf_demo_mode') === 'marcus';
+  const marcusReady = isMarcus && comparisons.length >= 5 && !done;
+
   if (done) {
     const countA = comparisons.filter(c => c.preferred === 'A').length;
     const countB = comparisons.filter(c => c.preferred === 'B').length;
     const countTie = comparisons.filter(c => c.preferred === 'Tie').length;
+
+    // Marcus mode done screen
+    if (isMarcus) {
+      return (
+        <>
+          {showConfetti && <Confetti />}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.4 }} className="flex flex-col items-center justify-center py-20 gap-6"
+          >
+            <div className="font-syne font-extrabold text-[28px] text-[#fafafa] text-center">All done!</div>
+            <p className="text-sm" style={{ color: '#525252' }}>{comparisons.length} comparisons collected</p>
+            <div className="space-y-3 text-center">
+              <button onClick={() => onImproveMyAI?.()}
+                className="w-full px-8 py-4 rounded-full font-syne font-bold text-sm transition-opacity hover:opacity-88"
+                style={{ background: '#38bdf8', color: '#000' }}>
+                Improve My AI →
+              </button>
+              <p className="font-mono text-[11px]" style={{ color: '#525252' }}>
+                We'll train your AI on your feedback.
+              </p>
+            </div>
+          </motion.div>
+        </>
+      );
+    }
+
     return (
       <>
         {showConfetti && <Confetti />}
@@ -637,6 +671,20 @@ function PairwiseTab({ prompts, isGenerated }: { prompts: GeneratedPrompt[]; isG
           );
         })}
       </div>
+
+      {/* Marcus mode: "Improve My AI" CTA after 5 comparisons */}
+      {marcusReady && (
+        <div className="text-center space-y-3 py-4">
+          <button onClick={() => onImproveMyAI?.()}
+            className="w-full py-4 rounded-full font-syne font-bold text-sm transition-opacity hover:opacity-88"
+            style={{ background: '#38bdf8', color: '#000' }}>
+            Improve My AI →
+          </button>
+          <p className="font-mono text-[11px]" style={{ color: '#525252' }}>
+            We'll train your AI on your feedback.
+          </p>
+        </div>
+      )}
 
       {/* Helper text when nothing selected */}
       {!isSelected && (
@@ -855,7 +903,13 @@ export function Annotate() {
   const [tab, setTab] = useState<'pairwise' | 'rate'>('pairwise');
 
   // Pipeline step for progress indicator
-  const activePipelineStep = annotateStep === 'annotate' ? 2 : 1;
+  const isMarcusMode = localStorage.getItem('rf_demo_mode') === 'marcus';
+  const activePipelineStep = isMarcusMode
+    ? (annotateStep === 'annotate' ? 2 : 1)
+    : (annotateStep === 'annotate' ? 2 : 1);
+
+  // Marcus mode: "Improve My AI" submitted state
+  const [marcusSubmitted, setMarcusSubmitted] = useState(false);
 
   const isGenerated = localStorage.getItem('rf_generated_prompts') !== null;
 
@@ -929,8 +983,30 @@ export function Annotate() {
       {/* Annotate state */}
       {annotateStep === 'annotate' && (
         <>
-          {/* Cap reached → show "All done!" state */}
-          {isCapReached ? (
+          {/* Marcus submitted confirmation */}
+          {isMarcusMode && marcusSubmitted ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.4 }} className="flex flex-col items-center justify-center py-24 gap-5"
+            >
+              <div className="text-[64px]">✅</div>
+              <div className="font-syne font-extrabold text-[28px] text-[#fafafa] text-center">Submitted for training</div>
+              <p className="text-sm text-center" style={{ color: '#a3a3a3' }}>
+                Your AI is being trained on Marcus Chen's preferences.
+              </p>
+              <p className="font-mono text-[12px] text-center" style={{ color: '#525252' }}>
+                Estimated time: 20–45 minutes
+              </p>
+              <p className="font-mono text-[11px] text-center" style={{ color: '#333' }}>
+                We'll notify you at marcus@chenassociates.com when ready.
+              </p>
+              <button onClick={() => navigate('/dashboard')}
+                className="mt-4 px-6 py-3 rounded-full font-syne font-bold text-sm transition-opacity hover:opacity-88"
+                style={{ background: '#fafafa', color: '#000' }}>
+                View Dashboard →
+              </button>
+            </motion.div>
+          ) : isCapReached ? (
             <motion.div
               initial={{ opacity: 0, scale: 0.96, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: 0.4 }} className="flex flex-col items-center justify-center py-20 gap-6"
@@ -960,7 +1036,10 @@ export function Annotate() {
               {/* Tab bar + Upload new doc button */}
               <div className="flex items-center justify-between">
                 <div className="flex gap-0" style={{ borderBottom: '1px solid #1a1a1a' }}>
-                  {[{ id: 'pairwise', label: 'Pairwise Comparison', subtitle: null }, { id: 'rate', label: 'Rate & Score', subtitle: '(Optional)' }].map(t => (
+                  {(isMarcusMode
+                    ? [{ id: 'pairwise', label: 'Pairwise Comparison', subtitle: null }]
+                    : [{ id: 'pairwise', label: 'Pairwise Comparison', subtitle: null }, { id: 'rate', label: 'Rate & Score', subtitle: '(Optional)' }]
+                  ).map(t => (
                     <button key={t.id} onClick={() => setTab(t.id as 'pairwise' | 'rate')}
                       className="px-5 py-3 font-syne font-bold text-sm transition-all flex flex-col items-start"
                       style={{ color: tab === t.id ? '#fafafa' : '#525252', borderBottom: `2px solid ${tab === t.id ? '#38bdf8' : 'transparent'}`, marginBottom: -1 }}>
@@ -969,7 +1048,6 @@ export function Annotate() {
                     </button>
                   ))}
                 </div>
-                {/* Hide "Upload new doc" if cap is reached */}
                 {!isCapReached && (
                   <button
                     onClick={() => { localStorage.removeItem('rf_generated_prompts'); setAnnotateStep('upload'); setPrompts([]); }}
@@ -987,7 +1065,10 @@ export function Annotate() {
               <AnimatePresence mode="wait">
                 {tab === 'pairwise'
                   ? <motion.div key="pairwise" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                      <PairwiseTab prompts={prompts} isGenerated={isGenerated} />
+                      <PairwiseTab prompts={prompts} isGenerated={isGenerated} onImproveMyAI={isMarcusMode ? () => {
+                        localStorage.setItem('rf_training_complete', 'false');
+                        setMarcusSubmitted(true);
+                      } : undefined} />
                     </motion.div>
                   : <motion.div key="rate" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                       <RateTab prompts={prompts} />
