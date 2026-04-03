@@ -272,7 +272,7 @@ export function MarcusVerificationFlow({ onClose }: { onClose: () => void }) {
           {/* ════════ CHECKLIST ════════ */}
           {step === 'checklist' && (
             <motion.div key="checklist" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
-              <h2 className="font-syne font-extrabold text-xl text-[#fafafa] mb-1">CA Bar Compliance Review</h2>
+              <h2 className="font-syne font-extrabold text-xl text-[#fafafa] mb-1">TX Bar Compliance Review</h2>
               <p className="font-mono text-[12px] mb-6" style={{ color: '#525252' }}>
                 Run each test to verify LexAI meets professional standards.
               </p>
