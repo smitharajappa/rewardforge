@@ -422,7 +422,7 @@ export function Evaluate() {
                   developer: 'Administrator · Your Organization',
                 };
                 const STANDARDS_MAP: Record<string, string> = {
-                  legal: 'California Bar Association Guidelines',
+                  legal: 'State Bar of Texas Guidelines',
                   medical: 'AMA Clinical Documentation Standards',
                   financial: 'CFA Institute Code of Ethics',
                   customer_service: 'Customer Experience Professional Standards',
