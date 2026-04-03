@@ -370,7 +370,7 @@ export function MarcusVerificationFlow({ onClose }: { onClose: () => void }) {
                       <p className="text-[12px] mt-1" style={{ color: '#34d399' }}>5/5 compliance items verified by Marcus Chen personally</p>
                     </div>
                     <div>
-                      <span className="font-mono text-[10px] uppercase tracking-wider" style={{ color: '#525252' }}>CA Bar Number</span>
+                      <span className="font-mono text-[10px] uppercase tracking-wider" style={{ color: '#525252' }}>TX Bar Number</span>
                       <p className="text-[15px] font-syne font-semibold text-[#fafafa] mt-1">#2891047 · 50 years experience</p>
                     </div>
                   </div>
