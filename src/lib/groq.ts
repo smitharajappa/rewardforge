@@ -68,7 +68,7 @@ const DEV_RESPONSES: ResponseRule[] = [
 ];
 
 const USE_CASE_DEFAULTS: Record<string, string> = {
-  legal: "I am LexAI — your firm's AI, trained on Marcus Chen's professional judgment. Ask me about your training results, California law calibration, your compliance certificate, or how to interpret any part of the verification process.",
+  legal: "I am LexAI — your firm's AI, trained on Marcus Chen's professional judgment. Ask me about your training results, Texas law calibration, your compliance certificate, or how to interpret any part of the verification process.",
   medical: "I am your clinical AI assistant, trained on your team's medical judgment. Ask me about your training results, AMA compliance standards, your alignment certificate, or how to interpret your quality score.",
   financial: "I am your financial AI assistant, trained on your firm's investment judgment. Ask me about your training results, CFA compliance standards, your alignment certificate, or how to read your quality metrics.",
   customer_service: "I am your customer service AI, trained on your team's communication style. Ask me about your training results, your quality score, or how to improve your AI's responses to match your best agents.",

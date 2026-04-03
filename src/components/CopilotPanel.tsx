@@ -34,7 +34,7 @@ function buildSystemPrompt(
   const useCaseLabel = USE_CASE_LABEL[useCase] || 'general';
 
   if (isDemoMode) {
-    return `You are the RewardForge AI Copilot helping Marcus Chen, Managing Partner at Chen & Associates, a California law firm building a plain-English legal AI assistant called LexAI for small business owners.
+    return `You are the RewardForge AI Copilot helping Marcus Chen, Managing Partner at Chen & Associates, a Texas law firm building a plain-English legal AI assistant called LexAI for small business owners.
 Current pipeline state:
 - Comparisons collected: ${comparisons}
 - Reward models trained: ${rewardModels}

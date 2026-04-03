@@ -149,7 +149,7 @@ export const FAQ_LABEL: Record<string, string> = {
 };
 
 export const FAQ_SUBTITLE: Record<string, string> = {
-  legal: "47 questions from a California law firm",
+  legal: "47 questions from a Texas law firm",
   medical: "38 questions from a medical practice",
   financial: "42 questions from a financial advisor",
   customer_service: "51 questions from a support team",

@@ -406,7 +406,7 @@ export function MarcusVerificationFlow({ onClose }: { onClose: () => void }) {
                     { icon: Lock, label: 'Private' },
                     { icon: Shield, label: 'Credentialed' },
                     { icon: FileText, label: 'Auditable' },
-                    { icon: Scale, label: 'CA Bar Verified' },
+                    { icon: Scale, label: 'TX Bar Verified' },
                   ].map(b => (
                     <div key={b.label} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
                       style={{ background: 'rgba(52,211,153,0.06)', border: '1px solid rgba(52,211,153,0.15)' }}>

@@ -80,7 +80,7 @@ export function MarcusDemoModal({ open, onClose }: Props) {
               <h2 className="font-syne font-bold text-[20px] text-[#fafafa]">Marcus Chen</h2>
             </div>
             <p className="text-center font-mono text-[13px] mb-4" style={{ color: '#525252' }}>
-              Managing Partner · Chen & Associates · California
+              Managing Partner · Chen & Associates · Texas
             </p>
 
             <div style={{ borderTop: '1px solid #1a1a1a', marginBottom: 16 }} />
