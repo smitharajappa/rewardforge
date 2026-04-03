@@ -422,7 +422,7 @@ export function Evaluate() {
                   developer: 'Administrator · Your Organization',
                 };
                 const STANDARDS_MAP: Record<string, string> = {
-                  legal: 'California Bar Association Guidelines',
+                  legal: 'State Bar of Texas Guidelines',
                   medical: 'AMA Clinical Documentation Standards',
                   financial: 'CFA Institute Code of Ethics',
                   customer_service: 'Customer Experience Professional Standards',
@@ -443,7 +443,7 @@ export function Evaluate() {
                     : (CERTIFIED_BY_USE_CASE[useCase] || 'Licensed Expert · Your Organization');
 
                 const standards = isDemoMode
-                  ? 'California Bar Association Guidelines · Rule 1.1 Competence'
+                  ? 'State Bar of Texas Guidelines · Rule 1.01 Competent and Diligent Representation'
                   : (STANDARDS_MAP[useCase] || 'Professional industry standards');
 
                 return [

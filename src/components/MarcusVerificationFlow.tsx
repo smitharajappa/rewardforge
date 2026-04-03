@@ -5,33 +5,93 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/context/AppContext';
 
 // ── Taste Test Data ───────────────────────────────────────────
-const TASTE_PAIRS = [
+const ALL_TASTE_PAIRS = [
+  // ── 10 new immigration / international student pairs ──
+  {
+    prompt: 'I am on F-1 OPT and my employer wants me to work as a contractor instead of an employee. Is that allowed?',
+    base: 'F-1 OPT employment regulations vary and students should consult with their international student office and an immigration attorney to understand the specific requirements applicable to their situation.',
+    lexai: 'This is a red flag. USCIS requires OPT employment to be directly related to your field of study, but contractor status can create problems with your OPT authorization. USCIS looks at whether you have a qualifying employer relationship. A contractor arrangement without a clear employer of record has led to status violations for other students. Get this in writing from your employer and have an attorney review it before you sign anything.',
+  },
+  {
+    prompt: 'I have DACA status. Can I get a Texas driver\'s license and use it to travel?',
+    base: 'DACA recipients have certain rights that vary by state. You should consult with an immigration attorney about your specific situation and what identification documents you may be eligible for in your state.',
+    lexai: 'Yes. Texas allows DACA recipients to obtain a Texas driver\'s license. The license is marked Federal Limits Apply which means it cannot be used for federal identification at TSA. For domestic air travel you need a passport. For driving, employment verification, and most state purposes, your Texas license is fully valid.',
+  },
+  {
+    prompt: 'My employer terminated me while I am on H-1B. I have 60 days. What should I do right now?',
+    base: 'H-1B holders who lose their job have a grace period during which they may take certain actions. You should consult with an immigration attorney immediately to understand your options.',
+    lexai: 'You have a 60-day grace period from your termination date — not from when HR told you. Three things need to happen in parallel right now. Get your termination date in writing today. Contact an immigration attorney within 48 hours — not next week. Start the job search immediately because a new employer will need to file an H-1B transfer petition, which takes time. If you are in Texas, your employer must pay your final wages within six calendar days of termination. Do you need help understanding what a transfer petition looks like?',
+  },
+  {
+    prompt: 'I am an international student on F-1 and I was arrested last night. What happens to my visa?',
+    base: 'An arrest can have immigration consequences for international students. The specific impact depends on the charges and the outcome of the case. You should consult with both a criminal defense attorney and an immigration attorney.',
+    lexai: 'An arrest does not automatically affect your F-1 status — a conviction might. The distinction matters enormously. Do not discuss what happened with anyone except your attorney, including your university\'s international student office, which is not bound by attorney-client privilege. You need two attorneys: one for the criminal matter and one for immigration, and they need to coordinate. A plea deal that looks minor in criminal court can trigger mandatory deportation in immigration law. Do not accept any plea without immigration counsel reviewing it first. This is urgent.',
+  },
+  {
+    prompt: 'My landlord found out I am undocumented and is threatening to report me to ICE if I do not move out. What are my rights?',
+    base: 'Undocumented individuals have certain legal rights. You should consult with a legal aid organization or attorney who specializes in immigration and tenant rights.',
+    lexai: 'What your landlord is doing is illegal in Texas. Texas Property Code protects tenants from retaliation, and using immigration threats to coerce a tenant into vacating is considered coercion and potentially extortion under Texas Penal Code. You have the right to remain in your home, the right to withhold your immigration status from your landlord, and the right to file a complaint. Document every threat — screenshot texts, save voicemails. This is a strong case.',
+  },
+  {
+    prompt: 'I graduated in May and my OPT expires in August. I applied for STEM OPT but my employer has not submitted E-Verify enrollment yet. What should I do?',
+    base: 'STEM OPT extensions require both student and employer action within specific timeframes. You should work with your international student advisor and employer to ensure all requirements are met before your current OPT expires.',
+    lexai: 'This is a timing problem you need to solve in the next few days. Your employer must be enrolled in E-Verify before USCIS will approve your STEM extension. Contact your employer\'s HR department today and ask for the E-Verify company ID number as proof of enrollment. If they are not enrolled, they need to start now — it takes approximately 3 business days. Your DSO also needs to issue a new I-20 before you file. If your OPT expires while your extension is pending and you filed on time, you have a 180-day cap-gap period. What date exactly does your current OPT end?',
+  },
+  {
+    prompt: 'My employer has not paid me for three weeks and told me they will call immigration if I complain. I am undocumented. Do I have any options?',
+    base: 'Workers have certain rights regardless of immigration status. There are organizations that can help undocumented workers recover unpaid wages. You should consult with a workers rights organization.',
+    lexai: 'You are owed every dollar of those three weeks regardless of your immigration status. Texas law and federal law explicitly protect undocumented workers\' right to wages. Your employer threatening to report you as retaliation for a wage claim is itself illegal. You can file a claim with the Texas Workforce Commission without disclosing your immigration status — they do not ask and do not share information with ICE. You may also be entitled to additional penalties. Do not let the threat stop you — it is designed to.',
+  },
+  {
+    prompt: 'I am a permanent resident and was convicted of a misdemeanor five years ago. Can I still apply for a Texas nursing license?',
+    base: 'Professional licensing boards consider criminal history as part of their application review process. The impact varies depending on the nature of the conviction and the licensing board\'s policies. You should consult with an attorney familiar with professional licensing.',
+    lexai: 'Texas reformed professional licensing rules under HB 1342. Licensing boards can no longer automatically deny applications based on a conviction — they must consider the nature of the crime, how long ago it occurred, and evidence of rehabilitation. A single misdemeanor from five years ago is not an automatic bar to a nursing license. The Texas Board of Nursing offers a Declaratory Order process before you apply — you can ask whether your conviction would be disqualifying. I would recommend doing that before submitting the full application.',
+  },
+  {
+    prompt: 'I am on an F-1 visa and I want to marry my US citizen partner. How does this affect my immigration status?',
+    base: 'Marriage to a US citizen can provide a path to permanent residency. The process involves multiple steps and you should consult with an immigration attorney to understand how this affects your current F-1 status.',
+    lexai: 'Marriage to a US citizen makes you an immediate relative — the strongest family immigration category with no annual cap. You generally have two paths: adjust status in the US by filing Form I-485 while you are here legally, or apply for an immigrant visa at a consulate abroad. Adjusting status in the US is usually faster and lets you stay. While pending, you can apply for a work permit and travel authorization. One important note: if you have ever worked without authorization or violated your F-1 status, those issues need to be addressed before filing. When are you planning to marry?',
+  },
+  {
+    prompt: 'My DACA expires in two months. My employer says I might lose my job if I cannot show a renewed EAD. Is that legal?',
+    base: 'DACA recipients need to ensure timely renewal of their employment authorization documents. Employers have certain obligations under employment law. You should consult with an immigration attorney about your renewal timeline and with an employment attorney about your employer\'s obligations.',
+    lexai: 'Your employer is allowed to verify ongoing work authorization — that part is legal. But here is what protects you: if you file your DACA renewal at least 150 days before expiration, USCIS automatically extends your current EAD by up to 180 days while renewal is pending. You can show your employer the USCIS receipt notice plus your expiring EAD as proof of continued authorization — this is documented in I-9 Supplement B. If your employer threatens termination despite valid automatic extension documentation, that may constitute discrimination under the Immigration and Nationality Act. File your renewal this week if you have not already.',
+  },
+  // ── 5 original pairs ──
   {
     prompt: 'My landlord hasn\'t returned my deposit after 30 days',
     base: 'The security deposit laws vary by jurisdiction and tenants may have various remedies available under applicable statutes governing landlord-tenant relationships.',
-    lexai: 'In California, your landlord had 21 days to return your deposit or send an itemized statement. They have missed that deadline. You likely have a claim for up to 2x the deposit amount. I would recommend a demand letter first.',
+    lexai: 'In Texas, your landlord had 30 days to return your deposit or send an itemized statement of deductions under Texas Property Code Section 92.103. They have missed that deadline. You likely have a claim for up to 3x the deposit amount plus $100 and attorney fees. I would recommend a demand letter first.',
   },
   {
     prompt: 'Can I record my boss without them knowing?',
     base: 'Recording laws differ between states. Some require all-party consent while others only require one-party consent depending on applicable wiretapping statutes.',
-    lexai: 'California is a two-party consent state. Recording without permission is illegal and could expose you to criminal liability. There are legal ways to document workplace issues — let me walk you through them.',
+    lexai: 'Texas is a one-party consent state. Under Texas Penal Code Section 16.02, you can legally record a conversation you are a party to without telling the other person. This means recording your boss in a conversation you are participating in is legal. There are legal ways to document workplace issues — let me walk you through best practices.',
   },
   {
     prompt: 'My contractor didn\'t finish the job but I already paid',
     base: 'Disputes with contractors can be resolved through multiple legal channels depending on the nature of the agreement and applicable contract law in your jurisdiction.',
-    lexai: 'Send a formal written demand giving them 10 days to cure. If they do not respond, small claims court handles up to $12,500 in California with no attorney needed. How much was the contract?',
+    lexai: 'Send a formal written demand giving them 10 days to cure. If they do not respond, small claims court handles up to $20,000 in Texas with no attorney needed. How much was the contract?',
   },
   {
     prompt: 'I was fired the day I filed an HR complaint',
     base: 'Wrongful termination claims depend on the timing and documentation of events surrounding the termination and applicable employment law statutes.',
-    lexai: 'The timing here is significant. Termination within days of an HR complaint is a classic retaliation pattern California law explicitly protects against. Document everything now: dates, witnesses, communications.',
+    lexai: 'The timing here is significant. Termination within days of an HR complaint is a classic retaliation pattern that Texas law explicitly protects against under the Texas Labor Code anti-retaliation provisions. Document everything now: dates, witnesses, communications.',
   },
   {
     prompt: 'I signed a non-compete — can I work for a competitor?',
     base: 'Non-compete agreements are enforced differently across jurisdictions and the specific terms of the agreement must be reviewed under applicable law.',
-    lexai: 'Good news — California essentially bans non-competes. Under Business and Professions Code 16600, almost all non-competes are unenforceable here regardless of what the contract says. You are generally free to work for a competitor.',
+    lexai: 'Texas does enforce non-competes but only if they are reasonable in scope, geography, and duration — and only if they are ancillary to an otherwise enforceable agreement. Under Texas Business and Commerce Code Section 15.50, courts can reform overly broad non-competes. Many Texas non-competes are successfully challenged. Send me the specific language and I can assess the real risk.',
   },
 ];
+
+// Shuffle and pick 5 pairs for each demo session
+function shuffleAndPick(arr: typeof ALL_TASTE_PAIRS, count: number) {
+  const shuffled = [...arr].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+}
+
+const TASTE_PAIRS = shuffleAndPick(ALL_TASTE_PAIRS, 5);
 
 // ── Checklist Data ────────────────────────────────────────────
 const CHECKLIST_ITEMS = [
@@ -46,9 +106,9 @@ const CHECKLIST_ITEMS = [
     response: 'I cannot predict case outcomes — no one honestly can. What I can do is help you understand the relevant law, your strongest arguments, and what evidence would help your position.',
   },
   {
-    label: 'AI cites California law when relevant',
+    label: 'AI cites Texas law when relevant',
     prompt: 'What is the statute of limitations for breach of contract?',
-    response: 'In California, the statute of limitations for written contracts is 4 years under Code of Civil Procedure Section 337. For oral contracts it is 2 years under CCP Section 339.',
+    response: 'In Texas, the statute of limitations for written contracts is 4 years under Texas Civil Practice and Remedies Code Section 16.004. For oral contracts it is also 4 years under the same statute.',
   },
   {
     label: 'AI maintains attorney-client confidentiality standards',
@@ -212,7 +272,7 @@ export function MarcusVerificationFlow({ onClose }: { onClose: () => void }) {
           {/* ════════ CHECKLIST ════════ */}
           {step === 'checklist' && (
             <motion.div key="checklist" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
-              <h2 className="font-syne font-extrabold text-xl text-[#fafafa] mb-1">CA Bar Compliance Review</h2>
+              <h2 className="font-syne font-extrabold text-xl text-[#fafafa] mb-1">TX Bar Compliance Review</h2>
               <p className="font-mono text-[12px] mb-6" style={{ color: '#525252' }}>
                 Run each test to verify LexAI meets professional standards.
               </p>
@@ -306,11 +366,11 @@ export function MarcusVerificationFlow({ onClose }: { onClose: () => void }) {
                     </div>
                     <div>
                       <span className="font-mono text-[10px] uppercase tracking-wider" style={{ color: '#525252' }}>Professional Standards</span>
-                      <p className="text-[13px] text-[#fafafa] mt-1">California Bar Association Guidelines · Rule 1.1 Competence</p>
+                      <p className="text-[13px] text-[#fafafa] mt-1">State Bar of Texas Guidelines · Rule 1.01 Competent and Diligent Representation</p>
                       <p className="text-[12px] mt-1" style={{ color: '#34d399' }}>5/5 compliance items verified by Marcus Chen personally</p>
                     </div>
                     <div>
-                      <span className="font-mono text-[10px] uppercase tracking-wider" style={{ color: '#525252' }}>CA Bar Number</span>
+                      <span className="font-mono text-[10px] uppercase tracking-wider" style={{ color: '#525252' }}>TX Bar Number</span>
                       <p className="text-[15px] font-syne font-semibold text-[#fafafa] mt-1">#2891047 · 50 years experience</p>
                     </div>
                   </div>
@@ -346,7 +406,7 @@ export function MarcusVerificationFlow({ onClose }: { onClose: () => void }) {
                     { icon: Lock, label: 'Private' },
                     { icon: Shield, label: 'Credentialed' },
                     { icon: FileText, label: 'Auditable' },
-                    { icon: Scale, label: 'CA Bar Verified' },
+                    { icon: Scale, label: 'TX Bar Verified' },
                   ].map(b => (
                     <div key={b.label} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
                       style={{ background: 'rgba(52,211,153,0.06)', border: '1px solid rgba(52,211,153,0.15)' }}>

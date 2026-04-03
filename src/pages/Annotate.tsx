@@ -105,7 +105,7 @@ function UploadScreen({ onGenerate }: { onGenerate: (text: string) => void }) {
     : (FAQ_LABEL[useCase] || 'Use example FAQ →');
 
   const faqSubtitle = isDemoMode
-    ? "47 questions from a California law firm"
+    ? "47 questions from a Texas law firm"
     : (FAQ_SUBTITLE[useCase] || '');
 
   const tryGenerate = (text: string) => {
