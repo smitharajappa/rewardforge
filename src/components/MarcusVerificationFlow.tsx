@@ -106,9 +106,9 @@ const CHECKLIST_ITEMS = [
     response: 'I cannot predict case outcomes — no one honestly can. What I can do is help you understand the relevant law, your strongest arguments, and what evidence would help your position.',
   },
   {
-    label: 'AI cites California law when relevant',
+    label: 'AI cites Texas law when relevant',
     prompt: 'What is the statute of limitations for breach of contract?',
-    response: 'In California, the statute of limitations for written contracts is 4 years under Code of Civil Procedure Section 337. For oral contracts it is 2 years under CCP Section 339.',
+    response: 'In Texas, the statute of limitations for written contracts is 4 years under Texas Civil Practice and Remedies Code Section 16.004. For oral contracts it is also 4 years under the same statute.',
   },
   {
     label: 'AI maintains attorney-client confidentiality standards',
