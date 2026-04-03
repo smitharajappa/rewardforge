@@ -366,7 +366,7 @@ export function MarcusVerificationFlow({ onClose }: { onClose: () => void }) {
                     </div>
                     <div>
                       <span className="font-mono text-[10px] uppercase tracking-wider" style={{ color: '#525252' }}>Professional Standards</span>
-                      <p className="text-[13px] text-[#fafafa] mt-1">California Bar Association Guidelines · Rule 1.1 Competence</p>
+                      <p className="text-[13px] text-[#fafafa] mt-1">State Bar of Texas Guidelines · Rule 1.01 Competent and Diligent Representation</p>
                       <p className="text-[12px] mt-1" style={{ color: '#34d399' }}>5/5 compliance items verified by Marcus Chen personally</p>
                     </div>
                     <div>
